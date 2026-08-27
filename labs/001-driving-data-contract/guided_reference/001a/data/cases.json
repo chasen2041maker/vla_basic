@@ -1,0 +1,295 @@
+{
+  "cases": [
+    {
+      "name": "valid_straight",
+      "expected_valid": true,
+      "sample": {
+        "sample_id": "scene-001@1000",
+        "reference_timestamp_ms": 1000,
+        "coordinate_frame": "ego",
+        "cameras": [
+          {
+            "name": "front",
+            "timestamp_ms": 1000,
+            "image_ref": "synthetic://scene-001/front/1000"
+          },
+          {
+            "name": "front_left",
+            "timestamp_ms": 990,
+            "image_ref": "synthetic://scene-001/front_left/990"
+          },
+          {
+            "name": "front_right",
+            "timestamp_ms": 1010,
+            "image_ref": "synthetic://scene-001/front_right/1010"
+          }
+        ],
+        "ego_state": {
+          "timestamp_ms": 1000,
+          "x_m": 0.0,
+          "y_m": 0.0,
+          "yaw_rad": 0.0,
+          "speed_mps": 5.0
+        },
+        "future_trajectory": [
+          {
+            "timestamp_ms": 1100,
+            "x_m": 0.5,
+            "y_m": 0.0,
+            "yaw_rad": 0.0
+          },
+          {
+            "timestamp_ms": 1200,
+            "x_m": 1.0,
+            "y_m": 0.0,
+            "yaw_rad": 0.0
+          },
+          {
+            "timestamp_ms": 1300,
+            "x_m": 1.5,
+            "y_m": 0.0,
+            "yaw_rad": 0.0
+          }
+        ]
+      }
+    },
+    {
+      "name": "valid_left_turn",
+      "expected_valid": true,
+      "sample": {
+        "sample_id": "scene-002@2000",
+        "reference_timestamp_ms": 2000,
+        "coordinate_frame": "ego",
+        "cameras": [
+          {
+            "name": "front",
+            "timestamp_ms": 2000,
+            "image_ref": "synthetic://scene-002/front/2000"
+          },
+          {
+            "name": "front_left",
+            "timestamp_ms": 1988,
+            "image_ref": "synthetic://scene-002/front_left/1988"
+          },
+          {
+            "name": "front_right",
+            "timestamp_ms": 2009,
+            "image_ref": "synthetic://scene-002/front_right/2009"
+          }
+        ],
+        "ego_state": {
+          "timestamp_ms": 2000,
+          "x_m": 0.0,
+          "y_m": 0.0,
+          "yaw_rad": 0.0,
+          "speed_mps": 3.0
+        },
+        "future_trajectory": [
+          {
+            "timestamp_ms": 2100,
+            "x_m": 0.3,
+            "y_m": 0.01,
+            "yaw_rad": 0.02
+          },
+          {
+            "timestamp_ms": 2200,
+            "x_m": 0.6,
+            "y_m": 0.05,
+            "yaw_rad": 0.08
+          },
+          {
+            "timestamp_ms": 2300,
+            "x_m": 0.88,
+            "y_m": 0.13,
+            "yaw_rad": 0.16
+          }
+        ]
+      }
+    },
+    {
+      "name": "duplicate_camera_name",
+      "expected_valid": false,
+      "sample": {
+        "sample_id": "scene-003@3000",
+        "reference_timestamp_ms": 3000,
+        "coordinate_frame": "ego",
+        "cameras": [
+          {
+            "name": "front",
+            "timestamp_ms": 3000,
+            "image_ref": "synthetic://scene-003/front/3000"
+          },
+          {
+            "name": "front",
+            "timestamp_ms": 3002,
+            "image_ref": "synthetic://scene-003/front-duplicate/3002"
+          }
+        ],
+        "ego_state": {
+          "timestamp_ms": 3000,
+          "x_m": 0.0,
+          "y_m": 0.0,
+          "yaw_rad": 0.0,
+          "speed_mps": 2.0
+        },
+        "future_trajectory": [
+          {
+            "timestamp_ms": 3100,
+            "x_m": 0.2,
+            "y_m": 0.0,
+            "yaw_rad": 0.0
+          },
+          {
+            "timestamp_ms": 3200,
+            "x_m": 0.4,
+            "y_m": 0.0,
+            "yaw_rad": 0.0
+          }
+        ]
+      }
+    },
+    {
+      "name": "trajectory_time_not_increasing",
+      "expected_valid": false,
+      "sample": {
+        "sample_id": "scene-004@4000",
+        "reference_timestamp_ms": 4000,
+        "coordinate_frame": "ego",
+        "cameras": [
+          {
+            "name": "front",
+            "timestamp_ms": 4000,
+            "image_ref": "synthetic://scene-004/front/4000"
+          },
+          {
+            "name": "front_left",
+            "timestamp_ms": 3995,
+            "image_ref": "synthetic://scene-004/front_left/3995"
+          }
+        ],
+        "ego_state": {
+          "timestamp_ms": 4000,
+          "x_m": 0.0,
+          "y_m": 0.0,
+          "yaw_rad": 0.0,
+          "speed_mps": 4.0
+        },
+        "future_trajectory": [
+          {
+            "timestamp_ms": 4100,
+            "x_m": 0.4,
+            "y_m": 0.0,
+            "yaw_rad": 0.0
+          },
+          {
+            "timestamp_ms": 4100,
+            "x_m": 0.8,
+            "y_m": 0.0,
+            "yaw_rad": 0.0
+          },
+          {
+            "timestamp_ms": 4300,
+            "x_m": 1.2,
+            "y_m": 0.0,
+            "yaw_rad": 0.0
+          }
+        ]
+      }
+    },
+    {
+      "name": "camera_clock_skew",
+      "expected_valid": false,
+      "sample": {
+        "sample_id": "scene-005@5000",
+        "reference_timestamp_ms": 5000,
+        "coordinate_frame": "ego",
+        "cameras": [
+          {
+            "name": "front",
+            "timestamp_ms": 5000,
+            "image_ref": "synthetic://scene-005/front/5000"
+          },
+          {
+            "name": "front_left",
+            "timestamp_ms": 4750,
+            "image_ref": "synthetic://scene-005/front_left/4750"
+          },
+          {
+            "name": "front_right",
+            "timestamp_ms": 5010,
+            "image_ref": "synthetic://scene-005/front_right/5010"
+          }
+        ],
+        "ego_state": {
+          "timestamp_ms": 5000,
+          "x_m": 0.0,
+          "y_m": 0.0,
+          "yaw_rad": 0.0,
+          "speed_mps": 8.0
+        },
+        "future_trajectory": [
+          {
+            "timestamp_ms": 5100,
+            "x_m": 0.8,
+            "y_m": 0.0,
+            "yaw_rad": 0.0
+          },
+          {
+            "timestamp_ms": 5200,
+            "x_m": 1.6,
+            "y_m": 0.0,
+            "yaw_rad": 0.0
+          }
+        ]
+      }
+    },
+    {
+      "name": "future_trajectory_starts_in_past",
+      "expected_valid": false,
+      "sample": {
+        "sample_id": "scene-006@6000",
+        "reference_timestamp_ms": 6000,
+        "coordinate_frame": "ego",
+        "cameras": [
+          {
+            "name": "front",
+            "timestamp_ms": 6000,
+            "image_ref": "synthetic://scene-006/front/6000"
+          },
+          {
+            "name": "front_left",
+            "timestamp_ms": 5990,
+            "image_ref": "synthetic://scene-006/front_left/5990"
+          }
+        ],
+        "ego_state": {
+          "timestamp_ms": 6000,
+          "x_m": 0.0,
+          "y_m": 0.0,
+          "yaw_rad": 0.0,
+          "speed_mps": 6.0
+        },
+        "future_trajectory": [
+          {
+            "timestamp_ms": 5900,
+            "x_m": -0.6,
+            "y_m": 0.0,
+            "yaw_rad": 0.0
+          },
+          {
+            "timestamp_ms": 6100,
+            "x_m": 0.6,
+            "y_m": 0.0,
+            "yaw_rad": 0.0
+          },
+          {
+            "timestamp_ms": 6200,
+            "x_m": 1.2,
+            "y_m": 0.0,
+            "yaw_rad": 0.0
+          }
+        ]
+      }
+    }
+  ]
+}
