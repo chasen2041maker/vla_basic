@@ -1,6 +1,6 @@
-# Migration: Robot Manipulation VLA → Autonomous Driving VLA
+# Migration History
 
-## 为什么重构
+## Migration 1 — Robot Manipulation VLA → Autonomous Driving VLA
 
 旧版仓库的 VLA 指向：
 
@@ -14,22 +14,20 @@ ACT / OpenVLA
 SO-101
 ```
 
-用户明确的目标则是类似小鹏汽车的自动驾驶 VLA：
+用户目标是类似小鹏智能驾驶的自动驾驶 VLA：
 
 ```text
 多相机时序视觉
 自车状态
 导航 / 语义条件
-未来车辆轨迹
+未来车辆轨迹或动作
 驾驶评测
 安全与部署
 ```
 
-两个方向共享“视觉、语言/语义、动作”的抽象，但数据、动作、仿真、评测和安全边界不同，因此不能在同一主线中混学。
+两个方向共享视觉、语言/语义和动作抽象，但数据、动作、仿真、评测和安全边界不同，因此不能混成一条课程。
 
-## 旧内容在哪里
-
-完整旧版保留在：
+旧内容保留在：
 
 ```text
 archive/robot-manipulation-vla-2026-07
@@ -41,26 +39,67 @@ archive/robot-manipulation-vla-2026-07
 2bff8713e215c919b027ee3f8ae434cfb58457d7
 ```
 
-没有删除 Git 历史。
+---
 
-## 保留了什么
+## Migration 2 — Lab-first → Role-driven System-first
 
-保留旧版最有价值的学习思想：
+日期：2026-08-28
 
-- 读懂 → 跑通 → 修改 → 制造失败 → 独立解释；
-- 稳定知识与动态生态分离；
-- 故障实验；
-- 不把运行成功当成掌握；
-- 明确类比失效点；
-- 用证据更新进度。
+### 为什么再次重构
 
-## 替换了什么
+旧路线虽然方向正确，但日常入口直接进入 Lab 001 数据契约，容易把局部 validator 当成课程实质。
 
-- 机械臂本体 → 汽车；
-- qpos / gripper → ego state / trajectory；
-- FK / IK → SE(2) / bicycle model；
-- MuJoCo → lightweight synthetic loop / NAVSIM / CARLA；
-- OXE / LeRobot → nuPlan / NAVSIM 等驾驶生态；
-- 抓取成功率 → safety / progress / comfort / trajectory metrics；
-- SO-101 真机 → 公开数据、仿真、部署与安全边界；
-- LLM tool orchestration 主线 → Driving VLM / VLA 与动作生成主线。
+学习者进一步明确：
+
+- 会常规深度学习模型训练；
+- 学过蒸馏和量化；
+- 未学习强化学习；
+- 视觉、几何、车辆运动、轨迹控制和闭环评测基本不会；
+- 目标是从当前背景成长到类似小鹏智能驾驶研发所需能力。
+
+因此课程必须先回答：
+
+```text
+我要成为什么研发人员？
+完整驾驶系统怎样工作？
+我会什么、缺什么？
+当前局部任务位于哪一层？
+```
+
+### 新增
+
+- `SYSTEM_MENTAL_MODEL.md`：整车智能链路；
+- `SKILL_GAP_MATRIX.md`：USE / VERIFY / LEARN / LATER；
+- `Lab 000`：系统图和 failure boundary；
+- 角色目标、桥梁岗位和作品证据；
+- 蒸馏、量化、部署的驾驶化验证；
+- 强化学习的依赖门槛；
+- CI 对 Lab 000 和 Lab 001 的共同验证。
+
+### 重排
+
+```text
+System Map
+→ Data / Time
+→ Coordinate / Motion
+→ Camera Geometry
+→ Multi-Camera Temporal
+→ Trajectory Model
+→ Open / Closed Loop
+→ Public Stack
+→ Driving VLA
+→ Action Representation
+→ Distill / Quantize / Deploy
+→ Safety
+→ RL / World Model
+```
+
+### 保留
+
+- Lab 001A 的可运行 4/6 intentional baseline；
+- 读懂 → 运行 → 修改 → 故障 → 测试 → 解释；
+- evidence-based progression；
+- 公开复现与闭源量产的边界；
+- 不从空白重复写低价值样板。
+
+这次重构不删除有效代码，而是给现有 Lab 增加正确的系统上下文和依赖顺序。

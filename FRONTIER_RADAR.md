@@ -1,8 +1,8 @@
 # Frontier Radar — Autonomous Driving VLA
 
-最后核对：2026-08-27
+最后核对：2026-08-28
 
-这份文件记录会快速变化的模型、工具和产业方向。稳定知识放在课程和 labs，不在这里重复。
+这份文件记录快速变化的模型、工具和产业方向。稳定知识放在课程和 labs，不在这里重复。
 
 状态：
 
@@ -17,31 +17,33 @@ ADOPT   作为主线工具或基准
 
 | 方向 / 项目 | 状态 | 为什么 | 当前行动 |
 |---|---|---|---|
-| XPENG VLA 2.0 | WATCH | 量产驾驶方向的重要架构参考，但完整代码、权重和训练栈未公开 | 学习公开架构思想，不声称复现 |
-| XPENG X-World | WATCH | 多视角驾驶世界模型，面向数据生成、闭环验证和系统演进 | Lab 009 再研究 |
-| XPENG X-Mind | WATCH | 强调预测与可解释视觉推理 | 关注 reasoning-action consistency |
-| AutoVLA | TRIAL | 公开 Driving VLA 实现，包含轨迹 action token 与自适应推理路线 | Lab 007/008 候选复现对象 |
-| NVIDIA Alpamayo 系列 | WATCH | 开放 reasoning VLA，模型规模和硬件门槛较高，生态仍快速变化 | 先读接口和评测，再决定试跑 |
-| NAVSIM | ADOPT | 公开、可复现的驾驶规划评测主线，适合建立 open/pseudo-closed-loop 证据 | Lab 006 |
-| CARLA | WATCH | 交互式闭环仿真价值高，但环境重，不适合第一阶段 | Lab 005 后再引入 |
-| nuPlan devkit | WATCH | 规划数据与仿真基础，常与 NAVSIM 生态连接 | 按 NAVSIM 需要使用 |
+| XPENG 第二代 VLA | WATCH | 目标公司方向的重要系统参考，但完整训练栈和量产代码未公开 | 学习公开输入、动作、延迟和闭环信号，不声称复现 |
+| XPENG X-World | WATCH | 已公开用于闭环仿真、在线 RL、数据生成和模型评估 | Lab 012 前只理解作用，不提前做重型复现 |
+| FastDriveVLA / token pruning | WATCH | 直接关联车端视觉 token 效率和部署 | Lab 010 做公开可验证的代理实验 |
+| XPENG 数据价值岗位能力 | WATCH | 说明数据分析、价值评估、场景发现和数据流转是现实桥梁能力 | 在 Lab 001/006/007 增加数据价值证据 |
+| NAVSIM | ADOPT | 公开、可复现的驾驶规划评测主线 | Lab 007 |
+| AutoVLA | TRIAL | 公开 Driving VLA 候选，可用于 action token 与推理实验 | Lab 008/009 前重新核对 commit 和许可 |
+| CARLA | WATCH | 交互式闭环价值高，但环境重 | Lab 006 后按需要引入 |
+| nuPlan devkit | WATCH | 规划数据和仿真生态的重要基础 | 按 NAVSIM / evaluator 需要使用 |
+| World Model + Online RL | WATCH | 方向重要，但依赖闭环 evaluator 和 safety | Lab 012，不提前背算法名 |
 | Robot Manipulation VLA | IGNORE | OpenVLA、π0、LeRobot 的机械臂知识不是当前主线 | 仅在动作表示类比时引用 |
-| 自建真实车辆实验 | IGNORE | 安全、合规和成本不适合作为个人学习验收 | 使用公开数据和仿真 |
+| 自建真实车辆实验 | IGNORE | 安全、合规和成本不适合作为个人验收 | 使用公开数据、合成实验和仿真 |
 
-## 官方来源
+## 官方与公开来源
 
 ### XPENG
 
-- VLA 2.0：<https://www.xpeng.com/pressroom/news/019cae5e67b99c0960ee8a028129016a>
-- VLA 2.0 架构发布：<https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7>
-- X-World：<https://www.xpeng.com/news/019dd72da86c9dd703de8a0282290002>
-- X-Mind：<https://www.xpeng.com/news/019f12539bff9f1220b48a028223000e>
+- 27 届 VLA/VLM 算法岗位：<https://xiaopeng.jobs.feishu.cn/campus/position/7658239744397347110/detail>
+- 27 届数据价值算法岗位：<https://xiaopeng.jobs.feishu.cn/campus/position/7658239755088447770/detail>
+- 大模型算法工程师（智驾/机器人）：<https://xiaopeng.jobs.feishu.cn/campus/m/position/7668513578471475462/detail>
+- 世界模型及环境感知岗位：<https://xiaopeng.jobs.feishu.cn/campus/m/position/7658239755087759642/detail>
+- X-World：<https://www.xiaopeng.com/news/company_news/5548.html>
+- FastDriveVLA：<https://www.xiaopeng.com/news/company_news/5526.html>
 
 ### Public Reproduction Targets
 
-- AutoVLA：<https://github.com/ucla-mobility/AutoVLA>
 - NAVSIM：<https://github.com/autonomousvision/navsim>
-- NVIDIA Alpamayo：<https://github.com/NVlabs/alpamayo>
+- AutoVLA：<https://github.com/ucla-mobility/AutoVLA>
 
 ## 进入主线前的检查
 
@@ -56,15 +58,18 @@ ADOPT   作为主线工具或基准
 最低硬件
 能否只跑推理
 能否在 mini 数据上评测
-动作输出语义
+输入时间与坐标契约
+action 输出语义
 评测协议
+延迟和资源要求
 我是否亲自验证
 ```
 
-“读过论文”或“看过 demo”不能把状态改为 `ADOPT`。
+“读过论文”“看过 Demo”或“公司宣传效果很好”不能把状态改为 `ADOPT`。
 
 ## 更新日志
 
 | 日期 | 变化 | 依据 |
 |---|---|---|
-| 2026-08-27 | 仓库从机器人操作 VLA 重构为自动驾驶 VLA；建立 XPENG 方向参考、AutoVLA 复现、NAVSIM 评测三层关系 | 官方项目与公开仓库 |
+| 2026-08-28 | 路线从 lab-first 改为 role-driven、system-first；加入数据价值、无 Agent 调试、世界模型闭环和车端效率信号 | 公开岗位与官方技术资料 |
+| 2026-08-27 | 仓库从机器人操作 VLA 重构为自动驾驶 VLA | 官方项目与公开仓库 |
