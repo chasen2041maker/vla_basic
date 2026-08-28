@@ -4,355 +4,372 @@
 
 建立一套可迁移的自动驾驶 VLA 工程能力，而不是完成固定教程。
 
-主线必须始终回答：
+主线始终回答：
 
 ```text
-模型看到了什么？
-这些输入是什么时间、什么坐标？
+系统现在看到了什么？
+输入是什么时间、什么坐标？
 模型输出的 action 到底是什么？
-action 怎样影响车辆状态？
+action 怎样经过安全和控制影响车辆？
 如何证明行为正确？
-失败发生在 data、model、decode、control 还是 eval？
+失败位于 data、representation、model、decode、control、eval 还是 system？
 ```
 
 ---
 
-# 能力轴
-
-## 轴 A：Driving Foundations
-
-- 时间戳与同步；
-- 坐标系与 SE(2)；
-- trajectory / waypoint / control；
-- 运动学自行车模型；
-- 轨迹可行性；
-- 最低必要控制直觉。
-
-## 轴 B：VLA & Model Engineering
-
-- 多相机时序输入；
-- ego-state / route conditioning；
-- imitation learning；
-- VLM / VLA；
-- action token / continuous head；
-- reasoning / implicit token；
-- world model；
-- fine-tuning / inference。
-
-## 轴 C：Evaluation & Reliability
-
-- contract validation；
-- deterministic evaluator；
-- open-loop；
-- closed-loop / pseudo-simulation；
-- failure taxonomy；
-- ODD / safety monitor / fallback；
-- latency / stale observation；
-- reproducibility / observability。
-
-三条轴不是三套独立课程。每个 lab 用一个真实问题同时推进。
-
----
-
-# 阶段路线
-
-## Stage 0 — Scope & Mental Model
-
-### 必须理解
-
-- 模块化自动驾驶、端到端驾驶、Driving VLM、Driving VLA、world model 的区别；
-- 小鹏式量产方向只能作为架构参考；
-- 公开复现主线应依赖公开代码、数据和评测。
-
-### 证据
-
-能画出：
+# 路线总览
 
 ```text
-sensors + ego + route
-→ representation / reasoning
-→ trajectory
-→ safety / control
-→ environment
-→ next observation
+Layer 0  System Orientation
+Layer 1  Driving Foundations
+Layer 2  Vision & Temporal Representation
+Layer 3  End-to-End Model & Evaluation
+Layer 4  Driving VLA & Action
+Layer 5  Deployment, Safety & Closed-Loop Learning
 ```
+
+课程按依赖和证据解锁，不按固定日期。
 
 ---
 
-## Lab 001 — Driving Data Contract
+## Lab 000 — Driving System Map & Failure Boundaries
 
 ### 核心问题
 
-一条训练/推理样本到底表达什么事实？
+一个驾驶模型如何从相机观测走到真实车辆运动？
 
 ### 内容
 
-- sample / scene / history / future；
-- camera timestamps；
-- ego timestamp；
-- future trajectory；
-- units；
-- coordinate frame；
-- structural validity vs semantic validity；
-- validation trace。
+- sensor → data → representation → model → action → safety → control → environment → eval；
+- 训练链与推理链；
+- open loop 与 closed loop；
+- failure localization；
+- Agent 类比和物理世界失效点。
 
 ### 最小证据
 
-- 运行 baseline；
-- 找出两个 silent contract failures；
-- 增加时间语义检查；
-- tests 证明修复；
-- 能解释为什么程序成功但样本无效。
+- 能画完整系统图；
+- 能说明每层输入、输出、职责和非职责；
+- 能把 stale observation、unsafe trajectory、controller timeout 和 evaluator bug 放到正确边界；
+- 运行 000A reference trace。
 
 ---
 
-## Lab 002 — SE(2), Bicycle Model & Trajectory
+## Lab 001 — Driving Data Contract & Temporal Semantics
 
 ### 核心问题
 
-未来轨迹如何表示，怎样改变车辆状态？
+一条训练或推理样本到底表达什么驾驶事实？
 
 ### 内容
 
-- world ↔ ego；
-- yaw；
-- curvature；
+- scene / frame / sample / history / future；
+- reference time；
+- camera / ego / trajectory timestamps；
+- structural vs semantic validity；
+- units、coordinate frame 和 validation trace。
+
+### 最小证据
+
+- 运行 4/6 intentional baseline；
+- 找出 camera skew 与 future label in past；
+- 增加时间语义检查；
+- tests 证明 before/after；
+- 解释程序成功为什么不等于样本正确。
+
+---
+
+## Lab 002 — Coordinate Frames, Trajectory & Vehicle Motion
+
+### 核心问题
+
+未来轨迹如何表示，怎样经过车辆运动模型改变状态？
+
+### 内容
+
+- world / ego；
+- SE(2)、yaw 和单位；
+- trajectory / waypoint / control；
 - kinematic bicycle；
-- rollout；
-- waypoint spacing；
-- horizon；
-- trajectory vs control。
+- rollout、horizon 和 feasibility。
 
 ### 最小证据
 
 - 手写并测试坐标变换；
 - rollout 一条轨迹；
-- 故意把 yaw 单位写错；
-- 解释模型输出和执行器命令的边界。
+- 注入 degree/radian 故障；
+- 解释模型轨迹与执行器命令边界。
 
 ---
 
-## Lab 003 — Camera Time & BEV Mental Model
+## Lab 003 — Camera Geometry
 
 ### 核心问题
 
-多相机和历史帧如何形成同一个决策时刻的观测？
+二维像素与车辆周围空间如何关联？
 
 ### 内容
 
+- image / camera / ego / world；
 - intrinsics / extrinsics；
-- asynchronous cameras；
-- ego-motion compensation；
-- image / sensor / ego / BEV；
-- stale observation；
-- single-frame vs temporal。
+- projection、depth 和 field of view；
+- calibration error；
+- 教学级 2D/3D 可视化。
 
 ### 最小证据
 
-- 可视化时间轴；
-- 检测 camera skew；
-- 做一次 ego-motion compensation；
-- 注入一帧延迟并解释影响。
+- 投影和逆向射线实验；
+- 坐标 round-trip test；
+- 注入外参或单位错误；
+- 解释数值合理但空间错误的症状。
 
 ---
 
-## Lab 004 — Imitation-Learning Trajectory Baseline
+## Lab 004 — Multi-Camera Temporal Modeling & BEV Mental Model
 
 ### 核心问题
 
-不用 VLA，最小模型能否从输入预测未来轨迹？
+异步多相机和历史帧如何形成同一个决策时刻的表征？
+
+### 内容
+
+- camera skew；
+- history window；
+- ego-motion compensation；
+- feature/token fusion；
+- BEV / occupancy 的输入输出和假设；
+- stale observation。
+
+### 最小证据
+
+- 可视化多相机时间轴；
+- 做一次运动补偿；
+- 注入一帧延迟；
+- 解释简单拼接为什么不等于空间融合。
+
+---
+
+## Lab 005 — End-to-End Trajectory Learning Baseline
+
+### 核心问题
+
+如何把已有深度学习能力迁移为一个可信的驾驶轨迹模型？
 
 ### 内容
 
 - dataset split；
-- normalized input / target；
-- small encoder + trajectory head；
-- overfit 32 samples；
-- loss vs behavior；
-- leakage checks。
+- image/feature + ego + route input；
+- normalized target；
+- temporal encoder + trajectory head；
+- loss、leakage、overfit 和 inference contract。
 
 ### 最小证据
 
-- 过拟合小样本；
+- 过拟合 32 个样本；
 - 可视化预测与真值；
-- 故意用错 normalization；
-- 新增一个 failure test。
+- 输入消融确实改变输出；
+- 注入 normalization 或 future leakage 故障；
+- 独立修改 head 或 loss。
 
 ---
 
-## Lab 005 — Open-Loop vs Closed-Loop Evaluation
+## Lab 006 — Open-Loop vs Closed-Loop Evaluation
 
 ### 核心问题
 
-为什么离线轨迹看起来不错，闭环仍会失败？
+为什么离线轨迹误差不错，车辆闭环仍可能失败？
 
 ### 内容
 
 - ADE / FDE；
-- collision / progress / comfort；
+- safety / progress / comfort；
 - evaluator tests；
 - compounding error；
-- conservative policy；
-- lightweight closed loop；
-- pseudo-simulation mental model。
+- distribution shift；
+- lightweight closed loop。
 
 ### 最小证据
 
 - 同一策略跑两类评测；
-- 构造开放环好、闭环差的案例；
-- 解释指标投机；
-- 给 evaluator 写单元测试。
+- 构造 open-loop 好、closed-loop 差案例；
+- 证明 evaluator 本身正确；
+- 输出 failure taxonomy。
 
 ---
 
-## Lab 006 — NAVSIM Onboarding
+## Lab 007 — Public Driving Stack / NAVSIM
 
 ### 核心问题
 
-如何在公开自动驾驶评测栈中复现 baseline？
+如何在公开自动驾驶栈中建立可复现 benchmark？
 
 ### 内容
 
-- official data split；
+- official split；
 - agent interface；
 - trajectory output contract；
-- PDMS / evaluation pipeline；
-- environment version；
-- data license；
-- reproducible config。
+- evaluation pipeline；
+- environment / commit / config / license；
+- mini-data reproducibility。
 
 ### 最小证据
 
-- 跑通 mini split；
-- 记录 commit / environment / result；
+- 跑通公开 mini split；
+- 记录环境和 commit；
 - 可视化一条预测；
-- 复现官方 baseline 的合理范围。
+- 复现合理 baseline 范围；
+- 定位一次数据或评测问题。
 
 ---
 
-## Lab 007 — Driving VLM / VLA
+## Lab 008 — Driving VLM / VLA
 
 ### 核心问题
 
-语言、视觉、状态和动作怎样进入统一模型？
+视觉、状态、导航、语言和动作怎样进入统一模型？
 
 ### 内容
 
-- visual tokens；
-- route / instruction；
-- ego-state token；
-- action token；
+- visual token；
+- temporal token；
+- ego / route conditioning；
+- VLM / VLA；
 - direct trajectory vs reasoning；
-- fast / slow reasoning；
-- conditioning ablation。
+- fast/slow path；
+- public checkpoint or proxy experiment。
 
 ### 最小证据
 
-- 跑通公开 checkpoint 或最小代理实验；
-- 证明语言/route 是否影响输出；
-- 无意义指令实验；
-- 记录延迟和动作解码。
+- 跑通公开实现或最小代理；
+- conditioning ablation；
+- 无意义指令或冲突条件实验；
+- 记录 action decode 与 latency；
+- 解释 reasoning 正确但 action 错误的风险。
 
 ---
 
-## Lab 008 — Action Representation
+## Lab 009 — Action Representation
 
 ### 核心问题
 
-离散 action token、连续回归、diffusion/flow 有何边界？
+离散 token、连续回归、diffusion/flow 轨迹头分别买来了什么？
 
 ### 内容
 
 - trajectory codebook；
 - quantization error；
-- multi-modality；
 - action horizon；
-- decode consistency；
-- physical feasibility。
+- multi-modality；
+- continuous / token / diffusion / flow；
+- decode consistency 与 feasibility。
 
 ### 最小证据
 
-- 编码/解码测试；
+- encode/decode tests；
 - 量化误差上界；
 - 错 codebook 故障；
-- 与任务精度对比。
+- 至少两类 action 表示对比。
 
 ---
 
-## Lab 009 — Reasoning, World Models & Long Tail
+## Lab 010 — Distillation, Quantization & Deployment
 
 ### 核心问题
 
-显式推理、隐式 token 和世界模型到底解决什么？
+怎样把大模型能力压到可运行系统，并证明行为没有被破坏？
 
 ### 内容
 
-- CoT / Chain-of-Causation；
-- visual reasoning；
-- implicit latent；
-- future prediction；
-- synthetic long-tail data；
-- reasoning-action consistency；
-- hallucinated rationale。
+- teacher/student target；
+- feature / logit / trajectory distillation；
+- PTQ / QAT；
+- token pruning；
+- preprocessing / inference / decode latency；
+- memory、throughput 和 stale deadline。
 
 ### 最小证据
 
-- reasoning ablation；
-- rationale 与 action 冲突案例；
-- 合成长尾场景；
-- 明确何种结果会推翻当前假设。
+- 一次驾驶任务蒸馏；
+- 一次量化或剪枝；
+- accuracy + behavior + latency + memory 对比；
+- 弯道、长尾或小概率场景回归；
+- 明确 rollback 条件。
 
 ---
 
-## Lab 010 — Safety Boundary & ODD
+## Lab 011 — Safety, ODD & Observability
 
 ### 核心问题
 
-端到端模型外面还需要哪些不可省略的边界？
+端到端模型外面哪些边界不可省略？
 
 ### 内容
 
 - ODD；
 - trajectory safety checker；
-- timeout；
-- sensor missing；
-- fallback；
-- minimum-risk behavior；
-- SOTIF mental model；
-- evidence log。
+- timeout / stale / sensor missing；
+- fallback / minimum-risk behavior；
+- logs / metrics / trace；
+- model/data/config version；
+- regression gate。
 
 ### 最小证据
 
-- 定义 allow / fallback / stop 条件；
-- 注入过期观测；
-- 注入不可行轨迹；
-- 测误报和漏报。
+- 定义 allow / reject / fallback；
+- 注入过期观测和不可行轨迹；
+- 测误报、漏报和超时；
+- 可复现一次线上式 failure trace。
 
 ---
 
-## Lab 011 — Deployment & Observability
+## Lab 012 — Reinforcement Learning, World Model & Long Tail
 
 ### 核心问题
 
-模型怎样在延迟和资源约束下稳定运行？
+闭环强化学习和世界模型到底解决什么，何时值得增加复杂度？
+
+### 前置条件
+
+必须先理解并验证：
+
+```text
+state
++ action
++ transition / rollout
++ reward / metric
++ closed-loop evaluator
++ safety boundary
+```
 
 ### 内容
 
-- preprocessing / inference / decode / control latency；
-- batching；
-- quantization；
-- TensorRT / ONNX 的适用边界；
-- model/data/config version；
-- logs / metrics / traces；
-- regression eval。
+- behavior cloning ceiling；
+- offline / online RL mental model；
+- reward design and reward hacking；
+- PPO / DPO / GRPO 只按任务需要引入；
+- controllable world model；
+- synthetic long-tail data；
+- sim-to-real / model bias；
+- reasoning-action consistency。
 
 ### 最小证据
 
-- latency breakdown；
-- overrun detection；
-- before/after benchmark；
-- 可复现实验清单；
-- rollback 条件。
+- 一个最小闭环 policy improvement 实验；
+- reward hacking failure；
+- world-model bias 或 rollout drift 实验；
+- 明确何种证据会推翻当前方案。
+
+---
+
+# 横向能力线
+
+以下内容不单独变成名词课，而是嵌入各 Lab：
+
+- 数学：线性代数、概率、优化、几何；
+- C++：数据结构、推理接口、性能和并发；
+- 论文：问题、假设、方法、证据和复现边界；
+- 工程：Linux、Git、CI、profiling、版本和可观测性；
+- 沟通：系统图、实验报告、failure analysis 和 design decision。
 
 ---
 
@@ -361,25 +378,26 @@ sensors + ego + route
 一个 Lab 进入 `PASSED` 至少需要：
 
 ```text
-Reference 运行成功
-+ 能画完整数据/执行链
+系统位置解释
++ reference 运行成功
++ 完整数据 / 执行链
 + 一个独立修改
 + 一个 failure experiment
 + tests / eval 证据
-+ 能解释 trade-off
++ trade-off 和失效边界
 ```
 
-论文阅读、视频观看、README 运行成功都不能单独构成 `PASSED`。
+Lab 000A 是读取与系统定位任务，可在尚未修改代码时先通过 `READ` 小步；完整 Lab 000 仍需要后续故障定位证据。
 
 ---
 
 # 当前阶段
 
 ```text
-Lab 001A — Driving Data Contract Baseline
+Lab 000A — Driving System Map Trace
 状态：LEARNING
 ```
 
 精确任务：
 
-- [`labs/001-driving-data-contract/CURRENT_TASK.md`](labs/001-driving-data-contract/CURRENT_TASK.md)
+- [`labs/000-driving-system-map/CURRENT_TASK.md`](labs/000-driving-system-map/CURRENT_TASK.md)

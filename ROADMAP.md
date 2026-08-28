@@ -1,61 +1,77 @@
 # Roadmap
 
-这是一张日常可读的能力地图。完整要求见 `MASTER_GROWTH_PLAN.md`。
+这是日常可读的能力地图。完整要求见 `MASTER_GROWTH_PLAN.md`。
 
 | Lab | 主题 | 状态 | 主要产出 | 最小独立证据 |
 |---|---|---|---|---|
-| 000 | Scope / System Map | REVIEW | 驾驶 VLA 系统图 | 能区分模型、轨迹、控制和评测 |
-| 001 | Driving Data Contract | **LEARNING** | 可验证驾驶样本 | 时间/坐标语义检查 + fault |
-| 002 | SE(2) / Bicycle / Trajectory | LOCKED | 轨迹 rollout | 坐标变换与 yaw 故障 |
-| 003 | Camera Time / BEV | LOCKED | 多传感器时间轴 | skew + stale observation |
-| 004 | Imitation Baseline | LOCKED | 小型轨迹模型 | overfit 32 samples |
-| 005 | Open / Closed Loop Eval | LOCKED | 双评测报告 | 构造指标背离案例 |
-| 006 | NAVSIM | LOCKED | 公开 benchmark baseline | mini split 复现 |
-| 007 | Driving VLM / VLA | LOCKED | 公开 checkpoint 实验 | conditioning ablation |
-| 008 | Action Representation | LOCKED | token/continuous 对比 | encode/decode + error |
-| 009 | Reasoning / World Model | LOCKED | 假设实验 | rationale-action consistency |
-| 010 | Safety / ODD / Fallback | LOCKED | safety boundary | stale/unsafe injection |
-| 011 | Deployment / Observability | LOCKED | latency/eval pipeline | regression evidence |
+| 000 | System Map / Failure Boundaries | **LEARNING** | 整车执行链与故障定位 | 4 场景 trace + 系统图 |
+| 001 | Data Contract / Time Semantics | QUEUED | 可验证驾驶样本 | 两类 silent failure + 修复 |
+| 002 | Coordinates / Trajectory / Motion | LOCKED | SE(2) 与 rollout | round-trip + yaw fault |
+| 003 | Camera Geometry | LOCKED | 投影与标定 mental model | projection + extrinsic fault |
+| 004 | Multi-Camera Temporal / BEV | LOCKED | 对齐后的时序表征 | skew + motion compensation |
+| 005 | Trajectory Learning Baseline | LOCKED | 小型端到端模型 | overfit + leakage/ablation |
+| 006 | Open / Closed Loop Eval | LOCKED | 双评测和 failure taxonomy | 指标背离案例 |
+| 007 | Public Stack / NAVSIM | LOCKED | 可复现公开 benchmark | mini split + config evidence |
+| 008 | Driving VLM / VLA | LOCKED | 多模态动作实验 | conditioning ablation |
+| 009 | Action Representation | LOCKED | token/continuous 对比 | encode/decode + error bound |
+| 010 | Distill / Quantize / Deploy | LOCKED | 压缩和延迟报告 | behavior + latency + memory |
+| 011 | Safety / ODD / Observability | LOCKED | 系统安全边界 | stale/unsafe/fallback tests |
+| 012 | RL / World Model / Long Tail | LOCKED | 闭环学习假设实验 | reward/model-bias fault |
 
-## 解锁规则
-
-不是按日期解锁，而是按依赖和证据：
+## 主依赖
 
 ```text
-001 PASS
-→ 002
+000 READ
+→ 001
 
-002 + 003 PASS
-→ 004
+001 + 002
+→ 003 / 004
 
-004 PASS
+002 + 004
 → 005
 
-005 PASS
-→ 006 / 007
+005
+→ 006
 
-007 PASS
-→ 008 / 009
+006
+→ 007 / 008
 
-005 + 007 PASS
-→ 010
+008
+→ 009
 
-006 + 010 PASS
-→ 011
+006 + 009
+→ 010 / 011
+
+006 + 011
+→ 012
+```
+
+## 并行验证线
+
+不需要等待所有 Lab 才验证已有能力：
+
+```text
+深度学习训练    在 Lab 005 形成证据
+蒸馏与量化      在 Lab 010 形成证据
+Linux / Git      每次任务持续验证
+无 Agent 调试    每个关键故障至少一次
+C++              从 Lab 002 后逐步加入
+论文阅读         从 Lab 004 后按当前问题进入
 ```
 
 ## 当前入口
 
-[`labs/001-driving-data-contract/CURRENT_TASK.md`](labs/001-driving-data-contract/CURRENT_TASK.md)
+[`labs/000-driving-system-map/CURRENT_TASK.md`](labs/000-driving-system-map/CURRENT_TASK.md)
 
 ## 中断后恢复
 
 ```text
-1. PROGRESS.md
-2. 当前 CURRENT_TASK.md
-3. 当前 reference README
-4. 运行 tests
-5. 从未完成的最小步骤继续
+1. LEARNER_PROFILE.md
+2. SKILL_GAP_MATRIX.md
+3. PROGRESS.md
+4. 当前 CURRENT_TASK.md
+5. 运行当前 tests / eval
+6. 从未完成的最小证据继续
 ```
 
-不要机械从 Lab 000 重新复习。
+不要机械从头复习，也不要跳过未满足的系统依赖。
