@@ -20,8 +20,9 @@
 |---|---|---|
 | `af1752c` | [Highway CI](https://github.com/chasen2041maker/vla_basic/actions/runs/35694565190)、[旧 CI](https://github.com/chasen2041maker/vla_basic/actions/runs/35694565219) | Linux/Windows 安装、pip check、旧 Lab、10 个新测试与输出通过；后续发现重复依赖与画面检查缺口 |
 | `feb3b6f` | [Highway CI](https://github.com/chasen2041maker/vla_basic/actions/runs/35695041543)、[旧 CI](https://github.com/chasen2041maker/vla_basic/actions/runs/35695041509) | 去掉重复 pygame，仅使用 pygame-ce 后，两平台全部通过；下载检查却发现图像是黑屏，因此不作为有效回放证据 |
+| **`203f838`** | [最终代码 Highway CI](https://github.com/chasen2041maker/vla_basic/actions/runs/35695444742)、[最终代码旧 CI](https://github.com/chasen2041maker/vla_basic/actions/runs/35695445008) | **Linux / Windows、Python 3.12 全部通过；含像素非空白、帧变化与多帧 GIF 检查；已打开实际工件确认道路与车辆可见** |
 
-新测试为 3 个纯逻辑测试 + 7 个真实环境集成测试。旧 Lab 000 有 4 个单元测试，Lab 001 有 7 个单元测试。教学输出保持 `SYSTEM MAP RESULT: 4 / 4 PASS` 与 `BASELINE RESULT: 4 / 6 PASS`，后者不是两个单元测试失败。
+新测试为 3 个纯逻辑测试 + 7 个真实环境集成测试。旧 Lab 000 有 4 个单元测试，Lab 001 有 7 个单元测试，完整检查共 21 个单元/集成测试。教学输出保持 `SYSTEM MAP RESULT: 4 / 4 PASS` 与 `BASELINE RESULT: 4 / 6 PASS`，后者不是两个单元测试失败。
 
 smoke 命令为 `--max-steps 5 --output-dir outputs/ci-smoke`，日志实际记录 `runner_step_limit`、5 个决策步、1.000 秒模拟时间、IDLE。这是短回合工程检查，不是安全驾驶结论。
 
@@ -35,7 +36,13 @@ smoke 命令为 `--max-steps 5 --output-dir outputs/ci-smoke`，日志实际记�
 
 依据：[官方 EnvViewer 源码](https://highway-env.farama.org/_modules/highway_env/envs/common/graphics/)。
 
-渲染修正后的 CI 与实际画面复核，待下一次验证完成后记录，不能用上面两轮结果代替。
+## 最终回放证据
+
+已下载并打开 [203f838 的 Ubuntu 工件](https://github.com/chasen2041maker/vla_basic/actions/runs/35695444742/artifacts/10680465446)：首末 PNG 为 720×160，各含 7 种 RGB 颜色；GIF 含 6 帧，不再是单帧黑屏。图中可见车道、自车和其他车辆。summary、逐步日志与 pip-freeze 均在同一工件内。
+
+对应运行脚本 SHA-256：`6b10e93915ecd1dad5bf64344031c7144bdfcf8944c930c7d5677b69920f6e40`，与本地审查副本一致。
+
+最后这次提交仅补充验证文档；所记录的运行代码、测试、依赖与工作流仍与已验证的 `203f83893c8ec1f267cc6951bddd5603d04f8587` 相同。
 
 ## 限制
 
