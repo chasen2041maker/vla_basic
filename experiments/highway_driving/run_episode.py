@@ -72,6 +72,24 @@ def make_env(*, render_mode: str | None = None, duration_s: float = 8.0,
     })
 
 
+
+def capture_frame(env: Any) -> Any:
+    """保存真实画面，而不是只检查 PNG 文件能否创建。"""
+    from PIL import Image
+
+    frame = env.render()  # 首次调用同时创建 viewer。
+    viewer = env.unwrapped.viewer
+    if viewer.offscreen and not viewer.enabled:
+        # HighwayEnv 1.12.1 在 SDL dummy 下会关闭全部绘制，造成合法但全黑的图片。
+        # 仅恢复离屏画布绘制，offscreen=True 仍不创建桌面窗口。
+        # 上游升级后须复核此兼容点，tests 会检查非空白画面和帧变化。
+        viewer.enabled = True
+        frame = env.render()
+    if frame is None or (frame == frame[0, 0]).all():
+        raise ValueError("渲染得到空白画面，不能作为有效回放保存")
+    return Image.fromarray(frame)
+
+
 def end_reason(*, crashed: bool, on_road: bool, terminated: bool,
                truncated: bool) -> str:
     """仅分类本次结束原因；时间用尽不等于驾驶成功。原始标志另存。"""
@@ -115,8 +133,7 @@ def run_episode(*, seed: int = 7, max_steps: int = 50,
         initial_observation = obs.tolist()
         action_id = int(env.unwrapped.action_type.actions_indexes[action_name])
         if render_mode == "rgb_array" and output_dir is not None:
-            from PIL import Image
-            frames.append(Image.fromarray(env.render()))
+            frames.append(capture_frame(env))
 
         terminated = truncated = False
         for step in range(1, max_steps + 1):
@@ -137,7 +154,7 @@ def run_episode(*, seed: int = 7, max_steps: int = 50,
             })
             obs = next_obs
             if render_mode == "rgb_array" and output_dir is not None:
-                frames.append(Image.fromarray(env.render()))
+                frames.append(capture_frame(env))
             if terminated or truncated:
                 break  # 结束后不再 step，也不偷偷 reset 成第二个回合。
 

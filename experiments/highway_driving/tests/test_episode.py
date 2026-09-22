@@ -72,7 +72,7 @@ class EpisodeTests(unittest.TestCase):
     def test_saved_artifacts_and_trace_continuity(self):
         with tempfile.TemporaryDirectory() as temp:
             folder = Path(temp) / "episode"
-            result = run_episode(max_steps=2, vehicles_count=0, output_dir=folder)
+            result = run_episode(max_steps=2, vehicles_count=12, output_dir=folder)
             saved = json.loads((folder / "summary.json").read_text(encoding="utf-8"))
             self.assertEqual(result, saved)
             rows = [json.loads(line) for line in (folder / "trace.jsonl").read_text(encoding="utf-8").splitlines()]
@@ -85,6 +85,13 @@ class EpisodeTests(unittest.TestCase):
                 with Image.open(folder / name) as image:
                     self.assertEqual(image.size, (720, 160))
                     image.verify()
+                with Image.open(folder / name) as image:
+                    pixels = np.asarray(image.convert("RGB"))
+                    self.assertGreater(len(np.unique(pixels.reshape(-1, 3), axis=0)), 3)
+                    if name.endswith(".gif"):
+                        self.assertGreater(image.n_frames, 1)
+            with Image.open(folder / "initial.png") as first, Image.open(folder / "final.png") as last:
+                self.assertFalse(np.array_equal(np.asarray(first), np.asarray(last)))
             with self.assertRaises(FileExistsError):
                 run_episode(max_steps=1, output_dir=folder)
 
