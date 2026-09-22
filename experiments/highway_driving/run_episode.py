@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 import os
@@ -161,9 +162,10 @@ def run_episode(*, seed: int = 7, max_steps: int = 50,
                 "normalize": False,
             },
             "config": env.unwrapped.config, "code_revision": code_revision(),
+            "runner_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
             "python": platform.python_version(), "platform": platform.platform(),
             "packages": {name: version(name) for name in
-                         ("highway-env", "gymnasium", "numpy", "pygame", "Pillow")},
+                         ("highway-env", "gymnasium", "numpy", "pygame-ce", "Pillow")},
         }
         if output_dir is not None:
             (output_dir / "trace.jsonl").write_text(

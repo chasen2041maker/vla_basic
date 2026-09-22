@@ -1,77 +1,40 @@
-# Roadmap
+# Roadmap｜围绕同一个驾驶项目成长
 
-这是日常可读的能力地图。完整要求见 `MASTER_GROWTH_PLAN.md`。
+2026-09-22 起不再把 Lab 000→001→002 的顺序当作开始仿真的门槛。**当前任务以 [PROGRESS.md](PROGRESS.md) 为准；长期能力依赖仍保留，但按项目问题补齐。**
 
-| Lab | 主题 | 状态 | 主要产出 | 最小独立证据 |
-|---|---|---|---|---|
-| 000 | System Map / Failure Boundaries | **LEARNING** | 整车执行链与故障定位 | 4 场景 trace + 系统图 |
-| 001 | Data Contract / Time Semantics | QUEUED | 可验证驾驶样本 | 两类 silent failure + 修复 |
-| 002 | Coordinates / Trajectory / Motion | LOCKED | SE(2) 与 rollout | round-trip + yaw fault |
-| 003 | Camera Geometry | LOCKED | 投影与标定 mental model | projection + extrinsic fault |
-| 004 | Multi-Camera Temporal / BEV | LOCKED | 对齐后的时序表征 | skew + motion compensation |
-| 005 | Trajectory Learning Baseline | LOCKED | 小型端到端模型 | overfit + leakage/ablation |
-| 006 | Open / Closed Loop Eval | LOCKED | 双评测和 failure taxonomy | 指标背离案例 |
-| 007 | Public Stack / NAVSIM | LOCKED | 可复现公开 benchmark | mini split + config evidence |
-| 008 | Driving VLM / VLA | LOCKED | 多模态动作实验 | conditioning ablation |
-| 009 | Action Representation | LOCKED | token/continuous 对比 | encode/decode + error bound |
-| 010 | Distill / Quantize / Deploy | LOCKED | 压缩和延迟报告 | behavior + latency + memory |
-| 011 | Safety / ODD / Observability | LOCKED | 系统安全边界 | stale/unsafe/fallback tests |
-| 012 | RL / World Model / Long Tail | LOCKED | 闭环学习假设实验 | reward/model-bias fault |
+## 近期推进：不预建空目录
 
-## 主依赖
+| 阶段 | 驾驶问题 | 交付与验证 | 状态 |
+|---|---|---|---|
+| H001 单回合 | IDLE 后车为什么还动？一步多久？ | 固定种子、明确动作、画面、日志与结束原因；个人解释 | **唯一活跃任务** |
+| H002 跟车起点 | 前车更慢时为什么没有及时减速？ | 明确慢前车场景，找前车/速度差，第一条规则与失败用例 | 候选，未创建 |
+| H003 失败复现 | 哪组条件会碰撞或表现不合理？ | 可重放场景、失败定位与边界记录 | 候选 |
+| H004 对比评测 | 修改是否真的更好？ | 同种子场景集、碰撞/进度/速度等指标及其限制 | 候选 |
+| 后续模型化 | 规则的能力边界在哪里？ | 先数据/动作契约，再训练或模仿学习，并比较闭环 | 依赖前面证据 |
 
-```text
-000 READ
-→ 001
+每轮：提出问题 → 跑当前版本 → 读相关代码 → 预测 → 小修改 → 测试/实验 → 记录。不是每个概念重新写一个互不关联的 Demo。
 
-001 + 002
-→ 003 / 004
+## 原 Lab 与长期能力地图
 
-002 + 004
-→ 005
+原有 Lab 000/001 的代码与未完成学习状态保留，作为专项参考；下面 002–012 是知识编号，不声称对应代码已存在。
 
-005
-→ 006
+| 编号 | 能力 | 项目中何时回查/引入 |
+|---|---|---|
+| 000 | 系统链与故障边界 | 分不清数据、策略、控制和评测责任时 |
+| 001 | 数据与时间契约 | 观察字段、时间对齐或日志语义有疑问时 |
+| 002 | 坐标、轨迹、车辆运动 | 相对量、运动更新或轨迹控制需要解释时 |
+| 003–004 | 视觉、相机几何、多相机时序/BEV | 从模拟状态走向视觉输入时 |
+| 005 | 轨迹学习基线 | 驾驶数据与标签契约清楚后复用训练能力 |
+| 006–007 | 开放环/闭环、公开评测/NAVSIM | 需要可信对比与迁移到公开驾驶数据时 |
+| 008–009 | Driving VLM/VLA、动作表示 | 视觉、时序、动作与评测基础形成后 |
+| 010 | 蒸馏、量化、部署 | 有可信 baseline 后测行为/延迟/内存 |
+| 011 | 安全边界、ODD、可观测性 | 与实验并行说明边界，不宣称量产安全 |
+| 012 | 强化学习、世界模型、长尾 | state/action/rollout/closed-loop 建立后 |
 
-006
-→ 007 / 008
+Python、普通训练基础不机械重讲；Git/调试与独立解释在当前项目持续验证。C++、分布式训练、车端部署按实际需要引入，不为显得先进而增加框架。
 
-008
-→ 009
-
-006 + 009
-→ 010 / 011
-
-006 + 011
-→ 012
-```
-
-## 并行验证线
-
-不需要等待所有 Lab 才验证已有能力：
-
-```text
-深度学习训练    在 Lab 005 形成证据
-蒸馏与量化      在 Lab 010 形成证据
-Linux / Git      每次任务持续验证
-无 Agent 调试    每个关键故障至少一次
-C++              从 Lab 002 后逐步加入
-论文阅读         从 Lab 004 后按当前问题进入
-```
-
-## 当前入口
-
-[`labs/000-driving-system-map/CURRENT_TASK.md`](labs/000-driving-system-map/CURRENT_TASK.md)
+长期目标与岗位能力仍参考 `ROLE_TARGET.md`、`MASTER_GROWTH_PLAN.md`、`SKILL_GAP_MATRIX.md`。当前使用模拟器状态并不是视觉感知，更不是已经训练驾驶 VLA。
 
 ## 中断后恢复
 
-```text
-1. LEARNER_PROFILE.md
-2. SKILL_GAP_MATRIX.md
-3. PROGRESS.md
-4. 当前 CURRENT_TASK.md
-5. 运行当前 tests / eval
-6. 从未完成的最小证据继续
-```
-
-不要机械从头复习，也不要跳过未满足的系统依赖。
+先读 `AGENTS.md`、`LEARNER_PROFILE.md`、`PROGRESS.md`，再进入所指向的当前任务和对应实现。系统地图与旧 Lab 按需回查，不机械重新通关。

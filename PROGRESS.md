@@ -1,86 +1,71 @@
 # Progress
 
-最后更新：2026-08-28
+最后更新：2026-09-22
 
 ## 当前一句话接棒
 
-> **先完成 Lab 000A：建立 sensor → data → representation → model → action → safety → control → environment → eval 的系统图，运行 4 个 trace，并能把故障定位到正确边界；暂时不要进入 Lab 001 代码细节。**
+> **当前只推进 H001：运行并解释 HighwayEnv 的一个驾驶回合。先看车运行，读懂一条观察/动作/下一观察的时间与物理语义，再预测并比较 IDLE 与 SLOWER。旧 Lab 按需回查，不要求先通关。**
 
-当前任务：
+唯一活跃任务：[experiments/highway_driving/CURRENT_TASK.md](experiments/highway_driving/CURRENT_TASK.md)
 
-- [`labs/000-driving-system-map/CURRENT_TASK.md`](labs/000-driving-system-map/CURRENT_TASK.md)
+项目说明：[README.zh-CN.md](experiments/highway_driving/README.zh-CN.md)
 
----
+## 本次改变了什么
 
-## 最新学习者校准
+学习入口从按 Lab 顺序解锁改为同一个驾驶项目持续改进。保留旧 Lab 000/001、系统地图、能力矩阵和长期 VLA 目标；没有把旧任务标为已完成。
 
-学习者明确说明：
+新增真实环境交互、固定配置/种子、明确高层动作、逐步日志、回放、结束分类和最小测试。当前没有慢前车专用场景、跟车规则、训练模型、视觉感知或 VLA。工程验证详情见 [本次记录](notes/2026-09-22-highway-entry.md)。
 
-- 会进行常规深度学习模型训练；
-- 学过蒸馏和量化；
-- 未学习强化学习；
-- 计算机视觉、相机几何、多相机时序、车辆运动、轨迹控制、闭环评测和 Driving VLA 基本需要从领域基础建立。
+**代码与 CI 完成，是维护者的工程证据，不是学习者已掌握的证据。**
 
-教学决策：
+## 学习者基线：未擅自升级
 
-```text
-深度学习 / 蒸馏 / 量化：不从定义重讲，后续真实任务验证
-视觉 / 几何 / 驾驶 / 闭环：系统学习
-强化学习：延后到 state-action-rollout-eval 成熟之后
-```
+会常规深度学习训练，学过蒸馏和量化，未学习强化学习；Python、Agent/workflow、RAG 和 AI Coding 经验可作为起点。视觉、几何、车辆运动、轨迹控制、闭环评测与 Driving VLA 仍需学习与验证。
 
----
+| 能力 | 状态 | 现有依据 / 下一证据 |
+|---|---|---|
+| Python 工程阅读 | ASSUMED | 工作背景；下一步解释当前实验执行链 |
+| Agent / workflow mental model | ASSUMED | 说明物理世界 retry 的类比失效点 |
+| 常规深度学习训练 | REVIEW | 自述；后续驾驶模型 overfit/debug/ablation |
+| Transformer / Attention | REVIEW | 驾驶时序模型专项证据未形成 |
+| 蒸馏 / 量化 | REVIEW | 自述学过；驾驶行为、延迟与内存证据未形成 |
+| 强化学习 | ASSUMED-NO | 明确未学；延后到闭环基础之后 |
+| 驾驶系统全景 | LEARNING | Lab 000 保留；个人系统解释仍待验证 |
+| 驾驶数据契约 | QUEUED / 按需参考 | Lab 001 保留，未将其学习任务标为完成 |
+| 观察/动作/仿真时间 | LEARNING | 当前 H001，个人运行和解释待补 |
+| 视觉与相机几何 | ASSUMED-NO | 缺口不变，项目需要时补齐 |
+| 多相机时序 / BEV | ASSUMED-NO | 尚无个人实现证据 |
+| trajectory / control / vehicle motion | ASSUMED-NO | H001 只接触高层动作，不等于掌握轨迹控制 |
+| open-loop / closed-loop eval | ASSUMED-NO | 仿真入口存在不等于个人会设计评测 |
+| Driving VLM / VLA | ASSUMED-NO | 尚未实现或训练 |
+| deployment / observability | ASSUMED | 工程经验可迁移，驾驶专项证据不足 |
 
-## 当前能力状态
+`ASSUMED-NO` 仅表示明确缺口，不属于晋级状态。个人掌握仍须通过解释、修改、实验与故障定位确认。
 
-| 能力 | 状态 | 现有依据 | 下一证据 |
-|---|---|---|---|
-| Python 工程阅读 | ASSUMED | 工作背景 | 解释 Lab 000/001 execution path |
-| Agent / workflow mental model | ASSUMED | 工作背景 | 说明物理 retry 类比失效点 |
-| 常规深度学习训练 | REVIEW | 学习者自述 | Lab 005 overfit、debug、ablation |
-| Transformer / Attention | REVIEW | 与模型训练背景相关，未专项验证 | Lab 004/005 时序模型解释 |
-| 模型蒸馏 | REVIEW | 学习者自述学过 | Lab 010 驾驶行为蒸馏实验 |
-| 模型量化 | REVIEW | 学习者自述学过 | Lab 010 行为/延迟/内存实验 |
-| 强化学习 | ASSUMED-NO | 学习者明确未学 | Lab 012 前不提前标记 |
-| 驾驶系统全景 | LEARNING | 当前任务 | 4/4 trace + 系统图解释 |
-| 驾驶数据契约 | QUEUED | 已有 reference，尚未运行证据 | Lab 001A 4/6 diagnosis |
-| 视觉与相机几何 | ASSUMED-NO | 学习者明确缺口 | Lab 003 |
-| 多相机时序 / BEV | ASSUMED-NO | 学习者明确缺口 | Lab 004 |
-| trajectory / control / vehicle motion | ASSUMED-NO | 学习者明确缺口 | Lab 002 |
-| open-loop / closed-loop eval | ASSUMED-NO | 学习者明确缺口 | Lab 006 |
-| Driving VLM / VLA | ASSUMED-NO | 学习者明确缺口 | Lab 008 |
-| deployment / observability | ASSUMED | 工程经验可迁移，驾驶证据不足 | Lab 010/011 |
+## 学习者尚未提供的证据
 
-`ASSUMED-NO` 只用于本表表达“明确尚未学习”，不属于晋级状态；完成后仍按 `LEARNING → REVIEW → PASSED` 更新。
+- 未记录学习者在自己电脑运行 H001、解释字段和动作的结果。
+- 未有学习者对 IDLE/SLOWER 的事前预测与事后日志对照。
+- 原 Lab 000 的系统图、独立故障定位与 Lab 001 的个人诊断仍未完成验收。
+- 未有个人驾驶视觉/几何、轨迹模型训练、开放环对比、蒸馏量化驾驶化验证、RL 或真实车辆证据。
 
----
+不能把维护者运行 CI 的日志填进这些个人验收项。
 
-## 当前尚未产生的证据
+## 下一次接棒只做这一件事
 
-- 没有 Lab 000 trace 运行记录；
-- 没有完整驾驶系统图的个人解释；
-- 没有 Lab 001 实际 4/6 输出；
-- 没有驾驶视觉、几何或车辆运动代码；
-- 没有 trajectory model 训练、消融或闭环实验；
-- 没有蒸馏/量化在驾驶行为上的验证；
-- 没有 RL、world model 或真实车辆实验。
+先围绕“IDLE 后车为什么还动”讲清环境、动作和控制器的分工，再读 H001 对应代码。不要输出一整套新课程，也不要要求先重写 Python 或从零造模拟器。
 
-不要提前标记为 `PASSED`。
-
----
-
-## 完成 000A-Read 后应记录
+记录模板：
 
 ```text
-运行环境：
-实际输出：
-完整系统链：
-stale_camera 停在哪一层：
-past_trajectory 停在哪一层：
-controller_timeout 停在哪一层：
-为什么模型成功 != 驾驶成功：
-Agent 类比的失效点：
-commit / screenshot / log：
+代码版本 / Python / 依赖版本：
+seed / action / max_steps：
+输出目录 / 结束原因：
+obs[0] 和其他有效行分别是什么意思：
+一次动作前后时间：
+预测 SLOWER 的结果：
+实际日志对照：
+还不能证明什么：
 ```
 
-完成 000A-Read 后解锁 Lab 001A；Lab 000 的完整 `PASSED` 仍需要后续独立故障定位或系统图证据。
+H001 的个人证据完成后，再决定是否激活 H002（慢前车与第一条跟车规则）；本次不提前创建第二个活跃任务。
