@@ -1,0 +1,48 @@
+name: highway-driving
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  highway-checks:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    env:
+      PYTHONUTF8: "1"
+      SDL_VIDEODRIVER: dummy
+      SDL_AUDIODRIVER: dummy
+      PYGAME_HIDE_SUPPORT_PROMPT: "1"
+      MPLBACKEND: Agg
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: experiments/highway_driving/requirements.txt
+      - name: Install pinned direct dependencies
+        run: python -m pip install -r experiments/highway_driving/requirements.txt
+      - name: Check dependency compatibility
+        run: python -m pip check
+      - name: Preserve old baselines and test real HighwayEnv
+        run: python scripts/check_repo.py --with-highway
+      - name: Save one actual episode and resolved versions
+        run: |
+          python experiments/highway_driving/run_episode.py --max-steps 5 --output-dir outputs/ci-smoke
+          python -m pip freeze > outputs/pip-freeze.txt
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: highway-evidence-${{ matrix.os }}
+          path: outputs/
+          if-no-files-found: warn
+          retention-days: 14
