@@ -72,7 +72,6 @@ def make_env(*, render_mode: str | None = None, duration_s: float = 8.0,
     })
 
 
-
 def capture_frame(env: Any) -> Any:
     """保存真实画面，而不是只检查 PNG 文件能否创建。"""
     from PIL import Image
@@ -115,6 +114,29 @@ def code_revision() -> str:
         return "unknown"
 
 
+def format_teaching_summary(summary: dict[str, Any]) -> str:
+    """只展示第一条真实 transition；不能把首步动作与整回合末状态混在一起。"""
+    row = summary["first_transition"]
+    before = row["observation"][0]
+    after = row["next_observation"][0]
+    return "\n".join([
+        "H001 教学摘要（仅第 1 步，不是整回合）：",
+        f"动作：{row['action_name']}；请求可用={row['action_available']}",
+        f"仿真时间 (s)：{row['observation_time_s']:.3f} → "
+        f"{row['next_observation_time_s']:.3f}",
+        f"自车世界位置 (m)：({before[1]:.3f}, {before[2]:.3f}) → "
+        f"({after[1]:.3f}, {after[2]:.3f})",
+        # speed 是速率，不用世界 x 轴速度分量 vx 冒充转弯时的实际速率。
+        f"实际速率 (m/s)：{row['speed_before_mps']:.3f} → {row['speed_mps']:.3f}",
+        f"目标速度 (m/s，模拟器诊断)：{row['target_speed_before_mps']:.3f} → "
+        f"{row['target_speed_after_mps']:.3f}",
+        f"本步环境标志：terminated={row['terminated']}；truncated={row['truncated']}",
+        f"整回合结束原因：{summary['end_reason']}；共 {summary['steps']} 步；"
+        f"总仿真时间={summary['sim_time_s']:.3f}s",
+        "说明：目标速度不是策略观察；可用不等于安全；显示值已舍入，精确值见 trace.jsonl。",
+    ])
+
+
 def run_episode(*, seed: int = 7, max_steps: int = 50,
                 action_name: str = "IDLE", render_mode: str | None = "rgb_array",
                 output_dir: Path | None = None, duration_s: float = 8.0,
@@ -139,6 +161,9 @@ def run_episode(*, seed: int = 7, max_steps: int = 50,
         for step in range(1, max_steps + 1):
             observation_time_s = float(env.unwrapped.time)
             available = action_id in env.unwrapped.action_type.get_available_actions()
+            speed_before_mps = float(env.unwrapped.vehicle.speed)
+            # 仅供老师对照控制器目标与实际运动；不传入策略，不改变 observation。
+            target_speed_before_mps = float(env.unwrapped.vehicle.target_speed)
             # 本轮是恒定动作基线，故意不依据 obs 决策；不是避碰策略。
             next_obs, reward, terminated, truncated, info = env.step(action_id)
             trace.append({
@@ -147,7 +172,10 @@ def run_episode(*, seed: int = 7, max_steps: int = 50,
                 "action_id": action_id, "action_available": bool(available),
                 "next_observation_time_s": float(env.unwrapped.time),
                 "next_observation": next_obs.tolist(), "reward": float(reward),
+                "speed_before_mps": speed_before_mps,
                 "speed_mps": float(info["speed"]),
+                "target_speed_before_mps": target_speed_before_mps,
+                "target_speed_after_mps": float(env.unwrapped.vehicle.target_speed),
                 "crashed": bool(info["crashed"]),
                 "on_road": bool(env.unwrapped.vehicle.on_road),
                 "terminated": bool(terminated), "truncated": bool(truncated),
@@ -160,7 +188,7 @@ def run_episode(*, seed: int = 7, max_steps: int = 50,
 
         last = trace[-1]
         summary = {
-            "schema_version": 1, "environment": "highway-v0", "seed": seed,
+            "schema_version": 2, "environment": "highway-v0", "seed": seed,
             "policy": "constant_meta_action", "action_name": action_name,
             "action_id": action_id, "requested_max_steps": max_steps,
             "steps": len(trace), "sim_time_s": last["next_observation_time_s"],
@@ -171,6 +199,15 @@ def run_episode(*, seed: int = 7, max_steps: int = 50,
             "total_reward": sum(row["reward"] for row in trace),
             "initial_observation": initial_observation,
             "final_observation": obs.tolist(),
+            # 与 trace.jsonl 第一行完全相同，不拼接最后一步的速度或位置。
+            "first_transition": trace[0],
+            "diagnostic_contract": {
+                "source": "simulator internals; diagnostics only, not policy inputs",
+                "speed_before_mps": "ego speed magnitude before step",
+                "speed_mps": "ego speed magnitude after step (existing field)",
+                "target_speed_before_mps": "controller target before step",
+                "target_speed_after_mps": "controller target after step",
+            },
             "observation_contract": {
                 "features": FEATURES, "position_unit": "m", "velocity_unit": "m/s",
                 "ego_row": "absolute world position and velocity",
@@ -228,6 +265,7 @@ def main() -> int:
         return 1
     print("初始观察 [presence, x, y, vx, vy]：")
     print(json.dumps(result["initial_observation"], ensure_ascii=False))
+    print(format_teaching_summary(result))
     print(f"结束：{result['end_reason']}；决策步数={result['steps']}；"
           f"仿真时间={result['sim_time_s']:.3f}s；action={result['action_name']}")
     print(f"实验输出：{output.resolve()}")

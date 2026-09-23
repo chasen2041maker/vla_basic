@@ -2,116 +2,123 @@
 
 ## 这是什么，不是什么
 
-这是 `vla_basic` 当前主项目。先借 HighwayEnv 的道路、车辆、控制器和模拟状态，自己维护实验入口、策略、日志、评测与失败分析。
+这是 vla_basic 当前主项目。借 HighwayEnv 的道路、车辆、控制器和模拟状态，逐步维护实验入口、策略、日志、评测与失败分析。长期问题是：前车更慢时怎样调整行为，又怎样证明修改有用？
 
-长期追问：**前车更慢时，怎样调整行为，又怎样证明修改有用？** 当前 H001 只打通观察和动作的真实交互，还没有固定慢前车场景、跟车规则、视觉网络、强化学习或驾驶 VLA。默认种子复现的是随机生成场景，不保证每次都有特定的慢前车事件。
+当前 H001 只打通观察和动作的真实交互；没有固定慢前车场景、跟车规则、视觉网络、RL 或驾驶 VLA。默认种子复现随机生成场景，不保证出现特定慢前车事件。
+
+## GPT 怎么教，你与 Codex 怎么做
+
+[AGENTS.md](../../AGENTS.md) 是角色和进度规范；[CURRENT_TASK.md](CURRENT_TASK.md) 把老师讲解和有限动手分开；[H001 带读](walkthrough/H001-idle-step.md) 提供具体课堂材料。当前实际进度只看 [PROGRESS.md](../../PROGRESS.md)。
+
+GPT 先示范如何跟代码、读日志，核对学习者理解；你与 Codex 再执行已激活的动手卡。Codex 更新客观工程证据，不自行升级个人掌握。第一课可以只运行与解释，不为形式造新功能。
 
 ## 安装与第一跑
 
-推荐 Python 3.12。先按 [根 README](../../README.md#直接运行) 创建独立环境。下列 `python` 均指该环境解释器，命令从仓库根目录执行：
+使用 Python 3.12，按 [根 README](../../README.md#直接运行) 建独立环境。下面的 python 均指虚拟环境解释器，命令从仓库根目录执行：
 
 ```bash
 python -m pip install -r experiments/highway_driving/requirements.txt
-python experiments/highway_driving/run_episode.py --seed 7 --action IDLE
+python experiments/highway_driving/run_episode.py --seed 7 --vehicles 0 --max-steps 1 --action IDLE
 ```
 
-不要为本轮安装 PyTorch、训练框架或 GPU 工具链。`requirements.txt` 固定直接依赖，不是全量依赖锁文件；CI 用 `pip-freeze.txt` 留下实际解析版本，摘要也记录核心包、Python 和代码版本。不要把同种子误当成跨版本、跨平台逐位一致的承诺。
+这里 0 辆其他车、1 步是第一课的控制条件，不是默认配置被改成空场景。需要附近车辆观察时使用 `--vehicles 12`；需要完整回合时去掉 `--max-steps 1`。
 
-三种显示方式：默认 `--render rgb_array` 保存画面；`--render human` 打开窗口并保存日志；`--render none` 仅保存日志。无桌面时默认方式更合适，原生 Windows 窗口需要在学习者电脑另验。
+本轮不需要 PyTorch、训练框架或 GPU。requirements.txt 固定直接依赖，不是全量锁文件；CI 留下 pip-freeze.txt，摘要记录核心包、Python、平台、代码版本与脚本哈希。同种子不意味着跨版本跨平台逐位一致。
 
-```bash
-# 首先只取得初始观察，执行一个明确动作
-python experiments/highway_driving/run_episode.py --max-steps 1
+显示模式：默认 `--render rgb_array` 保存画面；`--render human` 打开窗口并保存日志；`--render none` 只保存日志。无桌面时用默认模式，原生 Windows 窗口仍需本机另验。
 
-# 运行一个回合并看窗口
-python experiments/highway_driving/run_episode.py --render human
+其余参数：`--duration-seconds` 默认 8，允许 (0,60]；`--vehicles` 默认 12；`--max-steps` 默认 50；`--output-dir` 必须是尚不存在的目录。拒绝覆盖旧输出；参数、依赖或写入错误时非零退出。没有完整 summary.json 的目录不能作为完成证据。
 
-# 在同种子下改变动作；每次自动建立独立输出目录
-python experiments/highway_driving/run_episode.py --seed 7 --action SLOWER
-```
-
-其余选项：`--duration-seconds` 默认 8，允许 (0,60]；`--vehicles` 默认 12；`--max-steps` 默认 50；`--output-dir` 指定一个**尚不存在**的目录。拒绝覆盖旧输出。参数不合法、依赖缺失或写入失败时非零退出；没有完整 `summary.json` 的目录不作为完成证据。
-
-## 环境交互：不是旧 Lab 的合成 trace
+## 环境交互
 
 ```text
 reset(seed) → 初始 obs
-                   ↓
-选择本轮明确的高层动作（目前恒定，不依据 obs）
-                   ↓
-step(action) → 新 obs、reward、terminated、truncated、info
-                   ↓
-记录 → 未结束则继续；结束后 close，不自动重开一轮
+→ 当前恒定高层动作（目前不依据 obs 选择）
+→ step(action) → 新 obs、reward、terminated、truncated、info
+→ 记录；未结束则继续，结束后 close，不自动重开回合
 ```
 
-HighwayEnv 真正推动车辆并返回下一观察。但“真实模拟器交互”不等于“策略已经利用反馈”；本轮恒定动作只提供可对比的基线。
+环境确实推动车辆并返回新观察；这不意味着脚本已经依据反馈决策。旧 Lab 的合成 trace 不冒充本项目的实际模拟器交互。
 
-## 观察契约：先把值读对
+## 观察契约
 
-配置固定为 `Kinematics`，列顺序是 `[presence, x, y, vx, vy]`，形状为 `(5, 5)`。场景中 12 辆其他车与观察中的 5 行不是同一概念：后者包括自车，只保留有限附近车辆。
+Kinematics 的列为 `[presence,x,y,vx,vy]`，形状 (5,5)。5 行含自车，只观察有限附近车辆；与场景默认 12 辆其他车不是同一数量。
 
-`normalize=False`、`clip=False`：位置单位为米，速度为米/秒，不把归一化值当真实物理量。
+normalize=False、clip=False，位置单位 m，速度分量 m/s。absolute=False 的特殊点：第 0 行自车仍为世界绝对位置/速度，其他有效行是“其他车减自车”的位置差与速度差。坐标轴仍与世界对齐，不随自车航向旋转。
 
-`absolute=False` 的特殊处：**第 0 行自车仍是世界绝对位置/速度；其余有效行才是“其他车减自车”的位置差/速度差。轴仍与世界坐标对齐，不会随自车航向旋转。** 因而不能把自车位置期待为零，也不能直接把其他行的 `vx` 当对方绝对速度。
+presence=0 是空槽，不是原点的一辆静止车。order=sorted 的行号不是稳定车辆 ID，不可直接按前后同一行推导同车历史。负相对 vx 不等于对方一定倒车。
 
-`presence=0` 表示空槽，不代表有辆静止汽车在原点。`order=sorted` 表示附近车辆排序，行号不是稳定车辆 ID；不要直接逐行相减当成同一辆车的历史。
+观察来自模拟器状态，PNG/GIF 是俯视可视化，不是相机感知系统。
 
-观察来自模拟器的车辆状态。俯视 PNG/GIF 是可视化，不是已实现的相机感知系统。
+## 动作契约
 
-## 动作契约：IDLE 不等于停车
+DiscreteMetaAction 使用名称查编号，不写死整数：
 
-使用 `DiscreteMetaAction`。代码按环境的动作名称映射查找编号，不写死整数。
-
-| 名称 | 语义 |
+| 动作 | 含义 |
 |---|---|
-| IDLE | 不改变目标车道/目标速度，底层控制器仍工作 |
-| SLOWER / FASTER | 在 `[20,25,30]` m/s 目标速度档位中降低/提高目标 |
-| LANE_LEFT / LANE_RIGHT | 请求相邻目标车道，由底层控制器跟踪 |
+| IDLE | 不改变目标车道/目标速度，底层控制继续工作 |
+| SLOWER / FASTER | 降低/提高目标速度档位，当前档位 [20,25,30] m/s |
+| LANE_LEFT / LANE_RIGHT | 请求相邻目标车道，由底层控制跟踪 |
 
-**SLOWER 不是紧急制动，最低目标 20 m/s，不保证能停车或避免碰撞。** 连续发送可能到达档位边界。日志保留 `action_available`，不可用请求不能当作车辆确实完成该动作的证据。
+SLOWER 不是紧急制动，最低目标 20 m/s，不保证停车或避碰。连续请求可能到档位边界。action_available 只说明请求可用性，不证明安全或动作已经完成。
 
-## 时间与结束原因
+## 时间与结束
 
-`simulation_frequency=15` Hz，`policy_frequency=5` Hz：当前配置一轮策略动作对应 3 次物理更新，正常情况下是 0.2 秒。日志读取环境的实际 `time`，不把循环次数直接当秒数。修改频率时需重新检查整除关系、测试和 GIF 帧间隔。
+simulation_frequency=15 Hz、policy_frequency=5 Hz：当前正常一个决策步是 3 次物理更新、0.2 秒。日志读环境实际 time，不把循环次数或程序耗时当仿真秒数。改频率时须复核整除关系、测试与 GIF 间隔。
 
-`trace.jsonl` 每行成对保存当前观察及其时间、动作、下一观察及其时间。GIF 只采样策略时刻，约 5 帧/秒，不含全部物理帧。
+GIF 仅采样策略时刻，约 5 帧/秒，不含所有物理帧。日志成对记录动作前后的观察和时间。
 
-`end_reason` 区分 `collision`、`off_road`、其他 `terminated`、`environment_time_limit`、`runner_step_limit`。同时保留原始 `terminated` 和 `truncated`，二者可能同时为真。脚本步数上限是运行器停止，不伪造环境 `truncated=True`。
+end_reason 区分 collision、off_road、其他 terminated、environment_time_limit、runner_step_limit。原始 terminated/truncated 保留，二者可同时为真；运行器步数上限不伪造 truncated=True。
 
-跑到时间上限、累计奖励高、进程返回 0，都不等于安全驾驶验证通过。
+时间用尽、累计奖励高、进程退出 0 都不等于通过驾驶安全验证。
 
-## 一次运行保存什么
+## 首步教学摘要与日志 schema v2
+
+本次不改变环境、动作选择或观察列，只增加教学诊断：
+
+| 字段 | 语义 |
+|---|---|
+| speed_before_mps | step 前的自车实际速率 |
+| speed_mps | step 后实际速率，保留原字段含义 |
+| target_speed_before_mps | step 前控制器目标速度；模拟器内部诊断 |
+| target_speed_after_mps | step 后控制器目标速度；模拟器内部诊断 |
+| summary.first_transition | 与 trace.jsonl 第一行相同的整条首步记录 |
+
+实际速率不能总用世界 x 轴分量 vx 替代，尤其有侧向运动时。目标速度不是策略观察，不加入 observation、不参与新的决策。diagnostic_contract 记录来源和时间语义。
+
+summary.schema_version 升为 2；原有字段保留。新格式器需要 v2 的 first_transition，不用旧日志缺失字段拼出假值；旧 v1 运行证据保留，不能据此声称已有目标速度记录。
+
+终端显示首步动作、前后时间/位置/实际速率/目标速度和本步环境标志，另列整回合结束原因、步数与总仿真时间。显示保留三位小数，精确数值在 JSON 中。多步回合不能把首步动作与末步位置混作一条 transition。
+
+## 输出
 
 ```text
-outputs/highway_driving/<本次 UTC 时间>/
-├── initial.png         # 初始画面（默认模式）
-├── final.png           # 最后画面
-├── episode.gif         # 策略时刻的回放
-├── trace.jsonl         # 每一步的状态、动作、时间和结果
-└── summary.json        # 配置、版本、种子、初末状态和结束原因
+outputs/highway_driving/<UTC 时间>/
+├── initial.png
+├── final.png
+├── episode.gif
+├── trace.jsonl
+└── summary.json
 ```
 
-输出目录已被仓库现有 `.gitignore` 排除。不要提交大量二进制、数据集或真实车辆日志。需要共享结论时，在 `notes/` 写最小复现条件与证据引用。
+目录由已有 gitignore 排除，不提交大量二进制、数据集或敏感车辆日志；有价值的复现条件和结论写到 notes，标注执行者。老师/维护者/Codex 运行不冒充学习者亲自运行。
 
-## 验证与边界
+## 验证
 
 ```bash
 python scripts/check_repo.py --with-highway
 ```
 
-纯逻辑测试检查参数和结束分类；真实环境测试检查观察物理单位/相对关系、空槽、一步运动与时间、同种子复现、SLOWER 改变运动、两类停止条件、日志连续性及图片文件。缺依赖直接失败，不跳过真实测试来制造绿色状态。
+原有纯逻辑与真实集成测试保留；新增教学摘要格式、首步/末步区分、目标/实际速率分离、直接模拟器逐步核对和 CLI 存盘一致性测试。缺依赖时集成失败，不 skip 来制造全绿。
 
-这些检查只能证明当前实验入口和记录满足已测契约，不能证明一般驾驶安全。工程执行证据与学习者掌握证据分别见 [工程记录](../../notes/2026-09-22-highway-entry.md) 和 [PROGRESS](../../PROGRESS.md)。
-
-## 当前只读哪段代码
-
-先看 `run_episode.py` 的 `make_env()` → `run_episode()` 中 `reset` 与 `step` → 日志里的对应字段。暂时不逐行讲命令行和保存细节。按 [CURRENT_TASK](CURRENT_TASK.md) 预测一个变化，再做一次小修改。
+这些检查只证明所测实验契约，不证明一般驾驶安全或学习者掌握。本次工程证据见 [维护记录](../../notes/2026-09-23-teacher-codex-handoff.md)。
 
 ## 官方依据
 
 - [上游仓库](https://github.com/Farama-Foundation/HighwayEnv)
 - [入门与配置](https://highway-env.farama.org/quickstart/)
-- [观察：自车绝对量、其他车相对量和空槽](https://highway-env.farama.org/observations/)
-- [动作：高层动作与底层控制器](https://highway-env.farama.org/actions/)
-- [时间频率与录制说明](https://highway-env.farama.org/faq/)
-- [采用的 HighwayEnv 1.12.1 发布页](https://pypi.org/project/highway-env/1.12.1/)
+- [观察](https://highway-env.farama.org/observations/)
+- [动作](https://highway-env.farama.org/actions/)
+- [控制器源码](https://highway-env.farama.org/_modules/highway_env/vehicle/controller/)
+- [时间频率与录制](https://highway-env.farama.org/faq/)
+- [采用的 1.12.1 发布页](https://pypi.org/project/highway-env/1.12.1/)
