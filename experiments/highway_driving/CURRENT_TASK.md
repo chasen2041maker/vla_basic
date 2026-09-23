@@ -1,82 +1,9 @@
-# H001｜运行并解释一个驾驶回合
+# 历史任务入口｜H001 已退出当前主线
 
-这是唯一活跃任务。**实时工程/学习状态和当前课堂片段只记在 [PROGRESS.md](../../PROGRESS.md)**；本文件定义任务，不复制一份进度。
+2026-09-23 起，本目录是历史运行器参考，不再定义当前课程、动手权限或晋级门槛。这里不再要求完成 H001 后才允许继续实践。
 
-## 1. 本次问题与系统位置
+当前接续请读取 [highwayenv-learning/PROGRESS.md](https://github.com/chasen2041maker/highwayenv-learning/blob/main/PROGRESS.md)，理论解释看 [theory/](../../theory/README.md)，实验对应关系看 [PRACTICE_MAP.md](../../PRACTICE_MAP.md)。
 
-**给出 IDLE 后为什么车还在动？一次 step 究竟发生了什么？**
+原 H001 任务卡完整保留在 [改造前固定版本](https://github.com/chasen2041maker/vla_basic/blob/4503a9cc9d0b67add5e85c28aa5d75e73f2725a7/experiments/highway_driving/CURRENT_TASK.md)。这是当时的验收设计，不是新的待办，也没有因退出主线而自动通过。
 
-HighwayEnv 提供道路、车辆模拟状态、底层控制与物理推进；当前脚本选择恒定高层动作并记录结果。这里还不是感知网络、跟车策略或 VLA。
-
-完整参考：[run_episode.py](run_episode.py)。课堂讲义：[walkthrough/H001-idle-step.md](walkthrough/H001-idle-step.md)。
-
-## 2. GPT 老师｜负责讲什么
-
-一次只讲一个片段，具体从哪里继续看 PROGRESS：
-
-| 片段 | 老师先讲并示范 | 理解核对重点 |
-|---|---|---|
-| A 高层目标与 IDLE | 谁选择动作、谁保持目标、谁推进车辆；带看首步目标速度与实际速率 | 不改变目标为什么不等于停车 |
-| B step 与时间 | reset/step 调用、动作前后时间、15 Hz 与 5 Hz | 一次决策步不是一秒 |
-| C 观察字段 | 自车/其他车、绝对/相对、单位、presence、排序 | 正确读一条日志，不把行号当稳定车辆 ID |
-| D 对照与结束 | 先预测 SLOWER，再比较真实结果；区分停止原因 | 目标降低不等于立即到达目标或安全停车 |
-
-这些是同一个 H001 的课堂片段，不是四个同时活跃的新任务。不要一次发出全部验收问题。老师必须先带读一个实际例子，不能只让学习者去读说明书。
-
-## 3. 你与 Codex｜有限动手卡
-
-### 前置条件与范围
-
-GPT 已讲到对应片段，并核对了所需的基本概念。未到的动手环节不提前执行。本轮允许运行现有脚本、查看输出、在老师明确指出的位置做一个临时故障对照；不要求从零重写模拟器。
-
-先使用 **0 辆其他车** 隔离高层动作和自车运动，种子固定 7、步数固定 1。它是教学控制条件，不是默认 12 辆其他车的交通表现评测。
-
-从仓库根目录执行；Windows 已按根 README 建好环境后：
-
-```powershell
-.\.venv\Scripts\python.exe experiments/highway_driving/run_episode.py --seed 7 --vehicles 0 --max-steps 1 --action IDLE
-```
-
-Linux/macOS 使用相同参数，将解释器换成 `.venv/bin/python`。第一次只做 IDLE，先读终端教学摘要与一条 trace，不急着改动作。
-
-到 D 片段时，**学习者先留下自己的预测**，再运行：
-
-```powershell
-.\.venv\Scripts\python.exe experiments/highway_driving/run_episode.py --seed 7 --vehicles 0 --max-steps 1 --action SLOWER
-```
-
-看初始条件是否一致，再比较目标速度、实际速率、位置、时间与停止原因。输出目录自动分开，不覆盖旧结果。C 片段为观察附近车辆，单独用 `--vehicles 12` 取得样本；不要拿它与 0 车回合混作同条件动作对照。
-
-### 学习者必须保留的部分
-
-事前预测、对结果的解释和不懂之处由学习者提供，Codex 不得代答。Codex 可以解释命令、帮读文件和定位错误，交付时标注实际协作方式。
-
-### 一个有限故障实验（到相应课堂环节再做）
-
-理解 B 后，老师可带着将 `test_padding_and_one_real_step` 中时间断言暂改为 `1.0`，学习者先预测，再运行这个单测观察失败，解释后恢复 `0.2` 并重跑。只做这一处临时对照，不提交故意失败的修改，不改环境频率、不触碰旧 Lab 的教学缺口。
-
-```powershell
-.\.venv\Scripts\python.exe -m unittest discover -s experiments/highway_driving/tests -p test_episode.py -k test_padding_and_one_real_step -v
-```
-
-本实验不是为了制造新功能，而是让学习者验证“一次 Python 循环就是一秒”的错误假设。
-
-### 交付与停止点
-
-按 [AGENTS.md](../../AGENTS.md) 交付：执行者/协作方式、版本、命令、退出码、输出位置、实际结果、未验证项、仍需学习者解释的内容。将客观结果交回 GPT 审查，Codex 不自行改学习状态或进入 H002。
-
-本轮不生成 policy.py、慢前车场景、变道策略、奖励设计、训练模型或新的活跃任务。
-
-## 4. GPT 验收｜每项都需要对应的个人证据
-
-以下是最终标准，不是第一次授课要一次问完的题单：
-
-- [ ] 学习者亲自运行并保留版本、种子、车辆数、动作、步数和输出位置；说明 AI 协助范围。
-- [ ] 能解释 IDLE 不停车，区分目标速度与实际速率；知道目标速度是内部诊断，不是策略观察。
-- [ ] 从日志解释动作前后时间，区分决策步与物理更新。
-- [ ] 解释自车第 0 行与其他有效行、负相对 vx、presence=0 与排序行号的边界。
-- [ ] 提供自己的 SLOWER 事前预测和事后日志对照，而不是复制老师/Codex 的答案。
-- [ ] 定位并解释一次有限的错误时间断言，恢复后确认测试结果。
-- [ ] 区分碰撞、环境时限、运行器步数上限；不把进程成功或单步未碰撞称作安全验证。
-
-只有 GPT 核对上述证据后才更新个人学习结论。工程 CI 不是这些复选项的替代证据。旧 Lab 未完成状态保持不变；H002 只是后续候选，尚不激活。
+run_episode.py、requirements.txt 和 tests/ 保留原路径与内容，按需参考，不复制成另一套活跃项目。详情见 [历史实验说明](README.zh-CN.md)。
