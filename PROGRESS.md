@@ -9,9 +9,9 @@
 | 当前任务 | H001：运行并解释一个驾驶回合 |
 | 唯一任务路径 | [experiments/highway_driving/CURRENT_TASK.md](experiments/highway_driving/CURRENT_TASK.md) |
 | 当前课堂片段 | A：高层目标与 IDLE；B/C/D 尚不据此标成已讲完 |
-| engineering_status | REVIEW：本次教学摘要与协作规范待新版本 CI 核验 |
-| 工程验证范围与执行者 | 原入口历史验证见 2026-09-22 记录；本次执行者为 GPT 维护角色，验证范围按本次记录更新 |
-| 工程待验证项 | 本次完整 CI、Linux/Windows 集成与摘要；原生桌面窗口和学习者本机运行未验证 |
+| engineering_status | VERIFIED：代码版本 4c78cfb 的现有 CI 与 Linux/Windows 无窗口完整集成通过；范围见本次记录 |
+| 工程验证范围与执行者 | GPT 维护角色核对 GitHub Actions；Python 3.12、依赖兼容性、旧 Lab、HighwayEnv/教学摘要/CLI、真实回合及证据上传通过；不代表学习者运行 |
+| 工程待验证项 | 原生桌面 human 窗口和学习者本机运行未验证；最终文档收尾不改变已测代码 |
 | learning_status | LEARNING；没有因为维护、讲义或 CI 提升为 PASSED |
 | 课堂阶段 | EXPLAIN：先核对高层目标与实际运动的区别 |
 | GPT 已实际讲解 | 上轮对话已示范 IDLE 保持目标、控制器和 step 的分工及时间概念；这是教学方式示范，不代表 H001 全部授课完成 |
@@ -19,9 +19,9 @@
 | 仍不确定或误解 | 对目标速度、实际速率、时间和观察字段的理解尚待核对；没有证据，不推断具体误解 |
 | 实践证据 | 仅有维护者工程材料；没有可归为学习者 H001 亲自运行或独立修改的证据 |
 | 待老师审查证据 | 暂无新的学习者回答、预测、实验或故障记录 |
-| 下一次 GPT 从哪里开始 | [H001 讲义 A](experiments/highway_driving/walkthrough/H001-idle-step.md#a-gpt-老师先讲为什么-idle-以后车还会动)；定位 make_env 的 action 配置和 run_episode 的 step 前后记录 |
+| 下一次 GPT 从哪里开始 | [H001 讲义](experiments/highway_driving/walkthrough/H001-idle-step.md) 的 A 片段；定位 make_env 的 action 配置和 run_episode 的 step 前后记录 |
 | 下一次 GPT 的一个问题 | 给一辆仍在行驶的车发送 IDLE，为什么“不改变目标速度”不等于“把速度变成零”？ |
-| 下一次你与 Codex 做什么 | 等 GPT 核对所需理解后，按 H001 动手区运行 0 车、seed=7、1 步 IDLE 并读首步摘要；暂不提前比较 SLOWER或改测试 |
+| 下一次你与 Codex 做什么 | 等 GPT 核对所需理解后，按 H001 动手区运行 0 车、seed=7、1 步 IDLE 并读首步摘要；暂不提前比较 SLOWER 或改测试 |
 | 本轮不做什么 | 不激活 H002，不生成跟车策略、慢前车场景、训练或新活跃任务 |
 
 教材准备与实际授课必须区分：新增讲义不表示 B/C/D 已讲给学习者；老师示范的推理不能填成学习者答案。
@@ -30,7 +30,7 @@
 
 按用户要求，将 GPT 授课、你与 Codex 有限实现、双轨验收写入 AGENTS.md；统一教学入口；加入 H001 实际带读；将目标速度和实际速率分别写进真实日志并显示首步摘要；新增格式、真实模拟器对照和 CLI 测试。
 
-**工程变更不改变个人学习状态。** 维护范围和测试证据见 [2026-09-23 记录](notes/2026-09-23-teacher-codex-handoff.md)。旧入口与回放验证见 [2026-09-22 记录](notes/2026-09-22-highway-entry.md)。
+**工程变更不改变个人学习状态。** 维护范围、真实首步例子和测试证据见 [2026-09-23 记录](notes/2026-09-23-teacher-codex-handoff.md)。旧入口与回放验证见 [2026-09-22 记录](notes/2026-09-22-highway-entry.md)。
 
 ## 3. 学习者能力基线：未擅自升级
 
