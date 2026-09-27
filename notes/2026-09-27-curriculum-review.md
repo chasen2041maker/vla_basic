@@ -8,13 +8,15 @@
 
 实际读取的实践 `PROGRESS.md` 更新时间为 2026-09-27T13:36:59+08:00，接续至 action.py 第 214 行，已有规则 demo、动作源码与部分用户实验记录。用户粘贴说明中的“当前唯一任务 H001”不作为覆盖新进度的依据；既不把旧恒定动作 runner 当成现有全部实践，也不把有实验记录推断成独立掌握。
 
-因此本次按可见远端版本改进理论库，并单独提交评审分支，不覆盖可能尚未推送的本地课程稿、不修改实践进度或用户学习代码。
+因此本次按可见远端版本改进理论库，并单独提交 [PR #2](https://github.com/chasen2041maker/vla_basic/pull/2)，不覆盖可能尚未推送的本地课程稿、不修改实践进度或用户学习代码。主体改动提交为 `79f665aa8f78058c41270eaba024131a6790756f`；本记录随后补入该提交的远端 CI 证据。
 
 ## 直接审阅的材料与限制
 
-读取了 AGENTS、README、LEARNER_PROFILE、ROLE_TARGET、ROADMAP、SKILL_GAP_MATRIX、PRACTICE_MAP、theory/README、theory/01–03、旧 run_episode.py、test_episode.py、test_logic.py、旧 requirements，以及实践库 PROGRESS。旧 runner 及两份测试做了静态核对。
+读取了 AGENTS、README、LEARNER_PROFILE、ROLE_TARGET、ROADMAP、SKILL_GAP_MATRIX、PRACTICE_MAP、theory/README、theory/01–03、旧 run_episode.py、test_episode.py、test_logic.py、旧 requirements，以及实践库 PROGRESS。随后读取 scripts/check_repo.py、旧 Lab 001 的 test_transforms.py，并核验 PR 自动 CI 的状态、作业步骤及 Ubuntu HighwayEnv 作业完整日志。
 
-未读到用户所称的新版第 1 章实际正文，未把旧材料替代它评为通过。本轮没有重新运行完整 HighwayEnv、旧工程 CI、桌面窗口、训练、真实数据集或 GPU/车端部署。容器为 Python 3.13.5，缺少 gymnasium/highway_env/pygame，直接克隆远端的网络解析失败；不使用 mock 或跳过依赖伪造集成通过。
+未读到用户所称的新版第 1 章实际正文，未把旧材料替代它评为通过。本地容器为 Python 3.13.5，缺少 gymnasium/highway_env/pygame，直接克隆远端的网络解析失败；本地没有重新运行完整 HighwayEnv，也没有用 mock 或跳过依赖伪造通过。PR 创建后，远端 CI 自动执行了原工程检查，证据单独列在下文，不能再笼统称本次“完全没有仿真验证”。
+
+本轮仍没有运行桌面可见窗口、用户本机、训练、真实数据集或 GPU/车端部署。
 
 ## 审查结论
 
@@ -22,7 +24,9 @@
 
 已有讲义不是空目录：它们解释了目标与实际速度、SLOWER 对实际速度档位的处理、step 时间、相对量、归一化、有限观察等具体问题；旧 runner 也有真实交互、明确动作、连续日志和非空白渲染检查。这些应保留，不需要推倒重写。
 
-缺口在于后续数据/视觉/模型链还没有实际交付，旧岗位目标把不同专业方向一并要求到较深水平，数学/C++/Linux缺少局部可验证起点，评测和车企需求/问题闭环尚未形成清晰的教材要求。课程覆盖广不是缺点，但不能把广泛理解误写成所有岗位都必须完成的一套最大清单。
+旧 Lab 001 也并非没有数学实证：[test_transforms.py](../labs/001-driving-data-contract/guided_reference/001a/tests/test_transforms.py)已经覆盖世界/自车坐标往返和 90° 旋转。新讲义是把这类基础重新接到当前问题，并补上理想相机投影、真实数据迁移与 C++检查，不是第一次在仓库引入坐标数学，更不需要另建重复的驾驶工程。
+
+主要缺口在于后续真实数据/视觉/模型链尚未实际交付；旧岗位目标把不同专业方向一并要求到较深水平；当前主线与旧数学工具、C++/Linux工程证据的衔接仍不足；评测和车企需求/问题闭环需要更清晰的教材要求。课程覆盖广不是缺点，但不能把广泛理解误写成所有岗位都必须完成的最大清单。
 
 | 主要问题 | 本次实际改动 | 仍然没有完成什么 |
 | --- | --- | --- |
@@ -30,7 +34,7 @@
 | 岗位范围过宽 | ROLE_TARGET 改为杭州/上海 OEM 目标，四方向分流、条件核验和来源限制 | 未找到薪资/主体/城市全验证的目标岗位，未确定用户唯一主攻方向 |
 | 缺少公平评测和失败证据方法 | 新增讲义 04，区分指标、场景配对、抽样不确定性和闭环类型 | 未建设实践批量评测器或可控碰撞/驶离场景 |
 | 从状态直接跳视觉/VLA | 新增讲义 05，给真实数据候选、接口/标签/时间/坐标和资源步骤 | 未下载 nuScenes、未实现适配器、未训练视觉/时序模型 |
-| 工程基础停留在技能词 | 新增讲义 06，可编译 C++几何例子和错误检查；矩阵按方向定深度 | 未证明大型 C++工程、Linux独立排错、模型部署或实时系统能力 |
+| 工程基础需要接回真实问题 | 新增讲义 06，可编译 C++几何例子和错误检查；矩阵按方向定深度；保留旧几何测试 | 未证明大型 C++工程、Linux独立排错、模型部署或实时系统能力 |
 | 章节和独立作品怎样验收不明确 | 新增 CURRICULUM_STANDARD，重整 ROADMAP、索引和对应表 | 后续实践仍需逐步交付；不能用新规范代替实际成果 |
 
 ## 本次实际执行的局部验证
@@ -45,7 +49,22 @@
 | `./geometry_check` | `geometry checks passed`，退出 0 | 两个已知坐标例子和 NaN 输入拒绝 |
 | `./geometry_check --inject-degrees` | `coordinate check failed`，退出 1 | 故意把度当弧度，业务数值检查发现错误；不是 sanitizer 自动发现单位错误 |
 
-以上是助手检查，不是学习者验收。未宣称运行过 Windows/WSL 本机、IDE/gdb、其他编译器或原项目集成测试；也没有用修改旧 Lab 001 的预期来制造全绿。
+以上是助手检查，不是学习者验收。新 C++例子没有在 Windows/WSL 本机、IDE/gdb 或其他编译器上验证。
+
+## PR 创建后的远端 CI 补录
+
+验证对象是 PR 主体提交 `79f665aa8f78058c41270eaba024131a6790756f` 与基准 `07195834977114e5fdffcf62358ea9ab93534612` 的测试合并版本。Ubuntu 日志实际 checkout 为 `9db0dd80cf9b81a2d064acee8a1e2d492155a535`，不是把当前浮动 main 当作证据。
+
+| 远端记录 | 已核验结果 |
+| --- | --- |
+| [ci / run 36302415440](https://github.com/chasen2041maker/vla_basic/actions/runs/36302415440) | 状态 completed，结论 success |
+| [highway-driving / run 36302415447](https://github.com/chasen2041maker/vla_basic/actions/runs/36302415447) | Ubuntu 与 Windows 两个作业均 success；依赖兼容、原基线/真实环境检查、短回合及证据上传步骤均 success |
+| Ubuntu job `108572415056` 完整日志 | Python 3.12.14，固定直接依赖安装；`pip check` 无冲突；运行 `python scripts/check_repo.py --with-highway`；Lab 000 4 项、Lab 001 7 项、Highway 15 项 unittest 均通过；原教学基线仍是 4/6 |
+| Ubuntu 短回合 | `python experiments/highway_driving/run_episode.py --max-steps 5 --output-dir outputs/ci-smoke`；恒定 IDLE，5 步、1.000 秒，以 runner_step_limit 结束；保存回放、日志和 pip-freeze，上传 artifact `10925762093` |
+
+Windows 这里只核验了作业及步骤状态，没有逐行复核其完整日志，因此不将 Ubuntu 的具体数字自动复制为 Windows 独立结果。CI 是 SDL dummy 的无窗口检查，不证明桌面窗口或实车行为。上面也不是新增讲义代码被原有 CI 自动覆盖：新数学/C++例子由本地临时检查验证，旧工程由原 CI 验证，两者范围分开。
+
+这份补录本身是后续文档提交；以上 run ID 只绑定所列主体提交与测试合并版本，不冒充任何尚未核对的新运行结果。
 
 ## 岗位材料怎样影响结论
 
