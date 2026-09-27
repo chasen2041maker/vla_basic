@@ -1,0 +1,98 @@
+{
+  "recorded_at": "2026-09-27T15:48:01+08:00",
+  "executor": "assistant",
+  "reason": "用户明确 vla_basic 是整体智驾学习项目；HighwayEnv 是阶段工具和模拟器源码",
+  "source_head": "49031bd",
+  "source_state": "包含迁移前未提交教学文档；Python 脚本按当前文件逐字节复制",
+  "originals_retained": true,
+  "files": [
+    {
+      "source": "demo.py",
+      "destination": "experiments/highway_driving/demos/00_following.py",
+      "sha256": "8abde7f5ffec4ac8fe64487b2d20dad49b50b6031c35f3fc70f5ecea7bc21997"
+    },
+    {
+      "source": "learning/demos/01_lane_change.py",
+      "destination": "experiments/highway_driving/demos/01_lane_change.py",
+      "sha256": "855e9dc527c87684f15b4d1354910e464c99a5f4706237efc812d782329ded20"
+    },
+    {
+      "source": "learning/demos/02_action_space.py",
+      "destination": "experiments/highway_driving/demos/02_action_space.py",
+      "sha256": "813cb87326bcc7ba47f7fd01227c2e4c61949311d6bcde0e2822097964790b08"
+    },
+    {
+      "source": "learning/demos/03_continuous_action.py",
+      "destination": "experiments/highway_driving/demos/03_continuous_action.py",
+      "sha256": "8f6891e05b55e1656200d5023551abd33657da9121fca0f361f8e68e87aa9371"
+    },
+    {
+      "source": "learning/evidence/2026-09-23-speed-targets-check.json",
+      "destination": "learning/evidence/2026-09-23-speed-targets-check.json",
+      "sha256": "f6e4e87f3975871af91b6b10d255179073213514c23d54ee69393d659397cbaa"
+    },
+    {
+      "source": "learning/evidence/2026-09-23-user-driving-log.txt",
+      "destination": "learning/evidence/2026-09-23-user-driving-log.txt",
+      "sha256": "c78a707924053676b22f8889946f415533178b5963cb30a47915f605051d0603"
+    },
+    {
+      "source": "learning/evidence/2026-09-24-assistant-chinese-comments-check.json",
+      "destination": "learning/evidence/2026-09-24-assistant-chinese-comments-check.json",
+      "sha256": "153c2680fff04bdd9afe6075e0433042ea5f53b1d0cfc07c489b5323b2981819"
+    },
+    {
+      "source": "learning/evidence/2026-09-24-assistant-lane-change-check.json",
+      "destination": "learning/evidence/2026-09-24-assistant-lane-change-check.json",
+      "sha256": "a430f1678aa65ffae840390bd921dea15897b16a1f6ee2ff95c7db028ee23f01"
+    },
+    {
+      "source": "learning/evidence/2026-09-24-user-distance-speed-log.json",
+      "destination": "learning/evidence/2026-09-24-user-distance-speed-log.json",
+      "sha256": "d5c530825ebe379e7892138a27781fa5f85828ec34325eb626133c0be66614c1"
+    },
+    {
+      "source": "learning/evidence/2026-09-26-assistant-continuous-action-check.json",
+      "destination": "learning/evidence/2026-09-26-assistant-continuous-action-check.json",
+      "sha256": "5541b2ce955b88e6644bb750c91292abd45f93a3133d6c10df5712019e3eb18d"
+    }
+  ],
+  "runtime_validation": {
+    "recorded_at": "2026-09-27T15:51:21+08:00",
+    "executor": "assistant",
+    "command": "D:/miniconda/envs/py310/python.exe scripts/check_repo.py --with-highway",
+    "exit_code": 0,
+    "python": "3.10.20",
+    "packages": {
+      "highway-env": "1.12.2.dev0",
+      "gymnasium": "1.3.0",
+      "numpy": "1.26.4",
+      "pygame-ce": "2.5.8"
+    },
+    "highway_source": "C:\\Users\\Administrator\\Desktop\\职业生涯项目\\HighwayEnv\\highway_env\\__init__.py",
+    "unit_tests": {
+      "lab000": 4,
+      "lab001": 7,
+      "highway": 10
+    },
+    "legacy_baseline": "4 / 6 PASS, intentionally unchanged",
+    "teaching_demos": {
+      "02_action_space.py": "Discrete(5); 4 valid, 5 invalid; no driving step",
+      "03_continuous_action.py": "one step; speed 25 -> 27.5 m/s; acceleration 2.5 m/s^2; steering -0.1571 rad",
+      "01_lane_change.py": "render_mode=None; 10 steps; target lane 1 -> 2; y prints 4,4,7.41,7.95,8; time-limit ending"
+    },
+    "not_run": [
+      "00_following.py interactive random-traffic run",
+      "visible-window verification",
+      "remote CI"
+    ],
+    "checks": {
+      "source_destination_sha256_pairs": 10,
+      "markdown_files": 28,
+      "local_links": 176,
+      "missing_links": 0,
+      "git_diff_check": "passed in both repositories"
+    },
+    "learner_completion": false
+  }
+}

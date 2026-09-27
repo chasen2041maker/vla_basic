@@ -1,19 +1,40 @@
 # Highway Driving｜驾驶决策与失败分析实验
 
-## 这是什么，不是什么
+## 在主项目中的位置
 
-这是 `vla_basic` 当前主项目。先借 HighwayEnv 的道路、车辆、控制器和模拟状态，自己维护实验入口、策略、日志、评测与失败分析。
+这是 vla_basic 的早期驾驶交互与控制阶段。课程的讲义、实验代码、证据与进度由主项目管理；HighwayEnv 提供道路、状态、动作接口、控制器与运动模型，源码保留在同级仓库。
 
-长期追问：**前车更慢时，怎样调整行为，又怎样证明修改有用？** 当前 H001 只打通观察和动作的真实交互，还没有固定慢前车场景、跟车规则、视觉网络、强化学习或驾驶 VLA。默认种子复现的是随机生成场景，不保证每次都有特定的慢前车事件。
+## 当前学习实验
 
-## 安装与第一跑
+阅读正文请直接打开[连续教材](../../learning/BOOK.zh-CN.md)，相关代码和完整实验均在章内。本页是运行器与环境的技术参考。
 
-推荐 Python 3.12。先按 [根 README](../../README.md#直接运行) 创建独立环境。下列 `python` 均指该环境解释器，命令从仓库根目录执行：
+[实验目录说明](demos/README.md)列出已归入的四个脚本、运行命令与来源。它们是原练习的逐字节迁移，保留用户已有代码；未复制模拟器、未添加新驾驶行为。当前小节见 [CURRENT_TASK](CURRENT_TASK.md)，全项目进度见 [PROGRESS](../../PROGRESS.md)。
+
+本机继续使用 `D:\miniconda\envs\py310\python.exe`，其 HighwayEnv 导入来自同级源码。后续章节需要别的依赖时按阶段隔离，不把新工具都塞进这个模拟器仓库。
+
+以下章节说明保留的 `run_episode.py` 基线，不是四个 demos 的统一配置。该基线无跟车规则；demos 已有距离跟车与个人运行证据。观察归一化、频率、时限与目标速度必须按所运行脚本分别解释。
+
+## 安装与第一跑（旧记录器基线）
+
+以下步骤供新机器或重建旧固定版本基线使用，推荐 Python 3.12。本机课程已经有 py310 环境，继续沿用，不需要为目录整理重装。命令从仓库根目录执行。
+
+Windows PowerShell（无需激活环境）：
+
+```powershell
+py -3.12 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r experiments/highway_driving/requirements.txt
+.\.venv\Scripts\python.exe experiments/highway_driving/run_episode.py --seed 7 --action IDLE
+```
+
+Linux / macOS：
 
 ```bash
-python -m pip install -r experiments/highway_driving/requirements.txt
-python experiments/highway_driving/run_episode.py --seed 7 --action IDLE
+python3.12 -m venv .venv
+.venv/bin/python -m pip install -r experiments/highway_driving/requirements.txt
+.venv/bin/python experiments/highway_driving/run_episode.py --seed 7 --action IDLE
 ```
+
+下文的 `python` 均指所选环境解释器，可替换为上面的完整解释器路径。
 
 不要为本轮安装 PyTorch、训练框架或 GPU 工具链。`requirements.txt` 固定直接依赖，不是全量依赖锁文件；CI 用 `pip-freeze.txt` 留下实际解析版本，摘要也记录核心包、Python 和代码版本。不要把同种子误当成跨版本、跨平台逐位一致的承诺。
 
@@ -91,7 +112,7 @@ outputs/highway_driving/<本次 UTC 时间>/
 └── summary.json        # 配置、版本、种子、初末状态和结束原因
 ```
 
-输出目录已被仓库现有 `.gitignore` 排除。不要提交大量二进制、数据集或真实车辆日志。需要共享结论时，在 `notes/` 写最小复现条件与证据引用。
+输出目录已被仓库现有 `.gitignore` 排除。不要提交大量二进制、数据集或真实车辆日志。需要共享结论时，在学习日志和 `learning/evidence/` 写最小复现条件与证据引用；旧 notes 已归档。
 
 ## 验证与边界
 
@@ -101,11 +122,11 @@ python scripts/check_repo.py --with-highway
 
 纯逻辑测试检查参数和结束分类；真实环境测试检查观察物理单位/相对关系、空槽、一步运动与时间、同种子复现、SLOWER 改变运动、两类停止条件、日志连续性及图片文件。缺依赖直接失败，不跳过真实测试来制造绿色状态。
 
-这些检查只能证明当前实验入口和记录满足已测契约，不能证明一般驾驶安全。工程执行证据与学习者掌握证据分别见 [工程记录](../../notes/2026-09-22-highway-entry.md) 和 [PROGRESS](../../PROGRESS.md)。
+这些检查只能证明当前实验入口和记录满足已测契约，不能证明一般驾驶安全。工程执行证据与学习者掌握证据分别见 [工程记录](../../archive/notes/2026-09-22-highway-entry.md) 和 [PROGRESS](../../PROGRESS.md)。
 
-## 当前只读哪段代码
+## 旧记录器代码怎样回查
 
-先看 `run_episode.py` 的 `make_env()` → `run_episode()` 中 `reset` 与 `step` → 日志里的对应字段。暂时不逐行讲命令行和保存细节。按 [CURRENT_TASK](CURRENT_TASK.md) 预测一个变化，再做一次小修改。
+先看 `run_episode.py` 的 `make_env()` → `run_episode()` 中 `reset` 与 `step` → 日志里的对应字段。暂时不逐行讲命令行和保存细节。是否需要回查由 [CURRENT_TASK](CURRENT_TASK.md) 决定，不重做已完成的当前阶段实验。
 
 ## 官方依据
 

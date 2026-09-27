@@ -1,5 +1,7 @@
 # Master Growth Plan
 
+本文保留长期能力依赖与旧 Lab 专项目录。当前采用 [分章节人工智能驾驶教程](../learning/BOOK.zh-CN.md)，Lab 编号不代表当前章节顺序或已实现代码；学习状态以 [PROGRESS.md](../PROGRESS.md) 为准。
+
 ## 目标
 
 建立一套可迁移的自动驾驶 VLA 工程能力，而不是完成固定教程。
@@ -393,11 +395,4 @@ Lab 000A 是读取与系统定位任务，可在尚未修改代码时先通过 `
 
 # 当前阶段
 
-```text
-Lab 000A — Driving System Map Trace
-状态：LEARNING
-```
-
-精确任务：
-
-- [`labs/000-driving-system-map/CURRENT_TASK.md`](labs/000-driving-system-map/CURRENT_TASK.md)
+当前唯一任务由 [PROGRESS.md](../PROGRESS.md) 指向，课程教材从 [连续教材](../learning/BOOK.zh-CN.md) 进入。旧 Lab 000/001 的个人验收仍未完成，保留为专项材料；这里不另存一份活跃任务状态。

@@ -7,8 +7,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-LAB_000 = ROOT / "labs" / "000-driving-system-map" / "guided_reference" / "000a"
-LAB_001 = ROOT / "labs" / "001-driving-data-contract" / "guided_reference" / "001a"
+LAB_000 = ROOT / "archive" / "labs" / "000-driving-system-map" / "guided_reference" / "000a"
+LAB_001 = ROOT / "archive" / "labs" / "001-driving-data-contract" / "guided_reference" / "001a"
 HIGHWAY = ROOT / "experiments" / "highway_driving"
 
 
@@ -38,7 +38,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--with-highway", action="store_true")
     args = parser.parse_args()
-    for directory in (ROOT / "labs", ROOT / "experiments"):
+    for directory in (ROOT / "archive" / "labs", ROOT / "experiments"):
         if not compileall.compile_dir(directory, quiet=1):
             return 1
     for lab in (LAB_000, LAB_001):
@@ -52,6 +52,22 @@ def main() -> int:
             return 1
     if args.with_highway:
         if run_tests(HIGHWAY) != 0:
+            return 1
+        # 归入主项目的教学脚本也检查真实导入与执行；不启动交互窗口。
+        # 00 是随机交通的人工观察练习，不在这里运行，也不作为学员验收。
+        for name in ("02_action_space.py", "03_continuous_action.py"):
+            if subprocess.run(
+                [sys.executable, str(HIGHWAY / "demos" / name)],
+                cwd=ROOT, check=False,
+            ).returncode != 0:
+                return 1
+        if subprocess.run(
+            [sys.executable, "-c",
+             "import runpy; runpy.run_path("
+             "'experiments/highway_driving/demos/01_lane_change.py')"
+             "['main'](render_mode=None)"],
+            cwd=ROOT, check=False,
+        ).returncode != 0:
             return 1
         print("repository + HighwayEnv checks passed")
     else:
