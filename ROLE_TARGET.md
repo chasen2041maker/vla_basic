@@ -1,178 +1,55 @@
-# Role Target — XPENG-like Autonomous Driving R&D
+# 岗位目标｜车企智驾团队，一条主攻方向
 
-最后核对：2026-08-28
+更新与公开材料检索：2026-09-27。本文是课程选材依据，不是录用、薪资或学习期限承诺。当前学习状态只看 [实践进度](https://github.com/chasen2041maker/highwayenv-learning/blob/main/PROGRESS.md)。
 
-这不是职位或录用承诺，而是仓库用来筛选学习内容和证据强度的目标画像。
+## 目标和仍需核对的条件
 
-## 1. 北极星角色
+用户本次明确的目标：车企内部智能驾驶研发团队，杭州优先、上海其次，人民币月薪 20k 以上，暂按税前固定月薪理解，口径尚未最终确认。不能把年终奖、股票、总包除以 12 或招聘页的宽泛薪资栏直接当作固定月薪。
 
-长期目标偏向：
+供应商、Robotaxi 服务商、外包驻场以及车企普通 IT 岗位不自动视为同一目标。车企品牌、招聘账号、办公地点和劳动合同签约主体是四件事；即使岗位由车企官网发布，具体合同主体仍可能需要招聘方确认。
 
-- Driving VLM / VLA Algorithm Engineer；
-- End-to-End Autonomous Driving Algorithm Engineer；
-- Driving Foundation Model / World Model Engineer；
-- Action Representation / Planning Model Engineer；
-- Autonomous Driving Evaluation / Physical AI Systems Engineer。
+Python、Agent/workflow、RAG、tool calling 和 AI Coding 可作为已有经验使用；常规训练、蒸馏量化是自述，仍需在驾驶任务中验证。实践进度还记录了用户自述约半年工程师经历，不能等同于半年智驾研发经历。学历、专业、具体工作职责与年限口径、数学/C++深度、硬件、持续学习时间和转行期限仍未核实，不据此推算录用概率或完成日期。
 
-现实桥梁岗位包括：
+## 不再要求所有方向同时达到专家水平
 
-- 智驾数据价值、场景挖掘和数据闭环；
-- 自动驾驶评测、仿真和 failure mining；
-- AI Infra、训练平台、推理平台和模型优化；
-- 端到端模型工程、部署和可观测性。
+共同基础是：能沿着观察/数据 → 决策或模型 → 动作/轨迹 → 执行 → 评测解释一个系统；能核对单位、时间和坐标；能复现问题、修改有限逻辑、说明证据边界。
 
----
+在此基础上选择一个方向做深，其他模块先达到能够协作和定位责任边界的水平。不能把“全链路理解”扩张成“数据、感知、规控、VLA、CUDA、量产集成全都精通”。
 
-## 2. 2026 公开信号
+| 方向 | 真正需要交付的核心作品 | 不能用什么冒充 | 与当前背景的关系 |
+| --- | --- | --- | --- |
+| 车企内部智驾数据工程/数据闭环 | 可追溯的数据处理、场景查询、质量规则、去重/划分、任务失败恢复；证明数据问题怎样影响训练或评测 | 只有 Agent 对话界面；把高级数据挖掘算法岗当普通后端岗 | Python/工作流经验可以复用；需补驾驶数据语义与规模化处理。是否适合取决于具体 JD |
+| 仿真与算法评测工程 | 场景定义、可复现运行、评测器正确性、配对回归、失败归因、报告与问题闭环 | 演示一局不碰撞；仅做测试平台 CRUD；把安全测试当仿真平台研发 | 可作为近期探索候选，不等于用户已选，也不保证招聘门槛更低 |
+| 模型工程/训练或部署工程 | 可复现模型、训练/推理排错、性能剖析、版本管理；按岗位补 C++、算子/runtime、数值一致性与行为回归 | 导出一次 ONNX、单个平均耗时、只会部署 API | 可复用训练/量化自述，但需要实际模型、硬件与性能证据 |
+| 驾驶 VLM/VLA 算法 | 视觉/时序/轨迹数据、训练基线、模型或目标函数修改、消融、泛化和与动作执行一致的评测 | Prompt 调模型、复现 loss 曲线、让 AI 写完训练脚本 | 保留长期目标；尚不能由现有状态仿真证明相应算法能力 |
 
-公开岗位和技术资料表明，目标能力已经不只是普通深度学习训练，还包括：
+专门规控或感知岗位还会有各自的数学、C++、传感器及工程要求，不能拿上表的其他方向作品自动替代。选择 VLA 也不要求先成为 SLAM、底盘嵌入式和控制理论专家。
 
-- 不依赖 Coding Agent 完成关键 debug；
-- 多模态理解、时序推理和端到端模型；
-- VLA、VLM、世界模型和闭环强化学习；
-- 数据价值、场景发现和数据流转；
-- 闭环仿真、模型评估和长尾数据生成；
-- 蒸馏、视觉 token 压缩、推理效率和车端部署。
+## 岗位核验表：不是看到公司名就算匹配
 
-这些是路线设计依据，不代表每个候选人必须一开始同时精通所有方向。
+每个候选岗位至少保存：来源 URL、检索日、页面发布日期或“未显示”、职位 ID、团队、品牌、用人/签约主体、实际城市、校招/社招/实习、学历、年限、技能、薪资构成、有效状态和证据完整度。
 
-公开来源：
+信息冲突时保留冲突。例如页面标签写“学历不限”而正文写“本科及以上”，不能选择较宽松的一句替用户降低门槛。页面能被搜索到也不等于此刻仍接受申请；抓取时间不是发布日期。
 
-- VLA/VLM 算法工程师：<https://xiaopeng.jobs.feishu.cn/campus/position/7658239744397347110/detail>
-- 数据价值算法工程师：<https://xiaopeng.jobs.feishu.cn/campus/position/7658239755088447770/detail>
-- 大模型算法工程师（智驾/机器人）：<https://xiaopeng.jobs.feishu.cn/campus/m/position/7668513578471475462/detail>
-- 世界模型及环境感知：<https://xiaopeng.jobs.feishu.cn/campus/m/position/7658239755087759642/detail>
-- X-World：<https://www.xiaopeng.com/news/company_news/5548.html>
-- FastDriveVLA：<https://www.xiaopeng.com/news/company_news/5526.html>
+### 本轮公开抽样结果
 
-岗位和技术会变化，`FRONTIER_RADAR.md` 负责动态更新。
+以下检索日均为 2026-09-27。蔚来具体页本轮直接读取未获得完整正文，使用官网搜索索引片段，属于部分证据；发布日期、当前招聘有效性、固定月薪和劳动合同主体均未核实。
 
----
+| 官方岗位/来源 | 可见条件 | 可以用于什么，不能用于什么 |
+| --- | --- | --- |
+| [蔚来数据算法工程师/专家](https://nio.jobs.feishu.cn/index/m/position/7559545348076374299/detail) | 自动驾驶研发团队；上海；社招全职；本科及以上；5–7 年 | 反映长尾数据挖掘方向；不能据此推荐约半年经历者直接匹配，更不是数据工程初级岗的代表 |
+| [蔚来端到端模型 infra 专家/工程师](https://nio.jobs.feishu.cn/index/m/position/7582893832862730550/detail) | 自动驾驶研发团队；上海、北京；社招全职；本科及以上；3–5 年 | 反映训练/推理框架和性能工作；具体是否能选上海仍需逐岗确认 |
+| [蔚来 VLA 算法工程师](https://nio.jobs.feishu.cn/index/m/position/7548783213079267627/detail) | 自动驾驶研发团队；北京、上海；社招全职；索引学历标签与正文存在“要求不限/本科及以上”冲突；年限未完整读取 | 能确认研究对象涉及 VLA 与智能辅助驾驶；不能把学历或年限写成已放宽 |
+| [蔚来 VLA 方向实习生（上海）](https://nio.jobs.feishu.cn/campus/m/position/7620320073849522441/detail) | 自动驾驶研发团队；上海；校招实习；硕士及以上；2027 届实习生招募 | 可了解培养方向；不是社招正式岗位，也不是 20k 固定月薪证据 |
 
-## 3. 能力成熟度
+杭州尚未取得本轮可完整核验“具体智驾岗位 + 实际城市 + 有效状态 + 薪资”的样本。不能把未找到证据说成杭州没有机会。
 
-```text
-L0 不知道：无法解释基本输入输出
-L1 见过：知道名词和用途
-L2 能解释：能画数据链并指出常见失败
-L3 能控制：能实现、修改、测试、评测和排错
-L4 能权衡：能设计对照实验、替代方案和生产边界
-```
+[吉利 2027 届校招简章](https://career.hebut.edu.cn/home/correcruit/content/id/79225.html)由企业发布在河北工业大学就业平台，发布日期 2026-08-18，范围包括智驾规控方向，集团城市列表包括杭州、上海；资格面向相应 2027 届毕业生。它不是单岗位 JD；页面统一 8000–10000 元字段不能代替某个算法岗的报价，也不能据此否定整个集团的 20k 机会。
 
-目标不是所有方向都成为研究专家，而是：
+[零跑 2027 届校招公告](https://career.hznu.edu.cn/campus/view/id/551143)可见企业名浙江零跑科技股份有限公司及 2026-10-03 截止日期，但本轮未取得对应具体智驾 JD；不作为已匹配的杭州岗位。历史小鹏技术/校招材料可以用于了解方向，未核验的城市、招聘类型和薪资不沿用为新结论。
 
-```text
-主链 data → model → action → eval → system 达到 L3
-+ 至少一个方向逐步达到 L4
-```
+## 怎样决定主攻方向
 
----
+先用同一份小型驾驶成果，观察自己更能独立做好哪类工作：数据与任务组织、场景与指标、模型排错与性能，还是训练和模型修改。再找满足身份与城市条件的具体 JD，逐条映射到 [作品交付标准](CURRICULUM_STANDARD.md)。
 
-## 4. 七条能力轴
-
-### A. Coding & Debugging
-
-目标：L3
-
-- Python / PyTorch 工程链；
-- Linux、Git、profiling 和最小复现；
-- 能在没有 Coding Agent 时定位关键 bug；
-- C++ 达到阅读、修改和调试基础智驾模块；
-- tensor shape、device、dtype、mask、NaN、显存和吞吐排错。
-
-### B. Deep Learning & Experimentation
-
-目标：已有基础进入驾驶化验证
-
-- 训练、优化、过拟合、泛化、泄漏和消融；
-- Transformer、ViT 和时序建模；
-- 蒸馏、量化和模型压缩；
-- 分布式训练和大模型微调按需要补齐；
-- 强化学习在闭环基础建立后进入。
-
-### C. Vision, Geometry & Temporal Understanding
-
-目标：L3
-
-- 图像、视觉特征和 token；
-- 相机内参、外参、投影和深度；
-- ego / world / camera / image / BEV 坐标；
-- 多相机异步、历史帧和 ego-motion compensation；
-- BEV / occupancy / temporal representation 的边界。
-
-### D. Driving Motion & Action
-
-目标：L3
-
-- scene / sample / history / future；
-- waypoint / trajectory / speed profile / control；
-- SE(2) 和运动学自行车模型；
-- trajectory feasibility；
-- action token、continuous head 和 decode consistency；
-- 规划层与控制层职责边界。
-
-### E. Driving Model / VLA
-
-目标：L3
-
-- imitation-learning trajectory baseline；
-- 多相机历史、ego state 和 route conditioning；
-- Driving VLM / VLA；
-- direct trajectory、action token、diffusion/flow head；
-- reasoning / implicit token；
-- conditioning、action 和模型消融。
-
-### F. Evaluation & Reliability
-
-目标：L3–L4
-
-- contract tests；
-- open-loop / pseudo-closed-loop / closed-loop；
-- safety、progress、comfort 和 rule compliance；
-- evaluator unit tests；
-- failure taxonomy、long-tail 和 domain shift；
-- 结论边界和可复现实验。
-
-### G. Systems, Safety & Deployment
-
-目标：L3
-
-- preprocessing / inference / decode / control latency；
-- stale observation 和 deadline；
-- quantization / token pruning / runtime；
-- ODD、safety monitor、fallback 和 minimum-risk behavior；
-- model/data/config versioning、logs、metrics、trace 和 rollback。
-
----
-
-## 5. 可投递前的最低作品证据
-
-至少拥有一个公开、可复现的完整项目，能够展示：
-
-```text
-数据契约与可视化
-+ 端到端训练和推理
-+ 独立模型或 action 修改
-+ 开放环和闭环评测
-+ 三类以上 failure analysis
-+ 蒸馏/量化或部署实验
-+ latency / memory / behavior 对比
-+ 安全边界与 fallback
-+ 清楚的技术报告和复现说明
-```
-
-只跑 README、只展示 loss 曲线、只让 Coding Agent 写完或只背模型名称，都不足以达到目标。
-
----
-
-## 6. 范围边界
-
-本仓库不以以下角色为主：
-
-- 纯控制理论研究员；
-- SLAM / 高精地图深水区专家；
-- 底盘嵌入式和车辆硬件工程师；
-- 真实道路测试安全驾驶员；
-- 只做 Prompt 或聊天 Agent 的应用工程师。
-
-这些方向会按主线需要学习最低必要知识，但不会无限扩张。
+暂建议优先检验“驾驶数据工程 / 仿真评测工程”与现有经验的衔接，同时保留 VLA 学习主线。这是课程设计判断，不是用户已选方向，不是“先做工具必然能转算法”的承诺。若学历/校招资格或社招年限不匹配，应如实调整投递样本；不能用补几章教材消除招聘硬条件。
