@@ -1,122 +1,45 @@
-# Skill Gap Matrix
+# 能力补齐决策｜自述、证据与岗位要求分开
 
-最后校准：2026-08-28
+更新：2026-09-27。本页记录课程如何安排，不保存个人实时分数或另一份进度。实际实践和理解证据在 [实践 PROGRESS.md](https://github.com/chasen2041maker/highwayenv-learning/blob/main/PROGRESS.md)。缺少证据既不等于不会，也不等于已经会。
 
-本文件把“已经会”“需要验证”“必须系统学习”和“现在延后”分开，避免重复学习，也避免把自述经验直接当作驾驶研发证据。
+## 已有经验怎样使用
 
-## 1. 状态含义
+Python、Agent/workflow、RAG、tool calling 和 AI Coding 可用作教学起点；不机械重教整套语法。遇到数组维度、对象、继承等具体卡点时，就在当前代码中解释，不因“Python 熟悉”跳过真实困难。
 
-```text
-USE      可以直接作为教学起点使用
-VERIFY   不从基础重讲，但要在真实任务中用代码和实验验证
-LEARN    当前主要缺口，需要系统建立
-LATER    有价值，但依赖尚未满足，暂不进入主线
-PASSED   已在仓库中形成可复现证据
-```
+常规深度学习训练、蒸馏和量化是用户自述。先给有限的训练/排错任务核对，不默认都要从头重学，也不直接记为驾驶模型能力。约半年工程师经历来自实践记录中的自述，具体职责及招聘年限口径待核实。
 
-`USE / VERIFY` 是课程安排，不等于招聘层面的精通。
+## 共同基础与证据
 
----
+| 能力 | 教学决策 | 应当能展示什么 |
+| --- | --- | --- |
+| Python 执行链 | 复用经验，局部补语法 | 从观察到动作再到日志追踪一条真实执行路径；解释自己改动的变量 |
+| 时间与坐标 | 在当前驾驶例子中建立 | 区分动作前后、采集/到达时间、世界相对量与自车轴；正反变换及错误样本 |
+| 车辆运动与控制 | 先运动学与反馈，再按岗位深化 | 用单位正确的数值解释速度/角度变化；区分高层目标、轨迹和直接控制 |
+| 评测与实验 | 从规则基线开始，不等训练以后 | 同配置配对比较、失败复现、留出场景、指标单元检查、诚实的结论范围 |
+| Linux / Git / 调试 | 随每次运行积累 | 记录版本、命令、路径、环境、日志与退出码；定位一次真实故障而非只重装依赖 |
+| 数学 | 按任务补齐，不设全科考试 | 单位/代数 → 旋转投影 → 损失梯度 → 抽样不确定性；每项有反例 |
+| 模型实验 | 自述基础先验证 | 小数据过拟合、保存重载、数据划分、tensor/mask/NaN 排错；不是只看 loss 下降 |
+| 视觉与时序 | 不默认已有，需独立实验 | 真实图像及标定、历史对齐、未来标签参考系、按场景划分与单帧/时序消融 |
 
-## 2. 当前能力矩阵
+## 按主攻方向决定深度
 
-| 能力 | 当前状态 | 教学决策 | 需要的仓库证据 |
-|---|---|---|---|
-| Python 工程阅读与开发 | USE | 不从语法开始 | 能独立跟踪完整 execution path |
-| Agent / workflow / tool calling | USE | 只作为系统类比 | 能指出类比在物理世界哪里失效 |
-| 常规深度学习训练 | VERIFY | 跳过基础训练循环 | 过拟合小数据、定位 loss/shape/gradient 问题 |
-| Transformer / Attention | VERIFY | 按视觉与时序任务复用 | 能解释 token、mask、时序条件如何影响输出 |
-| 蒸馏 | VERIFY | 不重讲定义，后期做驾驶实验 | teacher/student 目标、消融、行为与延迟对比 |
-| 量化 | VERIFY | 不重讲定义，后期做部署实验 | 精度、行为、延迟、内存和失败场景对比 |
-| 强化学习 | LATER | 先不学 PPO 名词表 | 先完成 state/action/rollout/closed-loop 基础 |
-| 计算机视觉基础 | LEARN | 系统补齐 | 图像特征、ViT/CNN、检测/分割基本实验 |
-| 相机几何与坐标 | LEARN | 系统补齐 | 内外参、投影、ego/world/camera round-trip tests |
-| 多相机与时序 | LEARN | 系统补齐 | 时间轴、skew、ego-motion compensation 实验 |
-| BEV / occupancy mental model | LEARN | 在几何后进入 | 能说明输入、输出、假设和失败症状 |
-| 驾驶数据契约 | LEARN | 当前早期主线 | silent failure、validator 和 tests |
-| trajectory / waypoint / control | LEARN | 系统补齐 | 轨迹表示、rollout、控制边界解释 |
-| 车辆运动学 | LEARN | 系统补齐 | SE(2)、bicycle model、yaw/unit fault |
-| 模仿学习驾驶 baseline | LEARN | 复用已有训练能力 | trajectory model、overfit、leakage check |
-| 开放环 / 闭环评测 | LEARN | 核心缺口 | 构造指标背离与 compounding error |
-| Driving VLM / VLA | LEARN | 基础依赖满足后进入 | 公开实现、conditioning ablation、action decode |
-| ODD / safety / fallback | LEARN | 与闭环并行建立 | allow/reject/fallback tests |
-| C++ 智驾代码阅读 | VERIFY | 当前水平待仓库验证 | 能读改基础 C++ 数据与推理链 |
-| Linux / Git / 调试 | VERIFY | 不单独开基础课 | 无 Coding Agent 完成一次关键排错 |
-| 分布式训练 | LATER | 单机 baseline 稳定后进入 | 可复现实验和性能瓶颈证明 |
-| 车端推理与可观测性 | LEARN | 利用量化经验迁移 | latency breakdown、stale detection、version log |
+下表是交付要求，不是用户当前等级。行业入口速度和薪资不能由技能清单推导。
 
----
+| 主攻方向 | 应做深 | 可以先保持协作级理解 |
+| --- | --- | --- |
+| 驾驶数据工程/数据闭环 | Python、数据契约、质量/去重/划分、存储查询、幂等恢复、训练或评测消费者 | 核心感知网络设计、复杂控制、车端算子；若 JD 要求 C++ 或数据算法研究则另补 |
+| 仿真评测工程 | 场景与仿真接口、指标正确性、版本回归、故障归因、批量运行、统计；按 JD 做 C++ 集成 | 大规模 VLA 预训练、复杂视觉骨干设计；不能省略基本运动与传感器语义 |
+| 模型工程/部署 | Linux、PyTorch、tensor/数值调试、C++构建调试、runtime/性能、压缩前后行为验证 | 世界模型研究、多模态推理结构创新；CUDA/分布式按实际岗位与瓶颈加入 |
+| VLA/时序算法 | 线性代数与优化、视觉几何、时序轨迹、训练/消融、泛化、评测与可执行动作 | 平台前后端大全、底盘硬件开发；C++/部署深度仍取决于具体 JD |
 
-## 3. 最短转型路径
+“数据闭环”中的高级数据算法岗位和数据工程岗位并不等价；“仿真”中的平台研发、场景算法、测试执行也不等价。选定 JD 后逐项匹配，不只匹配职位标题。
 
-### 路径 A：先形成可投递的桥梁能力
+## 三个不能省略的个人证据
 
-更贴近当前工程背景：
+能解释：换一组未见数值或一个相近场景，仍能说清输入、时刻、单位、动作和预期后果。
 
-```text
-驾驶数据契约
-→ 数据价值 / 场景挖掘
-→ 评测与仿真
-→ 模型训练和推理链
-→ 部署与可观测性
-```
+能修改与排错：允许使用 AI 和参考实现，但必须能指出改了什么、如何验证；至少完成一次未获完整答案的局部故障定位，不能只重新运行 AI 给出的命令。
 
-可连接的岗位方向包括：
+能比较和限定结论：有基线、对照、失败与未验证项，知道一次成功、程序通过和真实驾驶安全不是一回事。
 
-- 智驾数据价值与数据闭环；
-- 自动化评测与仿真；
-- AI Infra / 训练平台 / 推理平台；
-- 端到端算法工程支持。
-
-### 路径 B：长期进入核心 VLA 算法
-
-```text
-视觉与几何
-→ 多相机时序
-→ 轨迹与车辆运动
-→ 端到端模型
-→ 闭环评测
-→ Driving VLM / VLA
-→ RL / world model / long-tail
-```
-
-两条路径不是二选一。路径 A 提供更快的行业入口，路径 B 是长期北极星。
-
----
-
-## 4. 不重复教学规则
-
-以下内容不机械重讲：
-
-- Python 基础语法；
-- 普通 `Dataset/DataLoader` API 大全；
-- 基础反向传播和 optimizer 定义；
-- 蒸馏、量化的纯名词课；
-- 从空白搭大量训练 boilerplate。
-
-但遇到驾驶任务时仍会验证：
-
-```text
-能否跟踪 tensor 和时间语义
-能否修改 loss / head / decode
-能否定位 leakage / normalization / metric 问题
-能否用实验说明蒸馏或量化的真实收益
-```
-
----
-
-## 5. 当前优先级
-
-```text
-P0  系统全景和 failure boundary
-P0  时间、坐标、trajectory/control
-P0  视觉与相机几何
-P0  open-loop / closed-loop
-P1  端到端 trajectory baseline
-P1  Driving VLM / VLA
-P1  C++ / deployment / observability
-P2  distillation / quantization 驾驶化验证
-P2  reinforcement learning / world model
-```
-
-优先级由依赖决定，不代表后面的内容不重要。
+这些证据按实践仓库现行字段保存，不在这里新增“已通过”标记。详细格式见 [教材与作品交付标准](CURRICULUM_STANDARD.md)。强化学习、世界模型、大规模分布式和高级算子优化延后到有明确问题与基础之后，不作为所有人的起步门槛。
