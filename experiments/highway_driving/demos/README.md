@@ -30,6 +30,6 @@
 
 ## 文字与源码
 
-阅读[连续教材](../../../learning/BOOK.zh-CN.md)，必要源码与完整实验已在对应章节就地展示。需要核对原始实现时，可选打开本机 [controller.py](../../../../HighwayEnv/highway_env/vehicle/controller.py) 与 [action.py](../../../../HighwayEnv/highway_env/envs/common/action.py)；这不是额外的阅读任务。
+阅读[连续教材](../../../learning/BOOK.zh-CN.md)，必要源码与完整实验已在对应章节就地展示。需要核对原始实现时，可选打开本机 [controller.py](https://github.com/chasen2041maker/highwayenv-learning/blob/main/highway_env/vehicle/controller.py) 与 [action.py](https://github.com/chasen2041maker/highwayenv-learning/blob/main/highway_env/envs/common/action.py)；这不是额外的阅读任务。
 
 迁移来源与校验值见[清单](../../../archive/notes/2026-09-27-project-consolidation.json)，历史结果见主项目 [learning/evidence](../../../learning/evidence)。迁移与助手验证不算学习者的新运行或掌握。

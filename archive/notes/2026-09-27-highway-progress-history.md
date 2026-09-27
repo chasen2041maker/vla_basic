@@ -4,11 +4,11 @@
 
 更新时间：2026-09-27T15:44:41+08:00，Asia/Shanghai。用户要求开始学习并由助手打通两库接续。新增整车职责到控制器初始化的讲义与带读：区分当前状态和目标状态；没有新仿真或个人回答，掌握待核对。此前动作源码与运行证据保留。
 
-这是两个仓库共同的唯一当前接续点。教学约定见 [AGENTS.md](../../../HighwayEnv/AGENTS.md)，长期实践方向见 [路线图](../../../HighwayEnv/learning/ROADMAP.md)，历史证据见 [学习记录](../../../HighwayEnv/learning/LEARNING_LOG.md)。
+这是两个仓库共同的唯一当前接续点。教学约定见 [AGENTS.md](https://github.com/chasen2041maker/highwayenv-learning/blob/main/AGENTS.md)，长期实践方向见 [路线图](https://github.com/chasen2041maker/highwayenv-learning/blob/main/learning/ROADMAP.md)，历史证据见 [学习记录](https://github.com/chasen2041maker/highwayenv-learning/blob/main/learning/LEARNING_LOG.md)。
 
 ## 理论与实践怎样接续
 
-本仓库负责实践及真实进度；[vla_basic](https://github.com/chasen2041maker/vla_basic) 负责理论讲解和知识沉淀。通过 [理论反向索引](../../../HighwayEnv/learning/THEORY_LINKS.md) 找讲义，不在理论库创建第二份任务与完成记录。
+本仓库负责实践及真实进度；[vla_basic](https://github.com/chasen2041maker/vla_basic) 负责理论讲解和知识沉淀。通过 [理论反向索引](https://github.com/chasen2041maker/highwayenv-learning/blob/main/learning/THEORY_LINKS.md) 找讲义，不在理论库创建第二份任务与完成记录。
 
 保留线上理论材料索引，并按当前请求在本对话继续授课。不将讲义建立算成授课完成，不把旧 H001 当作重做门槛；9 月 23 日的旧低速待办不能覆盖之后已收到的实验日志和源码进度。
 
@@ -67,7 +67,7 @@
 
 本节目标：能说明不同动作类如何表达控制、如何连接车辆执行；接下来用可见的变道行为和自己修改的结果验证理解。读过行数不是能力证明，助手的准备与检查不升级为用户实践或理解。
 
-就业路线说明已加入 [路线图](../../../HighwayEnv/learning/ROADMAP.md)：近期形成可解释的高速跟车与变道策略，中期完成固定场景的策略对比和失败复现，再根据目标岗位拓展规划控制、感知或仿真工具。助手暂建议探索能衔接 Agent 经验的仿真评测/算法工具方向，尚未记为用户已选择；HighwayEnv 练习和一次模型训练均不等于达到岗位要求。本轮继续原源码课题，不开始另一项工程。
+就业路线说明已加入 [路线图](https://github.com/chasen2041maker/highwayenv-learning/blob/main/learning/ROADMAP.md)：近期形成可解释的高速跟车与变道策略，中期完成固定场景的策略对比和失败复现，再根据目标岗位拓展规划控制、感知或仿真工具。助手暂建议探索能衔接 Agent 经验的仿真评测/算法工具方向，尚未记为用户已选择；HighwayEnv 练习和一次模型训练均不等于达到岗位要求。本轮继续原源码课题，不开始另一项工程。
 
 ## 已有实践与理解记录
 
@@ -115,7 +115,7 @@
 
 每完成一个小节、收到新实验/理解证据或发生课题切换，助手在该轮结束前更新本页，并在历史记录追加结果。持续采用“实践状态”和“学习理解”分别记录的方式。
 
-用户于 2026-09-23 明确选择“每个教学小节结束或收到新实验结果时维护”。已创建技能 `$highway-learning-progress`，其 [仓库内入口](../../../HighwayEnv/.agents/skills/highway-learning-progress/SKILL.md) 与当时本机个人安装内容一致，已通过 skill-creator 格式校验，自动选择已启用，项目 `AGENTS.md` 已接入调用规则。下一次恢复教学先核对本页，有新增事实时再落盘；无变化不重复添加日志。没有配置固定时间的后台任务。本轮未修改技能内容，也未访问或同步用户本机个人技能安装。
+用户于 2026-09-23 明确选择“每个教学小节结束或收到新实验结果时维护”。已创建技能 `$highway-learning-progress`，其 [仓库内入口](https://github.com/chasen2041maker/highwayenv-learning/blob/main/.agents/skills/highway-learning-progress/SKILL.md) 与当时本机个人安装内容一致，已通过 skill-creator 格式校验，自动选择已启用，项目 `AGENTS.md` 已接入调用规则。下一次恢复教学先核对本页，有新增事实时再落盘；无变化不重复添加日志。没有配置固定时间的后台任务。本轮未修改技能内容，也未访问或同步用户本机个人技能安装。
 
 ## 代码与资料仓库
 

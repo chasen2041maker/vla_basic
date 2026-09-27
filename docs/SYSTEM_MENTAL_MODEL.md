@@ -64,7 +64,7 @@ target_speed = 20  # 目标速度：希望达到多快，单位 m/s
 <details>
 <summary>稍后看源码时再展开：这两个值保存在什么地方</summary>
 
-对应 [controller.py](../../HighwayEnv/highway_env/vehicle/controller.py) 的 `ControlledVehicle.__init__()`，第 35–48 行：
+对应 [controller.py](https://github.com/chasen2041maker/highwayenv-learning/blob/main/highway_env/vehicle/controller.py) 的 `ControlledVehicle.__init__()`，第 35–48 行：
 
 ```python
 super().__init__(road, position, heading, speed)

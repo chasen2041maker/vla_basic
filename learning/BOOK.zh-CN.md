@@ -557,7 +557,7 @@ assert choose_action(float("inf"), 50) == "FASTER"
 
 以下代码完整收录当前 `00_following.py`，可以在现有 HighwayEnv 环境中运行。保留原有变量拼写、注释和未启用片段，不把它偷偷替换成改良版；三引号内的旧判断和旧重启方案不参与执行。正文中的摘录用于讲解，这一块才是完整驾驶程序。
 
-可选核对来源：本项目的 [00_following.py](../experiments/highway_driving/demos/00_following.py)，以及同级模拟器的 [observation.py](../../HighwayEnv/highway_env/envs/common/observation.py)、[kinematics.py](../../HighwayEnv/highway_env/vehicle/kinematics.py)、[action.py](../../HighwayEnv/highway_env/envs/common/action.py)、[controller.py](../../HighwayEnv/highway_env/vehicle/controller.py)、[abstract.py](../../HighwayEnv/highway_env/envs/common/abstract.py) 和 [highway_env.py](../../HighwayEnv/highway_env/envs/highway_env.py)。正文已包含本章所需解释，这些链接用于进一步核对实现；同级来源链接依赖当前目录布局。
+可选核对来源：本项目的 [00_following.py](../experiments/highway_driving/demos/00_following.py)，以及同级模拟器的 [observation.py](https://github.com/chasen2041maker/highwayenv-learning/blob/main/highway_env/envs/common/observation.py)、[kinematics.py](https://github.com/chasen2041maker/highwayenv-learning/blob/main/highway_env/vehicle/kinematics.py)、[action.py](https://github.com/chasen2041maker/highwayenv-learning/blob/main/highway_env/envs/common/action.py)、[controller.py](https://github.com/chasen2041maker/highwayenv-learning/blob/main/highway_env/vehicle/controller.py)、[abstract.py](https://github.com/chasen2041maker/highwayenv-learning/blob/main/highway_env/envs/common/abstract.py) 和 [highway_env.py](https://github.com/chasen2041maker/highwayenv-learning/blob/main/highway_env/envs/highway_env.py)。正文已包含本章所需解释，这些链接用于进一步核对实现；同级来源链接依赖当前目录布局。
 
 ```python
 import gymnasium as gym

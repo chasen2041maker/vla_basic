@@ -2,7 +2,7 @@
 
 # 学习历史与实验依据
 
-当前接续点见 [PROGRESS.md](../../../HighwayEnv/PROGRESS.md)。后续按时间追加实质变化，不把讲解、助手验证和学习者独立掌握混写。以下首次归档依据当前会话回顾，不给旧实验编造精确发生时间。
+当前接续点见 [PROGRESS.md](https://github.com/chasen2041maker/highwayenv-learning/blob/main/PROGRESS.md)。后续按时间追加实质变化，不把讲解、助手验证和学习者独立掌握混写。以下首次归档依据当前会话回顾，不给旧实验编造精确发生时间。
 
 ## 2026-09-23｜实践起点与运行环境
 
@@ -95,9 +95,9 @@
 
 - 用户明确要求实际改造：vla_basic 主要承担理论讲解与知识沉淀，调整其整体入口；本仓库实践项目只做小改，并建立双向链接。
 - 执行者：GPT 维护角色。基准版本为本仓库 `caeee8225d88f8092fbcf39a5ff02c59d35904ca` 和 vla_basic `4503a9cc9d0b67add5e85c28aa5d75e73f2725a7`。
-- 本仓库只调整 README、AGENTS、PROGRESS、学习路线和本历史文件，新增 [理论反向索引](../../../HighwayEnv/learning/THEORY_LINKS.md)。实际 demo.py、模拟器、依赖、已有证据和进度技能内容保持不变；没有操作用户本机环境或技能安装。
+- 本仓库只调整 README、AGENTS、PROGRESS、学习路线和本历史文件，新增 [理论反向索引](https://github.com/chasen2041maker/highwayenv-learning/blob/main/learning/THEORY_LINKS.md)。实际 demo.py、模拟器、依赖、已有证据和进度技能内容保持不变；没有操作用户本机环境或技能安装。
 - 当前课题、实验和理解状态仍由本仓库 PROGRESS.md 唯一承接；vla_basic 的进度页只做跳转，不再用旧 H001 约束当前实践。新增理论材料不等于已经授课或掌握。
-- vla_basic 提供目标速度与控制器、step 与反馈、观察与相对运动三份讲义，对应这里现有代码；详细关系见 [理论—实践对应表](https://github.com/chasen2041maker/vla_basic/blob/main/PRACTICE_MAP.md)。
+- vla_basic 提供目标速度与控制器、step 与反馈、观察与相对运动三份讲义，对应这里现有代码；详细关系见 [理论—实践对应表](https://github.com/chasen2041maker/vla_basic/blob/main/archive/PRACTICE_MAP.md)。
 - 本轮未运行新的驾驶仿真、训练或桌面窗口验证，未收到学习者新日志或独立原理解释。低速配置依然是“已修改待运行/解释”，下一步不重复添加配置。
 - 维护检查范围是文档、互链和代码保留；远端发布结果以实际提交与分支核对为准，不将旧 CI 结果记成本轮通过。
 

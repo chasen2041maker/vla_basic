@@ -2,7 +2,7 @@
 
 # H001｜运行并解释一个驾驶回合
 
-状态：**历史任务，当前实践已转入 [HighwayEnv/PROGRESS.md](../../../HighwayEnv/PROGRESS.md)。旧任务未因此标为完成；下文保留旧范围，不覆盖后来已有的个人实验与理解证据。**
+状态：**历史任务，当前实践已转入 [HighwayEnv/PROGRESS.md](https://github.com/chasen2041maker/highwayenv-learning/blob/main/PROGRESS.md)。旧任务未因此标为完成；下文保留旧范围，不覆盖后来已有的个人实验与理解证据。**
 
 所属课程：[人工智能驾驶分章节实践教程](../../learning/BOOK.zh-CN.md)。本任务的带练正文：[第 01 章：看懂车辆的一次行动](../01-first-driving-loop.md)。章节提供讲解和操作，本文件保留本轮范围与验收，不另建任务副本。
 
