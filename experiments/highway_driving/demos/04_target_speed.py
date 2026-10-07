@@ -1,9 +1,14 @@
-"""实验 04：同一窗口观察道路与速度；直接设置内部目标，仅用于诊断控制过程。"""
+"""实验 04：目标速度一变，实际速度怎样慢慢跟上（教材 1.5）。
+
+要改的只有下面的 TARGET_SPEED。和驾驶有关的逻辑只有 `if steps == 10:` 那几行：
+先改目标、再 env.step 推进；其余代码都是画窗口和曲线，不用读。
+这里直接改车辆内部的目标速度，只为单独观察控制器，正常策略应该发 SLOWER 这类动作。
+"""
 import math
 import os
 from pathlib import Path
 
-TARGET_SPEED = 10.0  # m/s：本人已从原版 20 改为 10；保留当前实验值。
+TARGET_SPEED = 10.0  # m/s；原版是 20，你改成了 10。
 
 
 def run_demo(target_speed=None, headless=False, snapshot_path=None):

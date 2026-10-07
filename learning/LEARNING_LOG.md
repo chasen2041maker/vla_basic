@@ -337,3 +337,5 @@
 - 已改 AGENTS（新增第 0 节）、PROGRESS（精简为一页）、CURRENT_TASK（阶段 1 清单）；旧版存 archive/notes/2026-10-07-*-before-replan.md。HighwayEnv 侧 AGENTS 同步加注。此后本日志每次一到三行。
 
 - 2026-10-07｜讲 abstract.py 164–318：占位方法与 HighwayEnv 实现、奖励 0.822/0.044 手算、reset 顺序、step 与 _simulate（动作只在第一帧下达，之后每帧控制器继续追目标）。布置打印 reward 练习，待本人输出。两仓提交命令已给，尚未推送。
+
+- 2026-10-07｜本人反馈 GPT 写的材料难读、有些话不友好。整体改写：教材（1888→约 1150 行，修正全部旧电脑路径，删去重复免责与审核语气，补全书地图、实验设置总表、每章小结 / 自测 / 实测对答案、附录 A `env.step` 源码地图，结尾路线与三阶段一致）；README、PROGRESS、CURRENT_TASK、demos 与记录器说明；AGENTS 合并为无冲突版本并新增写作规范；画像、岗位、系统、术语文档去掉怀疑语气。旧版存 archive/notes/2026-10-07-*-before-readability-rewrite.md。实验代码只改了 04 / 05 的文件说明，行为不变。学习位置不变：abstract.py 第 318 行之后。

@@ -1,37 +1,68 @@
 # vla_basic｜智能驾驶学习项目
 
-**从 [连续教材](learning/BOOK.zh-CN.md) 开始，当前接续位置见 [PROGRESS](PROGRESS.md)。** 解释、相关代码和完整实验都在同一份文件里；已有 Python/AI 经验直接用，驾驶知识从具体问题补起。
+从零进入智能驾驶的个人学习项目：先在驾驶模拟器 HighwayEnv 里搞懂“感知 → 决策 → 控制 → 运动 → 评测”这条链，再做规则规划与评测项目，最后换到真实轨迹数据。
 
-| 你要做什么 | 打开哪里 |
+## 从哪里开始
+
+| 我想…… | 打开 |
 | --- | --- |
-| 看教材、跟着学习 | [learning/BOOK.zh-CN.md](learning/BOOK.zh-CN.md) |
-| 看学到哪里、下次接哪里 | [PROGRESS.md](PROGRESS.md) |
-| 运行或修改当前实验 | [experiments/highway_driving/demos](experiments/highway_driving/demos/README.md) |
+| 知道现在学到哪、下一步做什么 | [PROGRESS.md](PROGRESS.md) |
+| 看当前阶段的任务清单 | [CURRENT_TASK.md](experiments/highway_driving/CURRENT_TASK.md) |
+| 读教材（四章 + 源码地图） | [learning/BOOK.zh-CN.md](learning/BOOK.zh-CN.md) |
+| 运行或修改实验 | [experiments/highway_driving/demos/](experiments/highway_driving/demos/README.md) |
 
-HighwayEnv 是当前阶段的模拟器工具。后续数据、视觉、轨迹模型、VLA 与部署继续属于本项目；当前已交付四章入门教材，后续工程状态在书末说明。
+## 运行实验
 
-**整个项目统一按“短段学习、及时实践”交付。** 一次具体问题要配齐短讲解、就地代码、运行入口、可观察结果、本人小改和对照证据；这适用于现有工程以及后续数据、几何、模型、视觉/时序、VLA 和部署。项目长期规则见 [AGENTS.md](AGENTS.md)，不是只约束一本 Markdown。
+在 VS Code 的 PowerShell 终端：
 
-| 项目部分 | 在学习中负责什么 |
-| --- | --- |
-| learning/BOOK | 连续讲解与就地代码；读一小段即动手 |
-| experiments/ | 真正运行、修改和验证；模拟器作为依赖 |
-| outputs/ | 本机生成的回放、曲线、原始日志和报告，不纳入 Git |
-| PROGRESS + learning/LEARNING_LOG | 一个当前任务；区分本人实践与助手检查 |
-| docs/ | 按当前疑问查系统、术语、背景和岗位证据，不另排课程关卡 |
-| archive/ | 保留旧实现与历史，按需取用，不改写当时结论 |
+```powershell
+conda activate py310
+cd C:\company\own\vla_basic
+python experiments\highway_driving\demos\04_target_speed.py
+```
 
-现有四章已配调速、跟车、变道和实验对照。后续从这些日志、数据契约与评测方式继续展开，具体衔接和待交付状态见[书末项目路线](learning/BOOK.zh-CN.md#project-continuity)。你的当前任务仍以 PROGRESS 为准。
+`py310` 环境里装的是本机 HighwayEnv 源码（`C:\company\own\highwayenv-learning`，可编辑安装），改那边的源码会直接生效。注意用 `python`，不要用 `py`——`py` 会启动另一个没装依赖的 Python。
+
+## 路线
+
+| 阶段 | 内容 | 状态 |
+| --- | --- | --- |
+| 1 | 收尾 HighwayEnv：读一次 `env.step` 闭环的关键源码 | 进行中 |
+| 2 | 自己写跟车 + 变道规则，多种子批量评测，和 DQN 对比 | 未开始 |
+| 3 | 换到 nuPlan / Waymo 等真实轨迹数据，做预测或规划 | 未开始 |
+
+更远的方向（视觉、端到端模型、VLA、部署）也在这个项目里继续，见[教材末尾](learning/BOOK.zh-CN.md#project-continuity)。
+
+## 目录
+
+```text
+PROGRESS.md                 当前位置和下一步（唯一进度）
+learning/
+  BOOK.zh-CN.md             教材
+  LEARNING_LOG.md           每次学习一到三行的流水记录
+  evidence/                 早期实验的原始输出
+experiments/highway_driving/
+  CURRENT_TASK.md           当前阶段清单
+  demos/                    00–05 六个小实验
+  run_episode.py            单回合记录器（第 4 章用）
+  tests/                    实验和记录器的测试
+docs/                       参考资料：系统全景、术语、岗位方向、学习者背景
+archive/                    旧课程、旧规划和历史记录，只供追溯
+AGENTS.md                   给 AI 助手的教学和维护规则
+```
+
+`outputs/`（实验生成的图片、日志、报告）不进 Git。
 
 <details>
-<summary>项目维护与参考资料（需要时再看）</summary>
+<summary>维护：检查命令与 CI</summary>
 
-- `learning/LEARNING_LOG.md`、`learning/evidence/`：学习记录和实验依据。
-- `docs/`：背景、岗位能力、系统原理和术语参考。
-- `archive/`：旧课程、规划与历史记录，不是当前作业。
-- `AGENTS.md`：助手教学与维护规则。
-- [运行器技术说明](experiments/highway_driving/README.zh-CN.md)：安装、日志和旧基线配置。
+```powershell
+python scripts\check_repo.py                  # 旧 Lab 测试与编译检查，不需要模拟器
+python scripts\check_repo.py --with-highway   # 再加上真实 HighwayEnv 测试和 01/02/03 示例
+```
 
-本机沿用已有的 `D:\miniconda\envs\py310\python.exe`。完整检查命令为 `python scripts/check_repo.py --with-highway`；不带参数只检查旧 Lab 与编译。归档 Lab 仍参与检查，原有 `4 / 6 PASS` 教学基线保留。
+GitHub Actions 用 `experiments/highway_driving/requirements.txt` 里固定的 highway-env 1.12.1 在 Ubuntu 和 Windows 上跑同样的检查。本机用的是 HighwayEnv 源码的开发版，两边版本不同，个别数值可能有细微差异。
+
+归档里的旧 Lab 仍参与检查，其中 001 的基线结果是 `4 / 6 PASS`，这是当时的教学设计，不需要改成全过。
 
 </details>

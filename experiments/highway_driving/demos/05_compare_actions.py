@@ -1,4 +1,8 @@
-"""实验 05：同一起点的恒定动作对照；保存真实回放、日志与浏览器报告。"""
+"""实验 05：同一起点，一直 IDLE vs 一直 SLOWER，生成对照报告（教材 4.2、4.4）。
+
+要改的只有下面的 MAX_STEPS。和驾驶有关的只有 run_comparison() 里调用 run_episode() 的那几行；
+其余代码是画速度曲线和拼网页，不用读。
+"""
 from __future__ import annotations
 
 import html
