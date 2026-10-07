@@ -5,7 +5,7 @@
 ## 现在在哪
 
 - **阶段 1 第 1 项**：读 `C:\company\own\highwayenv-learning\highway_env\envs\common\abstract.py`，已讲到第 318 行（奖励/结束占位、`_info`、`reset`、`step`、`_simulate`）。
-- 教材 [learning/BOOK.zh-CN.md](learning/BOOK.zh-CN.md) 已改写成更好读的版本；1.4 节和[附录 A 源码地图](learning/BOOK.zh-CN.md#appendix-a)正好对应现在读的 `step` / `_simulate`，可以拿来复习。
+- 学习方式：以 HighwayEnv 源码为主线，教材 [BOOK](learning/BOOK.zh-CN.md) 当复习（2026-10-07 确认）。路线、HighwayEnv 能教什么不能教什么、教材怎么配合用，都记在 [CURRENT_TASK](experiments/highway_driving/CURRENT_TASK.md)。
 
 ## 下一步
 
@@ -15,8 +15,9 @@
    cd C:\company\own\highwayenv-learning\learning\demos
    python .\01_lane_change.py
    ```
-2. `abstract.py` 第 320 行以后快速过一遍（显示、环境副本、多车包装，知道是干什么的即可）。
-3. 进入清单第 2 项：`highway_env.py` 回顾。
+2. 读教材 1.3–1.4 当复习（10 分钟），对照刚读完的 `step` / `_simulate`。
+3. `abstract.py` 第 320 行以后快速过一遍（显示、环境副本、多车包装，知道是干什么的即可）。
+4. 进入清单第 2 项：`highway_env.py` 回顾。
 
 ## 已经做过
 

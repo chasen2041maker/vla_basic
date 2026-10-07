@@ -1,13 +1,13 @@
 # vla_basic｜智能驾驶学习项目
 
-从零进入智能驾驶的个人学习项目：先在驾驶模拟器 HighwayEnv 里搞懂“感知 → 决策 → 控制 → 运动 → 评测”这条链，再做规则规划与评测项目，最后换到真实轨迹数据。
+从零进入智能驾驶的个人学习项目：先在驾驶模拟器 HighwayEnv 里搞懂“决策 → 控制 → 运动 → 评测”这半条链（感知由模拟器代办），再做规则规划与评测项目，最后换到真实轨迹数据。
 
 ## 从哪里开始
 
 | 我想…… | 打开 |
 | --- | --- |
 | 知道现在学到哪、下一步做什么 | [PROGRESS.md](PROGRESS.md) |
-| 看当前阶段的任务清单 | [CURRENT_TASK.md](experiments/highway_driving/CURRENT_TASK.md) |
+| 看整体路线、当前阶段清单、HighwayEnv 在路线里的位置 | [CURRENT_TASK.md](experiments/highway_driving/CURRENT_TASK.md) |
 | 读教材（四章 + 源码地图） | [learning/BOOK.zh-CN.md](learning/BOOK.zh-CN.md) |
 | 运行或修改实验 | [experiments/highway_driving/demos/](experiments/highway_driving/demos/README.md) |
 
