@@ -290,3 +290,50 @@
 
 - 用户要求将当前进度上传远端，准备在其他对话继续阅读。此请求没有带来新的本人运行、代码修改或理解证据；第 1 天仍进行中、REVIEW，源码从 abstract.py 第 92 行 `@property` / `vehicle` 接续，当前 01 练习仍在 HighwayEnv 项目运行。
 - 助手核对两仓与各自远端提交点一致，并修正 HighwayEnv 进度跳转页对当前 01 入口的过时描述。主项目在 UTF-8 控制台环境下执行 `scripts/check_repo.py --with-highway`，4+7+21 项检查及 02/03/无窗口 01 示例通过；均为助手验证，不推进本人学习状态。
+
+## 2026-10-06T20:31:30-06:00｜全项目学习目标与 abstract 开头复习（America/Denver）
+
+- 用户明确直接系统学习 HighwayEnv 的全部项目代码，以此完成智驾项目第一阶段；随后表示 abstract 有些遗忘，要求从头重新看。保存全项目范围，保留原 40 小时近期计划，不把职责导航或核心文件讲解当作全阶段完成。
+- 助手在当前对话复习本机 abstract.py 第 1–23 行：对照 action.py、highway_env.py 说明公共环境职责，分组讲解通用与项目导入，说明 Observation = TypeVar("Observation") 用作类型占位、不生成观察数据。源码位置已核对；没有运行仿真、代改练习或收到新的本人理解确认。
+- 历史 action.py、highway_env.py 完整带读与 abstract.py 首次带读至第 90 行的事实保留；当前仅按用户要求改变复习接续。唯一下一步为 `C:\company\own\highwayenv-learning\highway_env\envs\common\abstract.py` 第 26 行 ConnectedLaneNeighboursMixin，再到 AbstractEnv 类开头。第 1 天仍进行中，学习结论 REVIEW。
+- 本机主项目原为旧版，缺少教学记录；用户明确授权直接拉取后，助手检查 main 无已跟踪文件改动、未跟踪文件与远端路径无冲突，fetch 后从 2bff871 快进至 f038441，再补记本轮目标与复习。没有新建提交或推送；教学文档改动保留在本地。主项目为 `C:\company\own\vla_basic`，模拟器为同级 highwayenv-learning；原 D 盘 py310 路径本机不存在，实际运行前待核对现有环境，未安装依赖。
+
+## 2026-10-06T21:06:10-06:00｜abstract.py 从头完整重讲（一）：第 1–90 行（America/Denver）
+
+- 用户要求 abstract.py 的所有讲解从头开始。助手先给全文件分区（导入、Mixin、类开头与初始化、配置与空间、奖励/结束占位、reset、step/_simulate、显示、规划用副本、多车包装），再重讲第 1–90 行。
+- 已核对：Mixin 仅把 neighbour_vehicles_connected_lanes 默认改为 True，由 exit/merge/intersection/racetrack/roundabout/u_turn 的 ConnectedLane 变体继承，HighwayEnv 不使用；Vehicle.MAX_SPEED=40，故 PERCEPTION_DISTANCE=200 米，observation.py 第 252、678 行和本文件 simplify 使用。steps 在 _simulate 每帧加一的历史核对保留。
+- 执行者：助手讲解并维护记录；提供在 01 练习 reset 后打印 config/PERCEPTION_DISTANCE/time 的可选练习，未代写、未运行仿真。无本人新运行、修改或理解证据，REVIEW。下一步第 92 行 vehicle 属性。
+
+## 2026-10-07T00:50:48-06:00｜创建 Conda py310 并排除缺包错误（America/Denver）
+
+- 本人提供真实失败输出：在本库 learning/demos 执行 `py .\01_lane_change.py`，第 3 行 import gymnasium 报 ModuleNotFoundError；没有进入仿真。本人询问创建 Conda py310 的省事方式，并明确希望后续用 `conda activate py310` 直接切换环境。
+- 助手核对 py 默认解释器为系统 Python 3.13.14，gymnasium 查找结果 None；Miniconda 位于 C:\Users\15234\miniconda3，仅有 base 与 py313。依次执行 `conda create -n py310 python=3.10 pip -y`、`conda install -n py310 -c conda-forge noise=1.2.2 --freeze-installed -y`，再在本次安装进程设置 PYTHONUTF8=1 后，通过新环境 Python 执行本地 `pip install -e`。noise 使用已编译 Windows 包，未安装编译器、强化学习框架或测试额外依赖。
+- 执行 conda init powershell，更新 PowerShell 7 的用户 profile；WindowsPowerShell profile 已有初始化，未改变执行策略。助手加载 profile、激活 py310 后核对 sys.executable 为 C:\Users\15234\miniconda3\envs\py310\python.exe，Python 3.10.20；告知本人重开终端后 activate，并用 python 运行。切换其他已有环境仍可使用 conda activate 环境名。
+- 安装实际版本：highway-env 1.12.2.dev0（本库可编辑安装）、gymnasium 1.4.0、numpy 2.2.6、pygame-ce 2.5.8、noise 1.2.2；highway_env.__file__ 确认为本库源码路径，pip check 输出 No broken requirements found。
+- 助手通过 runpy 调用当前 01 的 main(render_mode=None)，保留原 4 车道、5 背景车、seed=0、1 Hz、400 秒及第 3 次右变道。实际打印车辆数 5、感知距离 200.0 米、reset 后 time/steps 为 0/0；前两次 y=4.0，第 3 次目标车道 2、y=6.85，报告碰撞并退出码 0。另建零背景车 highway-fast-v0/rgb_array 场景验证画面生成，图像为 (150,600,3)、uint8；不是本人窗口运行或自主安全驾驶证据。
+- 当前练习已新增三行初始化打印，本助手未代写或修改；前后 SHA-256 均为 400926834EDE205901EAE7BCCF4E6E22D34CEFD01600EEA38B4FB5CA628AFBF7。本人重跑结果与理解待收到；保留最新 abstract.py 重讲至 90 行、接 92 行的状态，不回退到更早 26 行。仅维护主项目记录，未提交或推送。
+
+## 2026-10-07T00:54:29-06:00｜激活 py310 后仍用 py 启动造成缺包（America/Denver）
+
+- 本人提供终端输出：提示符已为 `(py310)`，在 HighwayEnv/learning/demos 执行 `py .\01_lane_change.py`，第 3 行 import gymnasium 再次报 ModuleNotFoundError；询问依赖安装命令。该运行没有进入仿真。
+- 助手在 PowerShell 激活 py310 后独立核对：`python` 指向 `C:\Users\15234\miniconda3\envs\py310\python.exe`，gymnasium 版本 1.4.0、本库 highway_env 导入成功；`py` 指向 `C:\Users\15234\AppData\Local\Programs\Python\Python313\python.exe`，gymnasium 查找结果 None。依赖已存在于目标环境，错误原因是启动了另一解释器。
+- 已提供在本人当前目录运行 `python .\01_lane_change.py` 的方法，以及需要安装本地项目时使用 `python -m pip install -e "C:\company\own\highwayenv-learning"` 的命令。本轮未安装依赖、代改练习或启动仿真；本人改用 python 后的运行结果待收到。
+- 只保存真实排错证据；不新增掌握结论，REVIEW，源码接续仍为 abstract.py 第 92 行 vehicle 属性。未提交或推送。
+
+## 2026-10-07T00:55:17-06:00｜本人反馈运行问题已解决（America/Denver）
+
+- 在助手说明改用 python 及安装命令后，本人回复“好了”；记录为本人反馈运行问题已解决。没有提供实际采用命令、窗口现象或具体变道输出，不补猜实验结果或新增掌握结论。
+- 后续继续使用 Conda py310 的 python 运行当前 HighwayEnv/learning/demos/01_lane_change.py；源码接续仍为 abstract.py 第 92 行 vehicle 属性，REVIEW。助手仅维护记录，未改练习、安装依赖、启动仿真、提交或推送。
+
+## 2026-10-07T00:56:52-06:00｜abstract.py 重讲（二）：第 92–162 行与本机依赖（America/Denver）
+
+- 用户在本机首次运行 01 报 ModuleNotFoundError: gymnasium。助手核对 pyproject（Python ≥3.10，依赖含需编译的 noise），先给 venv 方案；用户不想每次激活，改给系统 py 直接 `py -m pip install -e .` 方案及 noise 编译工具备选。安装与运行结果待本人反馈，助手未安装任何依赖。
+- 用户要求继续讲代码。助手讲第 92–162 行：vehicle 属性/设置器与 env.unwrapped；默认配置逐层叠加和本人 config 最终覆盖（01 实际 lanes 4、背景车 5、duration 400、simulation_frequency 5）；configure 的浅层覆盖与 offscreen 推断；update_metadata；define_spaces 及 Kinematics 观察 Box(5,5) 与 Meta 动作空间。提供可选打印练习，未代写、未运行。
+- 状态 REVIEW；下一步第 164 行奖励/结束占位、_info，再进 reset。
+
+## 2026-10-07｜学习方式调整为项目驱动（America/Denver）
+
+- 本人问“这样学入门智驾是否有用”。助手评估：闭环骨架有价值，但逐行读完全库与求职目标距离远、记录负担过重；本人同意改为三阶段项目路线（HighwayEnv 主线收尾 → 规则规划+评测+DQN 项目 → 真实数据）。
+- 已改 AGENTS（新增第 0 节）、PROGRESS（精简为一页）、CURRENT_TASK（阶段 1 清单）；旧版存 archive/notes/2026-10-07-*-before-replan.md。HighwayEnv 侧 AGENTS 同步加注。此后本日志每次一到三行。
+
+- 2026-10-07｜讲 abstract.py 164–318：占位方法与 HighwayEnv 实现、奖励 0.822/0.044 手算、reset 顺序、step 与 _simulate（动作只在第一帧下达，之后每帧控制器继续追目标）。布置打印 reward 练习，待本人输出。两仓提交命令已给，尚未推送。
