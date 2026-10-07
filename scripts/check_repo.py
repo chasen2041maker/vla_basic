@@ -54,7 +54,8 @@ def main() -> int:
         if run_tests(HIGHWAY) != 0:
             return 1
         # 归入主项目的教学脚本也检查真实导入与执行；不启动交互窗口。
-        # 00 是随机交通的人工观察练习，不在这里运行，也不作为学员验收。
+        # 00 的短跑/回合边界及 04/05 的真实记录检查已由上面的测试发现运行。
+        # 这些检查不作为学员个人验收。
         for name in ("02_action_space.py", "03_continuous_action.py"):
             if subprocess.run(
                 [sys.executable, str(HIGHWAY / "demos" / name)],

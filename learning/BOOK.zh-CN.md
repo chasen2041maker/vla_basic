@@ -4,18 +4,18 @@
 
 这本书把当前阶段的讲解与相关代码放在同一页。先看具体问题，再看解释和代码；完整程序可以在需要实践时直接使用。源码文件路径留作可选出处，不需要开几个文件拼出一段意思。普通 Python 语法不重新讲一遍，驾驶里的新概念则从例子开始。
 
-**当前从第 01 章开始。** 你已经说对了“目标速度是 20，实际 25 应该往下降”。本章接着解释谁计算减速、时间推进后哪个值改变，不再反复考同一道数字题。
+**当前接续位置见 [学习进度](../PROGRESS.md)。** 第 01 章从你已经说对的“目标速度是 20，实际 25 应该往下降”出发，解释谁计算减速、时间推进后哪个值改变；已有实验和解释不要求重复完成。
 
 ## 本卷怎样读
 
 | 章 | 围绕的问题 | 你会看到的代码与实验 |
 | --- | --- | --- |
-| [01 系统怎样让车动起来](#chapter-01) | 保存目标、计算控制、车辆运动分别发生在什么时候？ | 控制器和速度更新源码；完整无窗口调速实验 |
-| [02 前车慢了，怎样作出反应](#chapter-02) | 表格中的哪辆车是前车，怎样根据它的距离选动作？ | 归一化、相对量、筛选与规则；现有跟车程序全文 |
-| [03 一个变道指令怎样变成运动](#chapter-03) | 发一次变道之后，为什么保持动作还能继续转过去？ | 动作接口、控制与运动摘录；完整变道程序与连续动作补充 |
-| [04 怎样知道修改有没有用](#chapter-04) | 一次没撞是策略变好，还是路况更容易？ | 时间日志、同条件对照、结束原因；完整小对照程序 |
+| [01 系统怎样让车动起来](#chapter-01) | 保存目标、计算控制、车辆运动分别发生在什么时候？ | 控制器和速度更新源码；车辆画面与速度曲线实验 |
+| [02 前车慢了，怎样作出反应](#chapter-02) | 表格中的哪辆车是前车，怎样根据它的距离选动作？ | 2.1 先看跟车窗口；2.6 改一处阈值，比较判断和车辆响应 |
+| [03 一个变道指令怎样变成运动](#chapter-03) | 发一次变道之后，为什么保持动作还能继续转过去？ | 3.1 先看变道；3.3 推迟请求，看目标与实际位置何时变化 |
+| [04 怎样知道修改有没有用](#chapter-04) | 一次没撞是策略变好，还是路况更容易？ | 4.1 生成并排回放与速度曲线；4.4 缩短观察时间，看结束原因变化 |
 
-先沿当前一章读，不需要今天把四章全运行。代码前会说明它是源码摘录、教学简化还是完整可运行程序；折叠内容是按需查阅的细节。
+每读一小段，就用一个能看见效果的实验停下来动手：先运行原版，再预测并亲手改一个量，最后看变化。不要等整章读完才实践；例如第 1 章读完 1.4 就可接 1.5 的车辆与速度曲线。先沿当前一章读，不需要今天把四章全运行。代码前会说明它是源码摘录、教学简化还是完整可运行程序；折叠内容是按需查阅的细节。
 
 已有实验沿用本机 py310 环境。给出的数值会注明是手算、源码预期还是有记录的助手实验，你实际运行的结果另记。不同小实验有自己的时间频率和观察配置，切换时会在正文说明。
 
@@ -25,6 +25,8 @@
 <summary>资料维护说明（不影响阅读）</summary>
 
 本文件是唯一教材，直接在这里更新正文，不再维护分章副本。学习状态以 [PROGRESS.md](../PROGRESS.md) 为准，书写好不等于学习者已掌握。
+
+2026-09-27 核对的教学形式参考：[PythonRobotics 路径跟踪示例](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/pure_pursuit/pure_pursuit.py)将控制代码、车辆动画与曲线放在一个例子中；[F1TENTH Lab 3](https://github.com/f1tenth/f1tenth_lab3_template/blob/2c559dad05ac06d2352794e4e37ec243d95e4b5f/README.md)按讲解、填代码、仿真验证组织实验。我们借鉴这种组织方式，当前仍使用已安装的 [HighwayEnv](https://github.com/Farama-Foundation/HighwayEnv)，不要求为第 1 章另装 ROS 2 或其他课程环境。这些是参考形式，不等于本书已覆盖它们的全部内容或车企岗位要求。
 
 </details>
 
@@ -148,11 +150,238 @@ self.road.step(1 / self.config["simulation_frequency"])
 
 这里要分清两种“使用反馈”。控制器用实际速度修正加速度，是控制层反馈；驾驶策略根据前车、车道等情况重新选择目标，是决策层反馈。本章只演示前一种，没有前车，也没有会自主跟车的策略。
 
-### 1.5 完整小实验：分别看三个时间点
+**读到这里就先停一下，下面直接看车和速度怎样变化。** 不需要继续背接口或先看完下一章。
+
+### 1.5 动手看见：目标一下变了，车速怎样跟上？
+
+这次打开一个窗口，上半部分是 HighwayEnv 的道路和车辆，下半部分画出刚才讲的两种速度。整段仿真只有 8 秒，结束后保留画面，方便你对照。
+
+在 VS Code 终端粘贴这一行即可运行，不用另装依赖，也不用先读完绘图代码：
+
+```powershell
+& 'D:\miniconda\envs\py310\python.exe' 'C:\Users\Administrator\Desktop\职业生涯项目\vla_basic\experiments\highway_driving\demos\04_target_speed.py'
+```
+
+第一遍先保持原版，观察这三件事：
+
+1. **前 2 秒**：实际速度和目标速度都是 25 m/s，两条线重合。
+2. **第 2 秒**：橙色 `Target` 线一下变为 20 m/s，这是保存了新目标。绿色 `Actual` 线没有立刻跳到 20，而是逐渐下降。
+3. **之后几秒**：实际速度越来越接近目标。车还在往前走，只是变慢了；上方镜头跟着车移动，不能把车在窗口中的位置不变理解成车辆没动。
+
+横轴 `Time (s)` 是**仿真时间**，纵轴 `Speed (m/s)` 是速度；25 m/s 相当于 90 km/h，20 m/s 相当于 72 km/h。橙线是要求，绿线是当时真实的模拟速度。重合时绿线可能盖住橙线，并非目标消失了。曲线每 0.2 秒采样一次，用直线连接样本；不是把每个物理小步都画了出来。
+
+**空格**暂停/继续，**R**从相同初始条件重播，**Esc**或窗口叉号关闭。暂停时仿真时间不变；运行期间尽量每 0.2 秒推进一次，绘制或电脑卡顿会让实际等待时间更长，所以横轴不是墙钟耗时。
+
+你现在只需看懂脚本里的这几行。下面是完整程序中的关键摘录，需要原程序的 `env`、`steps`、`record` 等上下文：
+
+```python
+TARGET_SPEED = 20.0  # m/s：你要动手修改的目标
+
+# run_demo(target_speed=TARGET_SPEED) 把上面的数传给本回合。
+if steps == 10:  # 已经执行 10 次 step，即仿真到第 2 秒。
+    env.unwrapped.vehicle.target_speed = float(target_speed)
+    record("target_changed")  # 先记下新目标，此刻没有推进运动。
+
+_, _, terminated, truncated, _ = env.step(idle)
+steps += 1
+record("motion")  # 再记下推进 0.2 秒后的实际速度。
+```
+
+前一个 `record()` 和上一次运动记录时间相同，所以橙线可以竖直下降；实际速度在 `env.step(idle)` 之后才变化。这里正好把 1.1–1.4 连起来：**保存目标 → 控制器计算 → 运动更新 → 看见新速度**。
+
+#### 现在由你亲手改一次
+
+代码文件已经准备好，修改位置是：
+
+`C:\Users\Administrator\Desktop\职业生涯项目\vla_basic\experiments\highway_driving\demos\04_target_speed.py`
+
+先想一下：如果希望车减速到更低的速度，橙线和绿线会有什么变化？然后只改文件顶部这一行，其他地方保持原样：
+
+```python
+TARGET_SPEED = 10.0  # 原来是 20.0；单位仍是 m/s
+```
+
+保存文件，关闭原窗口，再运行上面的同一条命令。**R 只重播当前进程里的参数，不会重新读取你保存的源码**，所以修改文件后要重新启动程序。
+
+如果你的本地文件已经改成 10，就从修改后的运行和比较继续，不用为了与教材一致再改回 20。下面保留的是初始教学版；本人修改可以与它不同，实际进度另记在 PROGRESS。
+
+对比时先看“橙线落到哪里，绿线怎样跟过去”，不用追求一次算对所有数。第一次运行和这次修改是同一个实验的两个条件，不是新布置两套作业。你自己的观察和修改结果会另记，助手跑通示例不算你已经完成。
+
+<details>
+<summary>本实验的条件与边界：为什么能用来解释控制，却不能证明会开车</summary>
+
+固定 seed=0，3 条车道、自车初始在车道 1、没有其他车辆。物理更新 15 Hz、外层 5 Hz，一回合最多 40 个外层 step，即 8 秒。实际速度来自模拟器内部 `vehicle.speed`，未归一化，单位 m/s；记录中的 x/y 是世界绝对位置，单位米。它们不是相机感知结果，也不是策略额外得到的输入。
+
+这里故意绕过高层调速档位，直接修改内部 `target_speed`，方便比较任意目标值。每次送给环境的 `IDLE` 仍是高层“保持已有目标”，不是直接制动、加速度或轨迹。控制器持续用实际速度修正加速度；外层程序按固定时刻设置目标，没有根据道路情况作决策，也没有强化学习或完整驾驶评分。
+
+特别是把目标改成 10 m/s 时，这个简化比例控制器可能要求很大的减速度；实验说明数值执行关系，不代表真实车辆舒适性、制动能力或安全要求已经满足。脚本把可尝试目标限定为 0–30 m/s，与图表量程一致。
+
+</details>
+
+<details>
+<summary>完整可运行源码：道路窗口、曲线和按键（初始教学版，按需展开）</summary>
+
+下面是 `04_target_speed.py` 的完整初始版本，目标为 20。你完成练习后，本地顶部目标可以是 10；不把个人修改覆盖回原版。当前学习重点是设置目标和推进环境；窗口绘图只是为了看见效果，不需要先学会所有 Pygame 调用。
+
+```python
+"""实验 04：同一窗口观察道路与速度；直接设置内部目标，仅用于诊断控制过程。"""
+import math
+import os
+from pathlib import Path
+
+TARGET_SPEED = 20.0  # m/s：初始教学版；本人练习时可改为 10。
+
+
+def run_demo(target_speed=None, headless=False, snapshot_path=None):
+    """未指定目标时使用文件顶部当前值；无窗口可保存画面并返回真实记录。"""
+    if target_speed is None:
+        target_speed = TARGET_SPEED
+    if not math.isfinite(target_speed) or not 0 <= target_speed <= 30:
+        raise ValueError("本示例目标速度需在 0–30 m/s 内，与图表范围一致")
+    previous_sdl = {key: os.environ.get(key) for key in ("SDL_VIDEODRIVER", "SDL_AUDIODRIVER")}
+    import gymnasium as gym
+    import highway_env
+    import pygame
+
+    env = gym.make("highway-v0", render_mode="rgb_array", config={
+        "lanes_count": 3, "initial_lane_id": 1, "vehicles_count": 0,
+        "duration": 8, "simulation_frequency": 15, "policy_frequency": 5,
+        "action": {"type": "DiscreteMetaAction"},
+        "screen_width": 960, "screen_height": 210,
+        "offscreen_rendering": True, "real_time_rendering": False,
+    })
+    records = []
+
+    def record(event):
+        vehicle = env.unwrapped.vehicle
+        records.append({
+            "time_s": round(float(env.unwrapped.time), 10), "event": event,
+            "speed_mps": float(vehicle.speed),
+            "target_speed_mps": float(vehicle.target_speed),
+            "x_world_m": float(vehicle.position[0]), "y_world_m": float(vehicle.position[1]),
+        })  # 内部实际速度与世界坐标位置，未归一化；不是视觉感知结果。
+
+    def road_image():
+        frame = env.render()
+        viewer = env.unwrapped.viewer
+        if viewer.offscreen and not viewer.enabled:
+            viewer.enabled = True  # SDL dummy 下恢复离屏绘制，不创建窗口。
+            frame = env.render()
+        if frame is None or (frame == frame[0, 0]).all():
+            raise ValueError("道路画面为空，不能作为有效回放")
+        return pygame.surfarray.make_surface(frame.swapaxes(0, 1))
+
+    try:
+        if headless:
+            os.environ.update(SDL_VIDEODRIVER="dummy", SDL_AUDIODRIVER="dummy")
+        env.reset(seed=0)  # 当前 highway-v0 自车初始速度为 25 m/s。
+        record("initial")
+        road = road_image()  # 先创建离屏 viewer，再创建我们自己的窗口。
+        screen = pygame.Surface((960, 670)) if headless else pygame.display.set_mode((960, 670))
+        pygame.display.set_caption("Target speed and actual motion")
+        font = pygame.font.Font(None, 24)
+        title_font = pygame.font.Font(None, 32)
+        clock = pygame.time.Clock()
+        idle = env.unwrapped.action_type.actions_indexes["IDLE"]
+        steps, paused, finished, running = 0, False, False, True
+        next_step_ms = pygame.time.get_ticks() + 200
+
+        def text(label, x, y, color=(222, 230, 240), title=False):
+            screen.blit((title_font if title else font).render(label, True, color), (x, y))
+
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+                    running = False
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                    paused = not paused
+                    next_step_ms = pygame.time.get_ticks() + 200
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_r:
+                    env.reset(seed=0)
+                    records.clear()
+                    record("initial")
+                    steps, paused, finished = 0, False, False
+                    next_step_ms = pygame.time.get_ticks() + 200
+            if not running:
+                break
+            if not paused and not finished and (headless or pygame.time.get_ticks() >= next_step_ms):
+                if steps == 10:  # 已推进 2 秒；目标先改变，实际状态与时间还没变。
+                    env.unwrapped.vehicle.target_speed = float(target_speed)
+                    record("target_changed")  # 同时间保留前后样本，让目标曲线出现竖直阶跃。
+                _, _, terminated, truncated, _ = env.step(idle)
+                steps += 1
+                record("motion")  # 每次 step 推进 0.2 秒，内部有 3 次控制与物理更新。
+                finished = terminated or truncated or steps >= 40
+                next_step_ms = pygame.time.get_ticks() + 200
+            road = road_image()
+            screen.fill((16, 24, 39))
+            text("Target speed and actual motion", 24, 14, title=True)
+            text("Internal target diagnostic | IDLE throughout | No traffic", 24, 47, (160, 177, 199))
+            current = records[-1]
+            state = "Finished - R to replay" if finished else "Paused" if paused else "Running"
+            text(f"t = {current['time_s']:.1f} s    actual = {current['speed_mps']:.2f} m/s    "
+                 f"target = {current['target_speed_mps']:.1f} m/s    {state}", 24, 77)
+            screen.blit(road, (0, 108))
+            text("Speed (m/s)", 24, 341)
+            text("Target", 704, 341, (255, 185, 78))
+            text("Actual", 820, 341, (71, 217, 190))
+            # 固定坐标轴：横轴仿真 0–8 秒，纵轴 0–30 m/s，保留完整历史。
+            for speed in range(0, 31, 5):
+                y = 586 - speed * 7
+                pygame.draw.line(screen, (48, 61, 79), (70, y), (924, y))
+                text(str(speed), 35, y - 9, (155, 172, 192))
+            for second in range(9):
+                x = 70 + second * 854 / 8
+                pygame.draw.line(screen, (35, 47, 64), (x, 376), (x, 586))
+                text(str(second), x - 4, 596, (155, 172, 192))
+            text("Time (s)", 837, 619, (155, 172, 192))
+            for key, color in (("target_speed_mps", (255, 185, 78)), ("speed_mps", (71, 217, 190))):
+                points = [(70 + row["time_s"] * 854 / 8, 586 - row[key] * 7) for row in records]
+                if len(points) > 1:
+                    pygame.draw.lines(screen, color, False, points, 3)
+                pygame.draw.circle(screen, color, points[-1], 4)
+            text("Space: pause/resume    R: restart    Esc / X: close", 24, 641)
+            if headless and finished:
+                break
+            if not headless:
+                pygame.display.flip()
+                clock.tick(60)  # 暂停或结束后仍处理按键，但不推进仿真。
+        if snapshot_path is not None:
+            path = Path(snapshot_path)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            pygame.image.save(screen, str(path))
+        return records
+    finally:
+        env.close()
+        pygame.quit()
+        if headless:
+            for key, old_value in previous_sdl.items():
+                if old_value is None:
+                    os.environ.pop(key, None)
+                else:
+                    os.environ[key] = old_value
+
+
+if __name__ == "__main__":
+    run_demo(target_speed=TARGET_SPEED)
+```
+
+</details>
+
+### 1.6 跑完以后，把现象接回刚才的解释
+
+先看橙线下降的地方：新目标已经保存，实际速度仍在原处。再看紧随其后的绿线：环境推进了时间，控制器与运动模型反复执行，车辆才逐渐接近目标。这样你读 `env.step(action)` 时，就能联想到正在发生的过程，而不只是“执行一步”四个字。
+
+如果没有车辆画面或曲线，先确认运行的是上面完整路径中的 `04_target_speed.py` 和已有 py310 解释器；保留终端报错再排查。若改成 10 后窗口仍显示目标 20，先检查文件是否保存、旧窗口是否关闭、是否重新执行了命令。
+
+到这里的一个小成果就是：**你亲手改变了目标，能在画面上指出车辆实际响应与目标要求的区别。** 这比先记住一串类名更有用。当前先做这一件事；跟车和变道仍留在后面的对应章节。
+
+<details>
+<summary>可选：只打印三个时间点，进一步拆开“保存、计算、运动”</summary>
 
 这个实验只改变目标速度，然后继续发 `IDLE`。道路上没有其他车辆，固定 seed，不打开窗口；打印内部状态是为了诊断执行链，不是假装获得了相机感知结果。
 
-先读代码里的三个标签：`target_saved` 是只保存了目标，`control_computed` 是只计算了加速度，`after_step` 才是环境推进之后。运行前，可以先想一下前两个标签的时间和实际速度是否应该变化；不需要另答一轮速度大小题。
+如果需要把时间点拆得更细，再看这个可选诊断。先读代码里的三个标签：`target_saved` 是只保存了目标，`control_computed` 是只计算了加速度，`after_step` 才是环境推进之后。运行前，可以先想一下前两个标签的时间和实际速度是否应该变化；不需要另答一轮速度大小题。
 
 下面是**完整可运行块**：在本项目的 PowerShell 终端整体粘贴即可，Python 通过标准输入执行，不创建 `.py` 文件，不需要激活环境。使用本机已有的 `D:\miniconda\envs\py310\python.exe`。
 
@@ -255,17 +484,9 @@ def act(self, action: Union[dict, str] = None) -> None:
 
 </details>
 
-### 1.6 怎样阅读你实际得到的输出
+读 `reset`、`target_saved`、`control_computed` 三行：前两次操作没有推进仿真，实际速度和位置保持原值。再沿 `after_step_1` 往下看，时间每次增加 0.2 秒，速度逐渐接近目标，x 继续增加。这个诊断把目标设为初始速度减 3，即当前配置的 22 m/s，与上面的 20/10 m/s 可视实验条件不同，不要混用数值。
 
-先把 `reset` 与 `target_saved` 两行并排看：目标列发生改变，时间、实际速度和位置应保持原值。再看 `control_computed`：屏幕已经出现加速度计算结果，但运动状态仍未推进。这两处把“保存要求”和“算出调整”从实际执行中拆开了。
-
-接着沿着 `after_step_1` 往下读：时间每次增加 0.2 秒，速度逐渐接近目标，x 位置继续增加。目标列应该保持不变；控制器在这个固定目标下，根据不断更新的实际速度计算调整。如果输出与这条关系不符，先比较实际打印的时间、目标与 `HighwayEnv source`，不要用预期数字盖过真实结果。
-
-这些是依据当前源码和配置的预期读法，不是已经收到的个人实验结果。没有必要把五行都背下来；更有用的是能指着相邻两行解释：这一段时间里，哪个量只是要求，哪个量是已经发生的变化。
-
-这次看到的是有反馈的控制与模拟运动，不是离线预测轨迹对标注的误差，也没有计算完整驾驶成绩。循环虽然接收 `obs`，却没有用它决定下一次目标；奖励也没有用于学习。无其他车辆的一秒调速实验只能说明这条执行链怎样工作，不能说明会跟车、会避碰或具备真实道路安全性。
-
-此时再读 `env.step(action)`，它就不只是“执行一步”的接口了：动作交给控制器，控制器与车辆运动交替执行一段时间，然后你拿到已变化世界的下一次观察。
+</details>
 
 <details>
 <summary>可选出处：本章对应的本机源码与既有实验</summary>
@@ -289,7 +510,7 @@ def act(self, action: Union[dict, str] = None) -> None:
 
 你已经运行过跟车实验，也已经解释过“前车距离为 50 米时保持目标速度”。这一章把你做过的事情连成一段完整的讲解，方便连续阅读和回头复习，不要求重新提交已经答过的题。
 
-正文会当场列出理解所需的代码，章末收录主项目已有跟车脚本的完整内容；你可以先连续阅读，需要动手时再按章内命令运行。
+本章分几次短段实践：2.1 先打开跟车窗口，2.3 用几行代码看归一化，2.6 亲手改一次阈值。完整程序在章末供核对，不用等读到章末才运行。你已经做过的跟车运行和解释继续保留，不要求重交旧作业。
 
 ### 2.1 先想一件开车时会遇到的事
 
@@ -307,12 +528,24 @@ def act(self, action: Union[dict, str] = None) -> None:
 
 我们负责中间的“找车和选动作”。HighwayEnv 提供道路、车辆状态、底层控制器和运动更新。这里没有相机识别：表格直接来自模拟器内部的车辆状态。以后从图像中识别周围车辆，才会补上当前被模拟器代办的那部分工作。
 
+#### 实践停靠：先看十几秒跟车
+
+等学到本章时，先打开现有程序。看到现象后再回来理解它用的表格，不需要先学完下面所有概念。
+
+```powershell
+& 'D:\miniconda\envs\py310\python.exe' 'C:\Users\Administrator\Desktop\职业生涯项目\vla_basic\experiments\highway_driving\demos\00_following.py'
+```
+
+窗口里看车辆，终端里看“决策前时间与距离 → 选择的动作 → 执行后时间与速度”。当它打印减速时，实际速度是否已经等于目标？先留意这一组现象即可。回到终端按 Ctrl+C 停止；本脚本没有 1.5 Demo 的空格/R 按键。
+
+这次为便于亲手对照，脚本新增 `SEED = 0`，每次重置都使用同一个种子；40/60 米的原规则没有替你改动。相同软件与配置下，每局从同样初态开始，连续重复它不等于覆盖多种路况。历史上你运行的未固定种子版本仍保留为历史证据，不与这次条件混用。
+
 ### 2.2 观察是一张表：先分清哪一行是什么
 
 程序通过这一行拿到初始表格。这是原脚本摘录，需要前面已经创建好 `env`：
 
 ```python
-obs, info = env.reset()
+obs, info = env.reset(seed=SEED)  # 当前脚本顶部 SEED = 0
 ```
 
 `obs` 默认有 5 行、5 列。每行的列顺序固定为：
@@ -373,12 +606,16 @@ side_distance = y * 16
 
 下面是一个完整、可单独执行的纯数学小例子，不创建环境，不产生驾驶结果：
 
-```python
+现在就在 VS Code 的 PowerShell 中粘贴运行，不必新建文件：
+
+```powershell
+@'
 for physical_x_m in (35.0, 200.0, 260.0):
     normalized_x = physical_x_m / 200.0
     clipped_x = max(-1.0, min(1.0, normalized_x))
     restored_x_m = clipped_x * 200.0
     print(physical_x_m, "→", clipped_x, "→", restored_x_m)
+'@ | & 'D:\miniconda\envs\py310\python.exe' -
 ```
 
 按算式得到的三行是 `35 → 0.175 → 35`、`200 → 1 → 200`、`260 → 1 → 200`。最后一行展示的是裁剪造成的信息丢失，不是模拟器实测输出。
@@ -425,6 +662,18 @@ for presense, x, y, vx, vy in obs[1:]:
 
 还要限定“最近”指的是哪一批车。当前观察只有 5 行，其中一行是自车，最多另外 4 行有其他对象；默认场景却有 50 辆其他车。程序找到的是**已经进入这张有限表格、又符合筛选条件的最近前车**，不保证是整个道路上真正最近的同车道前车。默认排序也不让行号成为稳定车辆 ID，下一轮第 1 行未必还是同一辆车。
 
+#### 实践停靠：把“选了哪辆车”看清楚
+
+如果刚才只看到“最近距离”，却还不清楚哪些车被排除了，可以在同一脚本**当前生效的**找车循环中临时加一条打印。不要加到三引号包住的旧代码里：
+
+```python
+# 接在当前循环的 side_distance = y * 16 后面，缩进与它一致。
+print("候选行：", presense, "纵向差", round(distance, 1),
+      "米；横向差", round(side_distance, 1), "米")
+```
+
+用 2.1 的同一命令运行两轮后 Ctrl+C，先排除空槽、后方和旁车道的行，再对照最后打印的最近距离。这里只增加诊断，没有改变选动作规则；看清后可删掉这条打印，避免终端太密。若原有输出已足够你解释选车过程，这一步可以略过。
+
 ### 2.6 40 米和 60 米怎样变成一个动作
 
 原脚本的规则如下。这是接在找车代码后的原文摘录：
@@ -467,17 +716,37 @@ else:
 
 标题说“前车慢了”，但当前生效代码并没有比较 `vx`。它只能发现距离已变近，不能直接判断距离将以多快的速度缩短。章末脚本还保留着一段带 `vx < 0` 的旧方案，但它被三引号包住，不参与运行；不能把那段当成当前规则。
 
+#### 实践停靠：现在亲手改一次减速距离
+
+先拿同一份“前车 45 米”的输入想一下：阈值从 40 改成 50，原来保持的情况会变成什么？然后在本章同一个 `00_following.py` 中，只改当前生效的这一行：
+
+```python
+if nearest_distance < 40:
+```
+
+改成：
+
+```python
+if nearest_distance < 50:
+```
+
+保持 `SEED = 0`、60 米的加速条件和其余配置不变，保存后用 2.1 的同一命令重跑。比较两次第一局：最早在哪一次判断选择了不同动作，之后实际速度怎样响应。不要修改三引号里的旧方案；那一段不参与运行。
+
+同种子让初态可对照，但动作不同会让之后的位置、距离和输入不同。不能拿后面两条不同距离的记录当作“相同输入”；也不能凭这一种场景宣布阈值更安全。先看一个能解释的变化，下面再读日志为什么要分前后时刻。
+
 ### 2.7 一次打印中的距离和速度，不是同一时刻
 
 原脚本把距离打印在 `step()` 之前，把速度打印在它之后。相关代码在这里一次列全：
 
 ```python
+print("决策前仿真时间：", round(env.unwrapped.time, 1), "秒")
 print("本轮判断用的前车距离：", round(nearest_distance, 1), "米")
 print(decision)
 
 obs, reward, terminated, truncated, info = env.step(action)
-print("当前速度：", round(info["speed"] * 3.6, 1), "公里/小时")
-print("目标速度：", env.unwrapped.vehicle.target_speed * 3.6, "公里/小时")
+print("执行后仿真时间：", round(env.unwrapped.time, 1), "秒")
+print("执行后实际速度：", round(info["speed"] * 3.6, 1), "公里/小时")
+print("执行后目标速度：", env.unwrapped.vehicle.target_speed * 3.6, "公里/小时")
 total_reward += reward
 ```
 
@@ -499,16 +768,12 @@ total_reward += reward
 
 这次程序确实使用了反馈：新 `obs` 会影响下一轮找车和动作选择。一次动作改变车辆位置后，后面的输入也会改变。这就是本章所说的交互闭环；它与在固定日志上只做预测比较不同，也还没有涉及强化学习。
 
-### 2.8 只改一个阈值，先看规则变了哪里
+### 2.8 可选核对：相同输入下，规则究竟变了哪里
 
-如果想继续做一个小实验，可以只把原脚本的减速阈值从 40 改成 50，其他条件先不动：
+2.6 已安排本章唯一的阈值修改，这里不再重复布置。前车 45 米时原规则保持，新规则减速；保持区间从 `[40, 60]` 变成 `[50, 60]`，正好 50 米仍保持，因为条件使用 `<`。这解释的是同一输入下的选择，不是整个回合的安全结论。
 
-```python
-# 教学修改片段：替换原来 if nearest_distance < 40 这一行。
-if nearest_distance < 50:
-```
-
-先不用猜整个回合的奖励。拿同一份“前车距离 45 米”的输入比较，就能说清一个确定变化：原规则选择保持，新规则选择减速。保持区间从 `[40, 60]` 变成 `[50, 60]`；正好 50 米仍保持，因为条件使用 `<`。这只能预测规则在相同输入下的输出，不能直接预测整局一定更安全。
+<details>
+<summary>想排除交通变化的干扰时，再运行这个纯逻辑对照</summary>
 
 下面是一个完整、可单独执行的纯逻辑对照，复述原规则但不启动模拟器：
 
@@ -533,13 +798,7 @@ assert choose_action(float("inf"), 50) == "FASTER"
 
 注意最后一条：调阈值没有解决“未观察到前车就加速”的问题，也没有让规则开始考虑速度差。
 
-需要看车辆实际反应时，在主项目根目录的 PowerShell 中使用现有环境运行：
-
-```powershell
-& 'D:\miniconda\envs\py310\python.exe' .\experiments\highway_driving\demos\00_following.py
-```
-
-脚本会打开窗口，按 `Ctrl+C` 可以结束。这份代码没有固定随机种子，两次运行会遇到不同场景。因此先用上面的相同输入对照确认规则变化，再把窗口中的运行当作寻找现象和失败的机会；不能把两个随机回合的总奖励直接当作阈值改进证据。本章没有要求重装已有环境，也没有替你宣称已运行这个改动。
+</details>
 
 ### 2.9 出现失败时，回到它作决定的那一刻
 
@@ -549,13 +808,13 @@ assert choose_action(float("inf"), 50) == "FASTER"
 
 运行期间，`reward` 是模拟器给这一段交互的评分，`total_reward` 把它累计起来。默认奖励同时考虑行驶速度、靠右和碰撞等因素，分数不是简单的“安全程度”。这些值来自执行动作后的模拟交互，不是固定数据上的开放环预测误差。
 
-当前默认环境一局最长 40 秒，碰撞也会结束。脚本结束一局后会打印成绩、清零累计奖励，并调用 `reset()` 开新一局。不过外层只有总共 300 次 `step()` 的预算，预算用完时可能正好处于某一局中途；那一段不会自动补成完整的 40 秒成绩。也不能因为窗口正常关闭，就把未结束的一局算作完成。
+当前默认环境一局最长 40 秒，碰撞也会结束。脚本结束一局后会打印成绩；若还有步数预算，再清零奖励并用 `reset(seed=SEED)` 开新一局。每局重复同一起点，不能把局数当成不同场景数。默认外层总共 300 次 `step()`，用完时可能正处于一局中途。停止时会打印当前局号、实际时间以及“本局未完成”或“环境已结束”；最后一步恰好结束一局时，不会再重置掉这个时刻。窗口关闭或脚本预算用完，都不能自动当作当前局已完成。
 
 这一章把已有规则接成了完整链条：观察中的相对位置，经筛选得到距离；距离决定高层目标请求；环境推进后才得到新的速度与观察。第一章讲过目标速度怎样逐渐实现，下一章把这条执行链扩展到横向运动：一个变道请求怎样让车实际转过去？
 
 ### 2.10 完整实验代码与可选来源
 
-以下代码完整收录当前 `00_following.py`，可以在现有 HighwayEnv 环境中运行。保留原有变量拼写、注释和未启用片段，不把它偷偷替换成改良版；三引号内的旧判断和旧重启方案不参与执行。正文中的摘录用于讲解，这一块才是完整驾驶程序。
+以下代码完整收录当前 `00_following.py`，可以在现有 HighwayEnv 环境中运行。保留原规则、变量拼写和未启用片段；为对照实验补了固定种子、时间标签、可独立调用的短跑入口及停止状态说明，三引号内的旧判断和旧重启方案不参与执行。正文中的摘录用于讲解，这一块才是完整驾驶程序。
 
 可选核对来源：本项目的 [00_following.py](../experiments/highway_driving/demos/00_following.py)，以及同级模拟器的 [observation.py](https://github.com/chasen2041maker/highwayenv-learning/blob/main/highway_env/envs/common/observation.py)、[kinematics.py](https://github.com/chasen2041maker/highwayenv-learning/blob/main/highway_env/vehicle/kinematics.py)、[action.py](https://github.com/chasen2041maker/highwayenv-learning/blob/main/highway_env/envs/common/action.py)、[controller.py](https://github.com/chasen2041maker/highwayenv-learning/blob/main/highway_env/vehicle/controller.py)、[abstract.py](https://github.com/chasen2041maker/highwayenv-learning/blob/main/highway_env/envs/common/abstract.py) 和 [highway_env.py](https://github.com/chasen2041maker/highwayenv-learning/blob/main/highway_env/envs/highway_env.py)。正文已包含本章所需解释，这些链接用于进一步核对实现；同级来源链接依赖当前目录布局。
 
@@ -563,109 +822,136 @@ assert choose_action(float("inf"), 50) == "FASTER"
 import gymnasium as gym
 import highway_env
 
-# 创建高速公路场景，并显示窗口
-#env = gym.make("highway-v0", render_mode="human")
+SEED = 0  # 固定每局初态，便于比较亲手修改前后的规则；不代表覆盖多种路况。
 
-env = gym.make(
-    "highway-v0",
-    render_mode="human",
-    config={
-        "action": {
-            "type": "DiscreteMetaAction",
-            "target_speeds": [0, 5, 10, 15, 20, 25, 30],
-        }
-    },
-)
-
-try:
-    # 初始化车辆和道路
-    obs, info = env.reset()
+def main(render_mode="human", max_steps=300):
+    """默认显示原跟车练习；render_mode=None 可做无窗口短跑。"""
+    if isinstance(max_steps, bool) or not isinstance(max_steps, int) or max_steps < 1:
+        raise ValueError("max_steps 必须是正整数")
+    # 创建高速公路场景，并显示窗口
+    #env = gym.make("highway-v0", render_mode="human")
+    env = gym.make(
+        "highway-v0",
+        render_mode=render_mode,
+        config={
+            "action": {
+                "type": "DiscreteMetaAction",
+                "target_speeds": [0, 5, 10, 15, 20, 25, 30],
+            }
+        },
+    )
     episode = 1  # 当前是第几局
     total_reward = 0   # 这一局的累计得分
+    steps_completed = 0
+    episode_finished = False
+    interrupted = False
 
-    for _ in range(300):
-        """
-        # 随机选择驾驶动作
-        action = 1
+    try:
+        # 初始化车辆和道路；每局使用相同种子，方便同场景对照。
+        obs, info = env.reset(seed=SEED)
+        print("本次种子：", SEED, "；每局重置为相同初态。")
 
-        # 逐辆检查附近的车，跳过第一行自己的车
-        for presense, x, y, vx, vy in obs[1:]:
-            distance = x * 200
-            side_distance = y * 16
-
-            if (presense == 1 
-                and 0 < distance < 40
-                and abs(side_distance) < 2
-                and vx < 0):
-                action = 4
-                print("发现同车道出现慢车，发出减速指令！")
-                break
-        """
-
-        # 先当作没有观察到同车道前车
-        nearest_distance = float('inf')
-
-        # 找到观察范围内，同车道最近的前车
-        for presense, x, y, vx, vy in obs[1:]:
-            distance = x * 200
-            side_distance = y * 16
-
-            if presense == 1 and distance > 0 and abs(side_distance) < 2:
-                nearest_distance = min(nearest_distance,distance)
-
-        # 根据最近前车的距离，选择动作
-        if nearest_distance < 40:
-            action = 4
-            decision = "前车太近，减速"
-
-        elif nearest_distance > 60:
-            action = 3
-            decision = "前方距离充足，加速"
-
-        else:
+        for _ in range(max_steps):
+            """
+            # 随机选择驾驶动作
             action = 1
-            decision = "保持当前目标速度"
 
-        print("本轮判断用的前车距离：", round(nearest_distance, 1), "米")
-        print(decision)
+            # 逐辆检查附近的车，跳过第一行自己的车
+            for presense, x, y, vx, vy in obs[1:]:
+                distance = x * 200
+                side_distance = y * 16
 
+                if (presense == 1
+                    and 0 < distance < 40
+                    and abs(side_distance) < 2
+                    and vx < 0):
+                    action = 4
+                    print("发现同车道出现慢车，发出减速指令！")
+                    break
+            """
 
+            # 先当作没有观察到同车道前车
+            nearest_distance = float('inf')
 
-        # 让车辆执行动作
-        obs, reward, terminated, truncated, info = env.step(action)
-        print("当前速度：", round(info["speed"] * 3.6, 1), "公里/小时")
-        print("目标速度：", env.unwrapped.vehicle.target_speed * 3.6, "公里/小时")
-        total_reward += reward
+            # 找到观察范围内，同车道最近的前车
+            for presense, x, y, vx, vy in obs[1:]:
+                distance = x * 200
+                side_distance = y * 16
 
-        """"
-        # 碰撞或时间到了，就重新开始
-        if terminated or truncated:
-            obs, info = env.reset()
-            print("车辆观察数据：\n", obs)
-        """
+                if presense == 1 and distance > 0 and abs(side_distance) < 2:
+                    nearest_distance = min(nearest_distance,distance)
 
-        if terminated or truncated:
-            print("\n========== 本局成绩 ==========")
-            print("第", episode, "局")
+            # 根据最近前车的距离，选择动作
+            if nearest_distance < 40:
+                action = 4
+                decision = "前车太近，减速"
 
-            if info["crashed"]:
-                print("结果：发生碰撞")
+            elif nearest_distance > 60:
+                action = 3
+                decision = "前方距离充足，加速"
+
             else:
-                print("结果：到达本局时间上限")
+                action = 1
+                decision = "保持当前目标速度"
 
-            print("本局仿真时间：", round(env.unwrapped.time, 1), "秒")
-            print("累计奖励：", round(total_reward, 2))
-            print("==============================\n")
+            print("决策前仿真时间：", round(env.unwrapped.time, 1), "秒")
+            print("本轮判断用的前车距离：", round(nearest_distance, 1), "米")
+            print(decision)
 
-            # 准备下一局
-            episode += 1
-            total_reward = 0
-            obs, info = env.reset()
+            # 让车辆执行动作
+            obs, reward, terminated, truncated, info = env.step(action)
+            steps_completed += 1
+            episode_finished = bool(terminated or truncated)
+            print("执行后仿真时间：", round(env.unwrapped.time, 1), "秒")
+            print("执行后实际速度：", round(info["speed"] * 3.6, 1), "公里/小时")
+            print("执行后目标速度：", env.unwrapped.vehicle.target_speed * 3.6, "公里/小时")
+            total_reward += reward
 
-except KeyboardInterrupt:
-    pass
-finally:
-    env.close()
+            """"
+            # 碰撞或时间到了，就重新开始
+            if terminated or truncated:
+                obs, info = env.reset()
+                print("车辆观察数据：\n", obs)
+            """
+
+            if terminated or truncated:
+                print("\n========== 本局成绩 ==========")
+                print("第", episode, "局")
+
+                if info["crashed"]:
+                    print("结果：发生碰撞")
+                else:
+                    print("结果：到达本局时间上限")
+
+                print("本局仿真时间：", round(env.unwrapped.time, 1), "秒")
+                print("累计奖励：", round(total_reward, 2))
+                print("==============================\n")
+
+                # 还有预算才准备下一局；最后一步不 reset 掉真正的结束时刻。
+                if steps_completed < max_steps:
+                    episode += 1
+                    total_reward = 0
+                    episode_finished = False
+                    obs, info = env.reset(seed=SEED)
+
+    except KeyboardInterrupt:
+        interrupted = True
+    finally:
+        stopped_at_s = float(env.unwrapped.time)
+        env.close()
+
+    stop_reason = "user_interrupt" if interrupted else "runner_step_limit"
+    print("\n本次运行停止：", "手动停止" if interrupted else "用完脚本步数预算")
+    print("当前第", episode, "局；仿真时间：", round(stopped_at_s, 1), "秒")
+    print("本局状态：", "环境已结束" if episode_finished else "本局未完成")
+    print("本次已返回的 step 次数：", steps_completed, "；环境结束不代表安全通过。")
+    return {"seed": SEED, "steps": steps_completed, "episode": episode,
+            "episode_time_s": stopped_at_s, "episode_finished": episode_finished,
+            "stop_reason": stop_reason}
+
+
+if __name__ == "__main__":
+    main()
 ```
 
 
@@ -675,7 +961,7 @@ finally:
 
 ## 第03章｜一个变道指令怎样变成真正运动
 
-本章可以从头连续阅读，理解所需的代码已经放在正文里，不需要读一句就切换一个文件。先看一次变道发生的过程，再读完整实验，最后亲手改一个条件。
+本章从可见的变道开始：读完 3.1 就运行原版，读到 3.3 就亲手改一次时机；后面再解释控制器怎样做到。必要代码在正文中，完整脚本在 3.7 供查阅，不用等读到那里才动手。
 
 本章只做一件事：**解释为什么目标车道可以立即改变，而车的位置需要经过一段运动才能靠近目标。** 你已经能说明“目标速度比实际速度低，就应该减速”；这里把同一个“目标与实际”的区别放到变道中。
 
@@ -714,7 +1000,33 @@ finally:
 
 当前脚本按预定时刻发请求，没有观察邻车后再作交通判断。它适合研究“变道怎样执行”。道路上没有其他车，所以一次执行顺利，也不能说明策略已经会判断何时可以安全变道。
 
+#### 实践停靠：现在看一次变道
+
+等学到本章时，先运行已有程序，不必先读完动作分类和控制公式。你已有的变道结果如果足以说明现象，可以直接对照，不要求重复提交。
+
+```powershell
+& 'D:\miniconda\envs\py310\python.exe' 'C:\Users\Administrator\Desktop\职业生涯项目\vla_basic\experiments\highway_driving\demos\01_lane_change.py'
+```
+
+窗口显示车辆，终端显示每次行动后的目标车道和实际 y。先看第三次发出右变道后，第四次虽然恢复保持动作，车是不是仍在靠近新车道中心。程序到 10 秒模拟时间结束；没看清可重新运行。它没有第 1 章 Demo 的空格暂停或 R 重播按键。
+
+决定发指令时机的代码只有这段，摘自现有循环：
+
+```python
+if step == 2:
+    action = 2
+    decision = "向右变道一次"
+else:
+    action = 1
+    decision = "保持目标车道和目标速度"
+```
+
+`step` 从 0 计数，所以 `step == 2` 是第三次决策；编号 2 是本配置的右变道请求，1 是保持已有目标。先看到现象，再读下面两小节解释：谁改变目标，谁继续让车转过去。
+
 ### 3.2 策略交出去的 action 到底是什么
+
+<details>
+<summary>其他动作类型的对照（当前先用高层变道请求，需要时展开）</summary>
 
 `action` 只是接口名，它的意义由配置决定。下面四种类型不是四种驾驶水平，而是四种表达和分发动作的方式。
 
@@ -726,6 +1038,8 @@ finally:
 | `MultiAgentAction` | 按车辆顺序排列的动作元组 | 分给各辆受控车的动作 | 两辆车分别收到元组中的第一个、第二个动作；每辆车再按自己的动作类型解释 |
 
 连续动作默认把第一维映射成加速度，单位 `m/s²`，把第二维映射成转向角，单位弧度。虽然有些接口文字使用 throttle，这里也不能把数值直接解释成真实车辆的油门踏板百分比。多车类型只负责组合与分发，不会因为打包了多辆车就自动完成协同决策。
+
+</details>
 
 本章完整脚本使用 `highway-v0` 的默认 `DiscreteMetaAction`，纵向与横向动作都启用。实际源码中的动作表为：
 
@@ -801,6 +1115,28 @@ elif action == "LANE_RIGHT":
 `np.clip` 限制编号不要越出道路范围；`is_reachable_from` 检查目标车道的几何可达性等条件。这里没有查询邻车距离。还有一个细节：加 1 的基础是已经保存的**目标车道**，因此重复发指令可能再次改变目标，即使上一次还没到位。
 
 </details>
+
+#### 实践停靠：现在亲手把变道推迟两次
+
+先保留原版输出，在自己的笔记中写下一句预测：**如果右变道从第三次推迟到第五次，第 3～6 次打印出的目标车道和实际 y 将怎样变化？** 不需要预测到小数点，先判断哪个时刻目标改变、哪个阶段实际位置开始移动。
+
+然后在同一个实验文件中亲手把这一行：
+
+```python
+if step == 2:
+```
+
+改为：
+
+```python
+if step == 4:
+```
+
+同时把相邻注释里的“第 3 次”改为“第 5 次”；这只是让注释符合新行为。种子、车辆数、起始车道、动作编号、频率与总时限都保持原样，再用同一条命令运行。
+
+比较两次第 3～6 次决策的目标和 y，说明“请求推迟”影响的是时间，还是目标车道本身。如果结果不符合预测，先核对保存的文件、运行路径、实际动作编号与结束原因。不要同时改速度、道路或其他车辆，把一个问题变成多个变量。
+
+先把画面中的变化看清，再接 3.4 的控制解释。不要求先推完转向公式，助手也没有替你修改脚本中的 `step == 2`。
 
 ### 3.4 控制器为什么同时看位置和车头朝向
 
@@ -973,9 +1309,9 @@ self.position += v * dt
 
 第四、第五次发送的都是 `IDLE`，实际位置仍然继续靠近 8 米，这就是控制器继续跟踪目标的证据。打印保留两位小数时，7.9968 会显示为 8.00；显示相等不能证明内部数值完全相等。
 
-### 3.7 本章完整实验：先运行现有版本
+### 3.7 完整脚本供核对：不用为了读全文再跑一次
 
-本章只运行下列变道实验。脚本已经归入主项目，不需要复制模拟器，也不需要重新安装环境。你可以在 VS Code 中打开它，对着下方全文阅读；已存在的文件不必重写。
+3.1 已运行、3.3 已安排小改，这里收录同一份原版完整脚本，供需要时核对。脚本已归入主项目，不需要复制模拟器或重新安装环境。学习者修改后的本地条件可能是 `step == 4`；下面展示助手准备的原版，不要求改回原版来凑一次运行。
 
 ```text
 C:\Users\Administrator\Desktop\职业生涯项目\vla_basic\experiments\highway_driving\demos\01_lane_change.py
@@ -1023,9 +1359,11 @@ def main(render_mode="human"):
                 decision = "保持目标车道和目标速度"
 
             print("\n第", step + 1, "次决策：", decision, "，动作编号：", action)
+            print("动作前仿真时间：", round(float(env.unwrapped.time), 3), "秒")
             obs, reward, terminated, truncated, info = env.step(action)
 
             # 目标会先改变，实际位置需要随车辆运动逐渐靠近目标。
+            print("动作后仿真时间：", round(float(env.unwrapped.time), 3), "秒")
             print("行动后目标车道编号：", vehicle.target_lane_index[2])
             print("行动后横向位置 y：", round(float(vehicle.position[1]), 2), "米")
 
@@ -1050,35 +1388,17 @@ if __name__ == "__main__":
 
 这段脚本可以按三部分读。配置把其他车辆清空，固定起始车道与种子，便于单独观察执行过程；循环只在 `step == 2` 时发一次动作 2；`env.step()` 之后才打印目标和实际位置。`env.unwrapped.vehicle` 读的是模拟器内部诊断信息，不是从摄像头感知出来的数据，也没有被用来作交通决策。
 
-在 PowerShell 中运行。本机继续使用已有的 `py310` 解释器，下面两个完整路径使命令不依赖终端当前目录：
+需要重播原版或运行自己保存的修改版时，仍使用 3.1 的同一命令；它运行磁盘上的当前文件：
 
 ```powershell
 & 'D:\miniconda\envs\py310\python.exe' 'C:\Users\Administrator\Desktop\职业生涯项目\vla_basic\experiments\highway_driving\demos\01_lane_change.py'
 ```
 
-保留第 2～5 次决策的输出及结束原因。先看第 3 次目标是否变了，再看第 4 次恢复 `IDLE` 后实际 y 是否继续靠近目标。达到时间上限表示这次实验按时结束；中途关闭或 Ctrl+C 应记为手动停止，不能当作完整回合。
+对照自己运行的版本：原版在第 3 次改变目标、第 4 次恢复 `IDLE`；若已改成 `step == 4`，则看第 5 次改变目标、第 6 次恢复 `IDLE`。两种情况都观察实际 y 如何继续靠近目标。达到时间上限表示这次实验按时结束；中途关闭或 Ctrl+C 应记为手动停止，不能当作完整回合。
 
-### 3.8 只改一个条件：把请求推迟两次
+### 3.8 把这次动手结果记清楚
 
-先保留原版输出，在自己的笔记中写下一句预测：**如果右变道从第三次推迟到第五次，第 3～6 次打印出的目标车道和实际 y 将怎样变化？** 不需要预测到小数点，先判断哪个时刻目标改变、哪个阶段实际位置开始移动。
-
-然后在同一个实验文件中亲手把这一行：
-
-```python
-if step == 2:
-```
-
-改为：
-
-```python
-if step == 4:
-```
-
-同时把相邻注释里的“第 3 次”改为“第 5 次”；这只是让注释符合新行为。种子、车辆数、起始车道、动作编号、频率与总时限都保持原样，再用同一条命令运行。
-
-比较两次第 3～6 次决策的目标和 y，说明“请求推迟”影响的是时间，还是目标车道本身。如果结果不符合预测，先核对保存的文件、运行路径、实际动作编号与结束原因。不要同时改速度、道路或其他车辆，把一个问题变成多个变量。
-
-本节留下四项简短记录即可：事前预测、两次输出对应的时间和动作、你对差异的解释、这次实验不能证明什么。能解释目标、控制和实际运动的先后，再讨论有交通时为什么要选择变道；读完本章或完成一次运行本身不自动代表掌握。
+3.3 已经安排了本章唯一的小修改，此处不再加一项新作业。本节留下四项简短记录即可：事前预测、两次输出对应的时间和动作、你对差异的解释、这次实验不能证明什么。能解释目标、控制和实际运动的先后，再讨论有交通时为什么要选择变道；读完本章或完成一次运行本身不自动代表掌握。
 
 ### 3.9 本章结论能够覆盖到哪里
 
@@ -1123,10 +1443,14 @@ try:
     # 读取模拟器内部信息，仅用于验证源码
     control = env.unwrapped.action_type.get_action(action)
     speed_before = env.unwrapped.vehicle.speed
+    time_before_s = float(env.unwrapped.time)
 
     obs, reward, terminated, truncated, info = env.step(action)
 
     print("动作空间：", env.action_space)
+    print("原始归一化动作 [加速度输入, 转向输入]：", action, "（无量纲）")
+    print("仿真时间：", round(time_before_s, 3), "→",
+          round(float(env.unwrapped.time), 3), "秒")
     print("加速度：", round(control["acceleration"], 4), "m/s²")
     print("转向角：", round(control["steering"], 4), "弧度")
     print("执行前速度：", round(speed_before, 2), "m/s")
@@ -1171,7 +1495,7 @@ finally:
 
 前面我们让车看前车距离，按规则决定加速或减速，也看过变道是怎样执行的。现在假设你把减速距离从 40 米改成了 50 米。新跑的一局没有撞车，你会自然地想：是不是这个修改有效？
 
-问题是，原来的程序每次重开一局都可能生成不同交通。也许规则改好了，也许这次前车更远、更快。要判断修改的作用，我们先让两个版本面对尽量相同的起点。
+未固定种子时，重开一局可能生成不同交通。第 02 章现在已经固定初态，让你方便比较一次修改；这一章再把比较条件、完整记录和结束原因一起保存，避免只凭窗口印象下结论。
 
 ### 4.1 先固定起点，再比较动作带来的变化
 
@@ -1180,6 +1504,22 @@ finally:
 在下面的实验中，“同条件”具体指同样的模拟器与运行器版本、配置、种子和初始观察。两个动作执行后，车辆位置和后续观察开始不同，这是我们要观察的结果，不应强行把它们改回一致。
 
 我们先借项目已有记录器做一个小对照：一组始终保持目标，一组每一步都请求减速。这个记录器还不能传入跟车策略，所以本节先学比较方法，后续再将相同方法接到跟车规则。不能把下面的结果当作 40 米和 50 米阈值实验。
+
+#### 实践停靠：先生成一张看得见的对照页
+
+等学到这一章，读到这里就运行，不必先读完日志格式。下面命令用现有记录器真实跑两次仿真，保存车辆回放，再打开本地报告：
+
+```powershell
+& 'D:\miniconda\envs\py310\python.exe' 'C:\Users\Administrator\Desktop\职业生涯项目\vla_basic\experiments\highway_driving\demos\05_compare_actions.py'
+```
+
+它会尝试用默认浏览器打开 `report.html`。如果没有自动打开，终端会打印本次报告的完整路径，在文件资源管理器中打开它即可；文件保存在项目的 `outputs/highway_driving/compare-actions/本次时间/`，每次运行独立保存。
+
+页面左边是 `IDLE`（始终保持目标），右边是 `SLOWER`（每次请求减速）；下方曲线使用同一组时间和速度坐标。先看减速那组是否逐渐变慢、8 秒后前进得是否更少，再看结束原因。两侧 GIF 各自循环，浏览器不保证同步；比较同一时刻时，用下方曲线和日志对齐。
+
+这次最小实验固定 seed=7、**没有其他车辆**，每组最多 40 次动作、8 秒。它单独展示动作响应，不是第 02 章的距离阈值比较，也没有展示避碰能力。图里的速率是模拟器实际值（m/s），世界 x 位移是末位置减初位置（米），不是目标速度，也不是累计路程。
+
+开始前可以先预测：持续请求减速的那组，速度曲线会怎样？运行后以真实结果为准。每组的回放、逐步日志与配置/版本文件都由本次运行生成，不预先填成绩。
 
 ### 4.2 一条日志为什么同时保存两次观察
 
@@ -1196,9 +1536,166 @@ next_obs, reward, terminated, truncated, info = env.step(action_id)
 
 本节使用的旧记录器配置为：物理更新 15 Hz、决策 5 Hz。因此正常情况下，一次 `env.step` 推进 0.2 秒。前面跟车与变道示例用的是 1 Hz 决策，一次通常是 1 秒；它们是不同实验配置。`Hz` 表示每秒发生几次，循环一次并不天然等于一秒。
 
-### 4.3 完整的小对照程序
+### 4.3 这张图怎样对应到真正运行过的车辆
 
-下面是完整程序。它调用项目已有记录器，但比较条件、如何调用、读取哪些结果都在这里列出，不需要打开记录器源码才能做本节。
+页面不是把两条预设曲线画出来。程序先让 `run_episode()` 执行动作、保存真实记录，再读取记录画图。下面是完整脚本里的调用摘录：
+
+```python
+summary = run_episode(seed=seed, max_steps=max_steps, action_name=action,
+                      render_mode="rgb_array", output_dir=folder,
+                      duration_s=DURATION_S, vehicles_count=0)
+```
+
+`action` 分别是 `IDLE` 和 `SLOWER`；两组都用相同种子、配置和运行器。`rgb_array` 让模拟器返回画面供保存，而不是要求你同时盯两个原生窗口。图上的起点取真实动作前速度，之后每个点配对 `next_observation_time_s` 与 `speed_mps`，也就是一次动作之后的时间和实际速率。缺失的时间段不会补成成功运行。
+
+本记录器采用未归一化的诊断与观察，物理 15 Hz、外层 5 Hz。目标速度档位为 **`[20, 25, 30]` m/s**，所以持续 `SLOWER` 最低仍追踪 20，不会把车刹停；这和第 02 章包含 0 的七档配置不同。报告先核对初始观察、配置、依赖版本和运行器内容，再展示两组；同初态不要求动作之后的世界继续相同。
+
+<details>
+<summary>本章可视实验的完整源码：与 05_compare_actions.py 一致</summary>
+
+当前先理解上面的调用和图的含义。HTML、SVG 和文件写入是展示方式，不需要先学会它们才能做驾驶对照。
+
+```python
+"""实验 05：同一起点的恒定动作对照；保存真实回放、日志与浏览器报告。"""
+from __future__ import annotations
+
+import html
+import json
+import math
+import sys
+import webbrowser
+from datetime import datetime, timezone
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from run_episode import run_episode
+
+SEED = 7                 # 复现条件；零交通下改种子未必能改变速度响应。
+MAX_STEPS = 40           # 本章只改这里为 5，比较观察时长和结束原因。
+DURATION_S = 8.0         # 环境最多推进 8 秒；曲线横轴固定 0–8 秒。
+OUTPUT_ROOT = Path(__file__).resolve().parents[3] / "outputs/highway_driving/compare-actions"
+COLORS = {"IDLE": "#176fbd", "SLOWER": "#cc6815"}
+END_LABELS = {
+    "collision": "发生碰撞", "off_road": "驶离道路", "terminated": "环境终止",
+    "environment_time_limit": "达到环境时间上限", "runner_step_limit": "用完脚本步数预算",
+}
+
+
+def speed_svg(runs: dict) -> str:
+    """首点用真实动作前速率，之后每点配对动作后时间与动作后速率。"""
+    series = {}
+    for action, run in runs.items():
+        first = run["summary"]["first_transition"]
+        series[action] = [(first["observation_time_s"], first["speed_before_mps"])]
+        series[action] += [(row["next_observation_time_s"], row["speed_mps"])
+                           for row in run["trace"]]
+    top = max(30.0, math.ceil(max(v for points in series.values() for _, v in points) / 5) * 5)
+    svg = ['<svg viewBox="0 0 960 300" role="img" aria-label="真实速率随模拟时间变化">',
+           '<rect width="960" height="300" fill="white"/>']
+    for speed in (0, top / 2, top):
+        y = 248 - speed / top * 204
+        svg += [f'<path d="M 70 {y} H 922" stroke="#dce3ea"/>',
+                f'<text x="58" y="{y + 5}" text-anchor="end">{speed:g}</text>']
+    for second in (0, 1, 2, 4, 6, 8):
+        x = 70 + second / DURATION_S * 852
+        svg += [f'<path d="M {x} 44 V 248" stroke="#edf0f4"/>',
+                f'<text x="{x}" y="273" text-anchor="middle">{second}</text>']
+    svg += ['<text x="70" y="25">实际速率（m/s）</text>',
+            '<text x="922" y="297" text-anchor="end">模拟时间（s）</text>']
+    for action, points in series.items():
+        xy = " ".join(f"{70 + t / DURATION_S * 852:.3f},{248 - v / top * 204:.3f}"
+                      for t, v in points)
+        svg.append(f'<polyline data-action="{action}" points="{xy}" fill="none" '
+                   f'stroke="{COLORS[action]}" stroke-width="3"/>')
+    return "\n".join(svg + ["</svg>"])
+
+
+def run_comparison(seed=SEED, *, max_steps=MAX_STEPS, open_browser=True) -> dict:
+    """跑两组真实回合；无界面验证请传 open_browser=False。"""
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S_%fZ")
+    output_dir = OUTPUT_ROOT / stamp
+    output_dir.mkdir(parents=True, exist_ok=False)  # 每次保留独立证据，不覆盖旧报告。
+    runs = {}
+    for action in COLORS:
+        folder = output_dir / action
+        summary = run_episode(seed=seed, max_steps=max_steps, action_name=action,
+                              render_mode="rgb_array", output_dir=folder,
+                              duration_s=DURATION_S, vehicles_count=0)
+        trace_path = folder / "trace.jsonl"
+        trace = [json.loads(line) for line in trace_path.read_text(encoding="utf-8").splitlines()]
+        runs[action] = {"summary": summary, "trace": trace,
+                        "trace_path": str(trace_path), "gif_path": str(folder / "episode.gif"),
+                        "final_speed_mps": trace[-1]["speed_mps"],
+                        "displacement_x_m": summary["final_observation"][0][1]
+                        - summary["initial_observation"][0][1]}
+    idle, slower = runs["IDLE"]["summary"], runs["SLOWER"]["summary"]
+    matched = (idle["initial_observation"] == slower["initial_observation"]
+               and idle["config"] == slower["config"]
+               and idle["packages"] == slower["packages"]
+               and idle["runner_sha256"] == slower["runner_sha256"])
+    if not matched:
+        raise RuntimeError("两组初始条件或运行版本不一致；保留日志，不生成公平对照结论。")
+
+    cards = []
+    for action, run in runs.items():
+        summary = run["summary"]
+        reason = html.escape(summary["end_reason"])
+        description = "每步保持已有目标" if action == "IDLE" else "每步请求降低目标速度档位"
+        cards.append(f'''<article><h2 style="color:{COLORS[action]}">{action}</h2>
+<p>{description}</p><img src="{action}/episode.gif" alt="{action} 真实道路回放">
+<dl><dt>模拟时长 / 动作次数</dt><dd>{summary['sim_time_s']:.2f} 秒 / {summary['steps']} 次</dd>
+<dt>末次实际速率</dt><dd>{run['final_speed_mps']:.3f} m/s</dd>
+<dt>自车世界 x 位移</dt><dd>{run['displacement_x_m']:.3f} 米</dd>
+<dt>碰撞</dt><dd>{'是' if summary['crashed'] else '否'}</dd>
+<dt>结束原因</dt><dd>{END_LABELS.get(summary['end_reason'], reason)}<br><code>{reason}</code></dd></dl>
+<p><a href="{action}/trace.jsonl">逐步日志</a> · <a href="{action}/summary.json">配置与版本</a></p></article>''')
+    report = output_dir / "report.html"
+    document = f'''<!doctype html>
+<html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IDLE 与 SLOWER：同一起点的动作对照</title>
+<style>
+*{{box-sizing:border-box}}body{{margin:0;background:#f2f5f8;color:#233044;font:16px/1.7 system-ui,"Microsoft YaHei",sans-serif}}
+main{{max-width:1160px;margin:auto;padding:32px 24px}}h1{{font-size:28px;margin:0}}h2{{margin:0;font-size:22px}}
+.tag{{color:#576a80}}.cards{{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin:24px 0}}
+article,.chart{{background:white;border:1px solid #dce3ea;border-radius:14px;padding:22px}}img{{width:100%;display:block}}
+dl{{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:20px}}dt{{color:#576a80}}dd{{margin:0;text-align:right}}
+code{{font-size:12px}}a{{color:#176fbd}}svg{{width:100%;display:block;font-size:14px;fill:#576a80}}
+.note{{border-left:4px solid #cc6815;padding:12px 18px;background:#fff7ed}}.legend{{display:flex;gap:24px}}
+@media(max-width:720px){{.cards{{grid-template-columns:1fr}}main{{padding:20px 12px}}h1{{font-size:23px}}}}
+</style><main><p class="tag">实验 05 · 真实环境执行对照</p><h1>同一起点，保持目标与持续请求减速</h1>
+<p>seed={seed} · 其他车辆=0 · 环境时限={DURATION_S:g} 秒 · 步数预算={max_steps}
+<br>两组初始观察、配置、依赖版本与运行器内容已核对一致。</p>
+<p class="note">这是恒定高层动作的控制响应对照，不是 40/50 米阈值策略评价。
+没有其他交通；无碰撞不构成安全证明。SLOWER 的最低目标档位仍是 20 m/s，不是紧急制动。</p>
+<section class="cards">{''.join(cards)}</section><section class="chart"><h2>实际速率随时间怎样变化</h2>
+<p class="legend"><span style="color:{COLORS['IDLE']}">━━ IDLE</span>
+<span style="color:{COLORS['SLOWER']}">━━ SLOWER</span></p>{speed_svg(runs)}
+<p>起点来自 first_transition 的动作前时间与 speed_before_mps；后续点来自每条日志的
+next_observation_time_s 与 speed_mps。它们是实际速率，未归一化，不是世界 x 轴速度分量或目标速度。</p>
+<p>横轴固定为 0–8 秒；曲线只画真实采样区间，不补齐提前结束的部分。
+GIF 各自循环播放，浏览器不保证两侧同步；比较同一时刻请看曲线与日志。</p></section>
+<p>动手：先预测，再把脚本顶部 MAX_STEPS 从 40 改成 5，重新运行。
+比较曲线覆盖的时间与结束原因，不能把观察更短理解成驾驶更安全。</p>
+<p class="tag">世界 x 位移=末位置−初位置（米），不是累计路程。原始数值、配置和版本保存在各组日志中。
+报告记录的是助手或学习者本次运行；谁运行、是否理解，需要另行记录。</p></main></html>'''
+    report.write_text(document, encoding="utf-8")
+    print(f"对照报告：{report}")
+    if open_browser:
+        webbrowser.open(report.as_uri())
+    return {"report_path": str(report), "output_dir": str(output_dir), "seed": seed,
+            "max_steps": max_steps, "initial_conditions_match": matched, "runs": runs}
+
+
+if __name__ == "__main__":
+    run_comparison()
+```
+
+</details>
+
+<details>
+<summary>可选进阶：原有的两个种子、带交通终端对照</summary>
+
+这是原有的补充实验：使用 2 个种子、12 辆其他车，终端打印结果。它和 4.1 的零交通可视对照条件不同；当前先做可视实验，这段不同时作为新作业。
 
 还要注意一处配置变化：本节记录器的目标速度档位为 **`[20, 25, 30]` m/s，最低仍是 20 m/s**。第 02 章跟车程序用的则是 `[0, 5, 10, 15, 20, 25, 30]`。因此这里连续请求 `SLOWER` 不会把目标降到零，更不能把它理解为紧急制动；速度如何接近目标仍由控制器决定。
 
@@ -1255,6 +1752,7 @@ for action, runs in results.items():
 这里运行的是 2 个种子 × 2 个动作，共 4 次独立回合，均不开图形窗口，也不写输出目录。每组的碰撞分母是 2 个回合，不是总步数。`assert` 只检查我们有没有真的从相同观察和配置开始，没有宣称两组的整个世界演化会相同。
 
 本章没有预先填一组“应该谁赢”的碰撞数字。请以你实际输出为准；种子固定也不能替代代码和依赖版本记录。
+</details>
 
 ### 4.4 先读结束原因，再看成绩
 
@@ -1272,13 +1770,31 @@ for action, runs in results.items():
 
 记录器还能保存每一步的观察、动作及新状态。需要回放失败时再使用它的保存功能；先选一局能说明问题的记录，不必一次堆几百张图。
 
+#### 实践停靠：亲手缩短一次观察
+
+在 `C:\Users\Administrator\Desktop\职业生涯项目\vla_basic\experiments\highway_driving\demos\05_compare_actions.py` 顶部，把这一行：
+
+```python
+MAX_STEPS = 40
+```
+
+改成：
+
+```python
+MAX_STEPS = 5
+```
+
+先预测：每次推进 0.2 秒，5 次最多能看多久？保存后再次运行 4.1 的同一命令，新报告会放进新的目录，旧的 8 秒报告仍保留。对照两页：曲线是否更早停止，结束原因是否从环境时限变成脚本预算。曲线横轴仍保留 0–8 秒，后面空白表示没有继续观察，不是车速变成零。
+
+本章只改这个步数预算，保持环境时限 8 秒和其他条件不动。这个修改让你看清“程序停止观察”和“环境到了时限”的区别；一小段无碰撞不能证明它更安全。
+
 ### 4.5 奖励高，不一定开得更合适
 
 `reward` 是环境按自己设定的规则打的分。你可以把它理解成训练或实验用的一张评分表；如果评分表很鼓励速度，快一点可能提高分数，却不代表所有风险都得到了照顾。
 
 比较驾驶行为时，至少要把“有没有撞”“是否向前行驶”“有没有突然加减速”分开看。它们是不同问题，可能存在取舍。当前记录器保存了速度与位置，尚未给出整套舒适性指标；不能因为目录里有日志就称为评测系统已经完成。
 
-两个种子足够演示如何成对比较，还不足以证明普遍改进。后续应准备一批调试时用的场景，再留出另一批场景检查泛化。做过训练集/验证集切分的你可以沿用这个习惯，但驾驶场景往往包含同一段路、同一交通过程，不能简单把相邻时间步随机拆开就认为彼此独立。
+当前零交通的一个种子只够看控制响应；折叠补充中的两个带交通种子也只够演示比较方法，都不足以证明普遍改进。后续应准备一批调试时用的场景，再留出另一批场景检查泛化。做过训练集/验证集切分的你可以沿用这个习惯，但驾驶场景往往包含同一段路、同一交通过程，不能简单把相邻时间步随机拆开就认为彼此独立。
 
 ### 4.6 开放环和闭环，先记它们实际做了什么
 
@@ -1290,11 +1806,11 @@ for action, runs in results.items():
 
 你在 NLP 中常用的一次离线准确率，与一辆车连续执行动作的行为，区别就在这里：先前动作会改变之后遇到的数据。以后训练视觉或轨迹模型时，我们仍会回到这个区别。
 
-### 4.7 做一个能解释的修改
+### 4.7 记录你已经看见的变化
 
-等这一章成为当前任务时，可以只把 `max_steps=40` 改成 `max_steps=5`，其他条件保持相同。先预测它最多观察多少秒，以及为什么更短的一段无碰撞记录不能证明策略改进，再比较实际结束原因。
+4.4 已安排了本章唯一的小修改，这里不再新增任务。保留两次报告，并用自己的话说明：改变的是观察预算还是驾驶动作，为什么两次结束原因不同，哪些结论没有足够证据支持。
 
-一次只改这一项；看懂结果后再考虑更多场景，而不是同时改车辆数、阈值、奖励和时间。你要练的是解释“是哪一个变化造成了哪些结果”，不是凑一个更好看的总分。
+先解释这一处变化，再考虑更多场景。页面、回放和曲线是帮助观察的工具，能运行它们不等于完整驾驶评测系统已经建好。
 
 <details>
 <summary>可选出处与已有实现</summary>
@@ -1308,11 +1824,30 @@ for action, runs in results.items():
 
 ---
 
+<a id="project-continuity"></a>
+
 ## 接下来，同一个项目怎样走向驾驶模型
 
 当前四章先让你能解释一次动作的执行，也开始建立比较实验的习惯。模拟器直接给出车辆状态，省去了真实图像里“车在哪里、动得怎样”的困难。走向车企智驾工作时，还需要把这部分补回来，并选一个方向形成更深入的作品。
 
 后续内容会继续写在 vla_basic，不把你送去另一个互不相干的教程。下面是还要交付的阶段及其具体问题，当前没有将它们记成已完成的章节或工程。
+
+整个项目后续继续采用同一种实践方式，而且前后使用的产物要接得起来。下面每一行会拆成多个短段实践，不是一次布置全部内容：
+
+| 阶段 | 从上一阶段接什么 | 将亲手改变什么、看见什么 | 当前实现状态 |
+| --- | --- | --- | --- |
+| 数据与时间 | 已有回合的 trace、summary、场景条件 | 移动参考时刻，在图上分清历史输入与未来标签 | 有旧合成时间契约素材，真实日志适配待交付 |
+| 二维几何与轨迹 | 同一段实际自车轨迹和补齐的参考位姿 | 改参考朝向，看世界图与自车图的轨迹旋转 | 有旧二维变换/测试，轨迹联动实验待交付 |
+| 第一个状态模型 | 版本化数据、动作定义、场景分组和规则基线 | 改训练步数，看小样本预测及接入环境后的行为 | 采集接口、训练和模型执行待实现 |
+| 相机与视觉 | 继续使用时间/坐标/标签契约，接公开图像和标定 | 缩图时改变内参处理，看投影是否偏移 | 数据适配、标定与投影实验待实现 |
+| 历史帧与导航 | 同一场景划分、视觉基线和轨迹报告 | 保持模型不变，屏蔽历史输入，对照预测是否变化 | 时序/导航数据和模型待实现 |
+| VLA 输出与部署 | 已有图像、动作语义、解码/控制接口和评测集 | 先看输出如何执行，再单独比较压缩前后行为与性能 | VLA、压缩与运行时待实现 |
+
+当前 `run_episode` 只记录恒定动作，未提供完整训练所需的自车朝向等字段；排序观察的行号也不能当稳定车辆 ID。下一阶段须先补采集契约和规则数据接口，不能把已有回放直接叫“专家数据集”。归档里的二维变换与合成时间案例只按需复用，不要求重走旧 Lab，也不改原 4/6 教学基线。
+
+同一个项目延续的是问题、数据契约、接口、对照方法和证据，不要求永远用同一模拟器。进入真实图像阶段，离线回放不能冒充可交互闭环。后续每项还要有独立验证，例如二维坐标不能只测往返变换，还要核对已知方向点；模型不能只报训练损失，还要保留场景划分与执行失败。
+
+这张表是明确的后续交付方向，不是已完成清单。已有实现继续复用；未实现部分不预建空目录，真正交付时同步文字、代码、运行、验证与学习接续。
 
 ### 从当前状态走到驾驶数据和未来轨迹
 

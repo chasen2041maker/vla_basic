@@ -1,8 +1,8 @@
-# Role Target — XPENG-like Autonomous Driving R&D
+# 车企智驾方向与能力证据参考
 
 公开方向资料原核对：2026-08-28；个人求职目标更新：2026-09-27（Asia/Shanghai）。下方历史岗位与技术链接不因本次个人目标更新而视作重新核验。
 
-这不是职位或录用承诺，而是仓库用来筛选学习内容和证据强度的目标画像。
+这里用于按目标岗位筛选学习内容和证据强度，不是另一份课程顺序或入门关卡。每个能力通过同一项目里的短段实践逐步验证；下一项学什么只查 [PROGRESS](../PROGRESS.md)。职位与录用不由课程名称或覆盖范围保证。
 
 ## 当前求职约束与待核对项
 
@@ -95,17 +95,20 @@ L4 能权衡：能设计对照实验、替代方案和生产边界
 目标不是所有方向都成为研究专家，而是：
 
 ```text
-主链 data → model → action → eval → system 达到 L3
-+ 至少一个方向逐步达到 L4
+共同基础：能解释 data → model → action → eval → system 的关系和边界
++ 选定方向：用实际项目做到可独立修改、验证、排错（L3）
++ 后续做深：结合岗位逐步学习权衡与设计（L4）
 ```
 
 ---
 
-## 4. 七条能力轴
+## 4. 长期能力地图（按选定方向决定深度）
+
+下列能力轴用于发现缺口，不要求进入任何智驾岗位前全部达到同一深度，也不要求先读完才做实验。每个选定目标应落实为可运行任务、一个本人改动及可解释的证据。
 
 ### A. Coding & Debugging
 
-目标：L3
+该方向做深时的参考：L3
 
 - Python / PyTorch 工程链；
 - Linux、Git、profiling 和最小复现；
@@ -125,7 +128,7 @@ L4 能权衡：能设计对照实验、替代方案和生产边界
 
 ### C. Vision, Geometry & Temporal Understanding
 
-目标：L3
+该方向做深时的参考：L3
 
 - 图像、视觉特征和 token；
 - 相机内参、外参、投影和深度；
@@ -135,7 +138,7 @@ L4 能权衡：能设计对照实验、替代方案和生产边界
 
 ### D. Driving Motion & Action
 
-目标：L3
+该方向做深时的参考：L3
 
 - scene / sample / history / future；
 - waypoint / trajectory / speed profile / control；
@@ -146,7 +149,7 @@ L4 能权衡：能设计对照实验、替代方案和生产边界
 
 ### E. Driving Model / VLA
 
-目标：L3
+该方向做深时的参考：L3
 
 - imitation-learning trajectory baseline；
 - 多相机历史、ego state 和 route conditioning；
@@ -157,7 +160,7 @@ L4 能权衡：能设计对照实验、替代方案和生产边界
 
 ### F. Evaluation & Reliability
 
-目标：L3–L4
+该方向做深时的参考：L3–L4
 
 - contract tests；
 - open-loop / pseudo-closed-loop / closed-loop；
@@ -168,7 +171,7 @@ L4 能权衡：能设计对照实验、替代方案和生产边界
 
 ### G. Systems, Safety & Deployment
 
-目标：L3
+该方向做深时的参考：L3
 
 - preprocessing / inference / decode / control latency；
 - stale observation 和 deadline；
@@ -251,7 +254,7 @@ PASSED   已在仓库中形成可复现证据
 | 相机几何与坐标 | LEARN | 系统补齐 | 内外参、投影、ego/world/camera round-trip tests |
 | 多相机与时序 | LEARN | 系统补齐 | 时间轴、skew、ego-motion compensation 实验 |
 | BEV / occupancy mental model | LEARN | 在几何后进入 | 能说明输入、输出、假设和失败症状 |
-| 驾驶数据契约 | LEARN | 当前早期主线 | silent failure、validator 和 tests |
+| 驾驶数据契约 | LEARN | 共同基础；按当前实验需要补齐 | silent failure、validator 和 tests |
 | trajectory / waypoint / control | LEARN | 系统补齐 | 轨迹表示、rollout、控制边界解释 |
 | 车辆运动学 | LEARN | 系统补齐 | SE(2)、bicycle model、yaw/unit fault |
 | 模仿学习驾驶 baseline | LEARN | 复用已有训练能力 | trajectory model、overfit、leakage check |
@@ -265,7 +268,7 @@ PASSED   已在仓库中形成可复现证据
 
 ---
 
-## 3. 最短转型路径
+## 3. 候选岗位的能力衔接（不是当前学习顺序）
 
 ### 路径 A：先形成可投递的桥梁能力
 
@@ -298,7 +301,7 @@ PASSED   已在仓库中形成可复现证据
 → RL / world model / long-tail
 ```
 
-两条路径不是二选一。路径 A 提供更快的行业入口，路径 B 是长期北极星。
+两条路径是候选能力组合，当前尚未选定岗位方向。路径 A 与已有工程经验存在衔接点，但不能据此承诺更快入职；路径 B 保留长期算法方向。课程采用同一项目逐步积累证据，不要求把两条路线全部完成才开始投递，也不以此处覆盖 PROGRESS。
 
 ---
 
@@ -323,7 +326,7 @@ PASSED   已在仓库中形成可复现证据
 
 ---
 
-## 5. 当前优先级
+## 5. 长期依赖参考（不作为同时布置的任务）
 
 ```text
 P0  系统全景和 failure boundary
@@ -337,4 +340,4 @@ P2  distillation / quantization 驾驶化验证
 P2  reinforcement learning / world model
 ```
 
-优先级由依赖决定，不代表后面的内容不重要。
+这份优先级只作长期依赖参考，不代表当前同时要学完所有 P0。阶段开始时，把选中的一项拆成短讲解、可见运行、一个小改和结果解释；当前顺序仍由唯一 PROGRESS 指向。

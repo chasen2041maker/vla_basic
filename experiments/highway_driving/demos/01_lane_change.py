@@ -37,9 +37,11 @@ def main(render_mode="human"):
                 decision = "保持目标车道和目标速度"
 
             print("\n第", step + 1, "次决策：", decision, "，动作编号：", action)
+            print("动作前仿真时间：", round(float(env.unwrapped.time), 3), "秒")
             obs, reward, terminated, truncated, info = env.step(action)
 
             # 目标会先改变，实际位置需要随车辆运动逐渐靠近目标。
+            print("动作后仿真时间：", round(float(env.unwrapped.time), 3), "秒")
             print("行动后目标车道编号：", vehicle.target_lane_index[2])
             print("行动后横向位置 y：", round(float(vehicle.position[1]), 2), "米")
 

@@ -2,12 +2,16 @@
 from __future__ import annotations
 
 import json
+import io
 import os
+import runpy
 import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
+from contextlib import redirect_stdout
 
 PROJECT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT))
@@ -116,6 +120,114 @@ class TeachingIntegrationTests(unittest.TestCase):
             self.assertIn("仿真时间 (s)：0.000 → 0.200", completed.stdout)
             self.assertIn("共 2 步；总仿真时间=0.400s", completed.stdout)
             self.assertFalse((folder / "episode.gif").exists())
+
+
+class VisibleSpeedDemoTests(unittest.TestCase):
+    def test_setting_target_does_not_move_vehicle_until_step(self):
+        demo = runpy.run_path(str(PROJECT / "demos" / "04_target_speed.py"))
+        with tempfile.TemporaryDirectory() as temp:
+            from PIL import Image
+            snapshot = Path(temp) / "speed.png"
+            before_sdl = {k: os.environ.get(k) for k in ("SDL_VIDEODRIVER", "SDL_AUDIODRIVER")}
+            records = demo["run_demo"](target_speed=20, headless=True, snapshot_path=snapshot)
+            self.assertEqual(before_sdl, {k: os.environ.get(k) for k in before_sdl})
+            change = next(i for i, row in enumerate(records) if row["event"] == "target_changed")
+            before, changed, after = records[change - 1:change + 2]
+            self.assertEqual(changed["time_s"], 2.0)
+            for field in ("time_s", "speed_mps", "x_world_m", "y_world_m"):
+                self.assertEqual(before[field], changed[field])
+            self.assertEqual(changed["target_speed_mps"], 20.0)
+            self.assertGreater(after["time_s"], changed["time_s"])
+            self.assertGreater(after["x_world_m"], changed["x_world_m"])
+            self.assertTrue(20 < after["speed_mps"] < changed["speed_mps"])
+            motion = [r for r in records if r["event"] != "target_changed"]
+            for left, right in zip(motion, motion[1:]):
+                self.assertAlmostEqual(right["time_s"] - left["time_s"], 0.2)
+            self.assertEqual(records[-1]["time_s"], 8.0)
+            self.assertAlmostEqual(records[-1]["speed_mps"], 20, places=3)
+            with Image.open(snapshot) as frame:
+                # 查看实际道路区域的颜色，不能只检查 PNG 文件存在。
+                colors = {color for count, color in
+                          frame.crop((0, 108, 960, 318)).convert("RGB").getcolors(960 * 210)}
+                self.assertGreater(len(colors), 3)
+                self.assertTrue(any(g > r * 1.5 and g > b * 1.5 for r, g, b in colors))
+
+    def test_lower_target_changes_response_from_same_initial_state(self):
+        demo = runpy.run_path(str(PROJECT / "demos" / "04_target_speed.py"))
+        regular = demo["run_demo"](target_speed=20, headless=True)
+        lower = demo["run_demo"](target_speed=10, headless=True)
+        self.assertEqual([r for r in regular if r["time_s"] < 2],
+                         [r for r in lower if r["time_s"] < 2])
+        a = next(r for r in regular if r["time_s"] == 2.2)
+        b = next(r for r in lower if r["time_s"] == 2.2)
+        self.assertLess(b["speed_mps"], a["speed_mps"])
+        self.assertGreater(b["speed_mps"], b["target_speed_mps"])
+        self.assertAlmostEqual(lower[-1]["speed_mps"], 10, places=3)
+
+    def test_headless_default_uses_current_file_parameter(self):
+        run = runpy.run_path(str(PROJECT / "demos" / "04_target_speed.py"))["run_demo"]
+        # 模拟学习者修改顶部配置；不改写其实际文件，也不把参考值20当当前值。
+        with patch.dict(run.__globals__, {"TARGET_SPEED": 15.0}):
+            records = run(headless=True)
+        changed = next(row for row in records if row["event"] == "target_changed")
+        self.assertEqual(changed["target_speed_mps"], 15.0)
+        self.assertAlmostEqual(records[-1]["speed_mps"], 15, places=3)
+
+
+class FollowingEntryTests(unittest.TestCase):
+    def test_short_observation_is_not_reported_as_a_complete_episode(self):
+        run = runpy.run_path(str(PROJECT / "demos" / "00_following.py"))["main"]
+        output = io.StringIO()
+        with redirect_stdout(output):
+            result = run(render_mode=None, max_steps=3)
+        self.assertEqual(result["steps"], 3)
+        self.assertEqual(result["episode"], 1)
+        self.assertAlmostEqual(result["episode_time_s"], 3)
+        self.assertFalse(result["episode_finished"])
+        self.assertIn("本局未完成", output.getvalue())
+
+    def test_budget_at_episode_end_keeps_final_state_instead_of_resetting(self):
+        run = runpy.run_path(str(PROJECT / "demos" / "00_following.py"))["main"]
+        with redirect_stdout(io.StringIO()):
+            result = run(render_mode=None, max_steps=40)
+        self.assertEqual(result["steps"], 40)
+        self.assertEqual(result["episode"], 1)
+        self.assertAlmostEqual(result["episode_time_s"], 40)
+        self.assertTrue(result["episode_finished"])
+        self.assertEqual(result["stop_reason"], "runner_step_limit")
+
+
+class ComparisonReportTests(unittest.TestCase):
+    def test_short_report_preserves_actual_motion_and_observation_limit(self):
+        from PIL import Image
+        compare = runpy.run_path(str(PROJECT / "demos" / "05_compare_actions.py"))["run_comparison"]
+        with tempfile.TemporaryDirectory() as temp:
+            with patch.dict(compare.__globals__, {"OUTPUT_ROOT": Path(temp)}):
+                result = compare(max_steps=5, open_browser=False)
+            self.assertTrue(result["initial_conditions_match"])
+            report = Path(result["report_path"])
+            page = report.read_text(encoding="utf-8")
+            self.assertIn("runner_step_limit", page)
+            self.assertIn("不是 40/50 米阈值策略评价", page)
+            a, b = result["runs"]["IDLE"], result["runs"]["SLOWER"]
+            self.assertEqual(a["summary"]["initial_observation"], b["summary"]["initial_observation"])
+            self.assertLess(b["final_speed_mps"], a["final_speed_mps"])
+            self.assertLess(b["displacement_x_m"], a["displacement_x_m"])
+            for action, run in result["runs"].items():
+                summary = run["summary"]
+                self.assertEqual(summary["steps"], 5)
+                self.assertAlmostEqual(summary["sim_time_s"], 1.0)
+                self.assertEqual(summary["end_reason"], "runner_step_limit")
+                self.assertFalse(summary["terminated"] or summary["truncated"])
+                saved = [json.loads(line) for line in Path(run["trace_path"]).read_text(
+                    encoding="utf-8").splitlines()]
+                self.assertEqual(saved, run["trace"])
+                self.assertEqual(run["final_speed_mps"], saved[-1]["speed_mps"])
+                self.assertIn(f'{action}/episode.gif', page)
+                self.assertTrue((report.parent / action / "summary.json").exists())
+                with Image.open(run["gif_path"]) as gif:
+                    self.assertEqual(gif.n_frames, 6)  # 初始帧 + 五个真实后续时刻。
+                    self.assertEqual(gif.info["duration"], 200)
 
 
 if __name__ == "__main__":

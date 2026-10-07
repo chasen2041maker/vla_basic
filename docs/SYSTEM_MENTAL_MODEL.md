@@ -2,6 +2,8 @@
 
 这是按需查询的系统参考。第一次阅读请打开 [连续教材 BOOK.zh-CN.md](../learning/BOOK.zh-CN.md)，相关代码与解释已放在同一章；本文件不再作为必读第一课。
 
+查系统位置时，把概念接回已经能运行的东西：04 调速展示“目标→控制→运动”，00 跟车展示“观察→规则→新观察”，01 变道展示“车道请求→转向→位置”，05 展示“真实执行→记录→对照”。对应运行命令统一在[实验入口](../experiments/highway_driving/demos/README.md)，本人当前任务只查 [PROGRESS](../PROGRESS.md)。相机、模型和部署的系统框图用于解释位置，当前还没有相应完整实验，不能把框图当实现。
+
 ## 1. 先看一辆车怎样完成一次调整
 
 比如前车变慢了，我们希望自己的车也慢下来。整个过程可以先理解成：
@@ -290,22 +292,11 @@ System
 
 ---
 
-## 8. 后续 Lab 如何映射到系统
+## 8. 怎样回到项目里的实际问题
 
-| Lab | 主要系统边界 |
-|---|---|
-| 000 | 全链路与 failure localization |
-| 001 | Data Contract & Alignment |
-| 002 | Action / Motion / Control boundary |
-| 003–004 | Sensor、Geometry、Representation |
-| 005 | Model training and trajectory head |
-| 006–007 | Evaluation and public benchmark |
-| 008–009 | Driving VLM/VLA and action representation |
-| 010 | Compression and deployment system |
-| 011 | Safety / ODD / fallback / observability |
-| 012 | Closed-loop learning, RL and world model |
+本文件不维护另一套未来 Lab 编号或通关顺序。当前实验对应上述观察、动作、控制、运动和记录；后续怎样复用日志、补数据与几何、训练模型、接视觉和部署，统一看[教材书末的项目衔接](../learning/BOOK.zh-CN.md#project-continuity)。
 
-局部知识只有放回这张图，才算真正理解。
+遇到问题时只取相关边界：曲线不符合预期，先查目标、控制和时间；轨迹方向不对，再查坐标；报告结论不对，再查记录与评测。旧专项实现留在 archive 按需提取，不要求先学完整个系统图再继续当前实验。
 
 ---
 
