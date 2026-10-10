@@ -10,8 +10,11 @@
 
 ## 下一步
 
-1. **阶段 2 第 0 步**：读教材 2.8、4.1、4.4、4.6（约 15 分钟）。
-2. **阶段 2 第 1 步**：写 `experiments/highway_driving/evaluate.py`，同一策略跑一组种子，输出碰撞率、平均速度、最小前车距离、变道次数；先比较“一直 IDLE”和 04 规则。
+阶段 2 作品仓库 **highway-sim-eval** 已建好（2026-10-10 首次提交：`sim_env.py` 环境入口、`check_env.py` 检查脚本、README 计划）。运行环境沿用 `py310`。
+
+1. **下次开始先做**：highway-sim-eval 已推送到 GitHub（eef4bde）。vla_basic 本次改动（AGENTS、PROGRESS、CURRENT_TASK、LEARNING_LOG）待提交推送。然后在 highway-sim-eval 运行 `python check_env.py`，确认 10 步正常。
+2. 阶段 2 第 0 步：读教材 2.8、4.1、4.4、4.6（约 15 分钟）。
+3. 阶段 2 第 1 步：在 highway-sim-eval 写 `evaluate.py`，比较“一直 IDLE”和 04 规则。
 
 <details><summary>阶段 1 的 6 课（2026-10-10 完成）</summary>
 

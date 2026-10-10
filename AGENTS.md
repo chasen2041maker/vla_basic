@@ -8,7 +8,7 @@
 
 - **vla_basic** 是学习者的智能驾驶学习主项目：教材、实验代码、进度都在这里。
 - **HighwayEnv**（学习者的 fork：`chasen2041maker/highwayenv-learning`）是当前阶段的模拟器和源码阅读对象，不在这里另建进度。
-- 本机路径：`C:\company\own\vla_basic`、`C:\company\own\highwayenv-learning`。旧记录里的 `C:\Users\Administrator\...` 和 `D:\miniconda\...` 是以前那台电脑的，不要再用。
+- 本机路径：`C:\company\own\vla_basic`、`C:\company\own\highwayenv-learning`。阶段 2 作品仓库：`C:\company\own\highway-sim-eval`（GitHub `chasen2041maker/highway-sim-eval`，学习者授权助手全权管理，推送由学习者在本机执行）。旧记录里的 `C:\Users\Administrator\...` 和 `D:\miniconda\...` 是以前那台电脑的，不要再用。
 - 运行环境：PowerShell 里 `conda activate py310`，然后用 `python` 运行（不要用 `py`，它会启动没装依赖的系统 Python）。`py310` 里是 HighwayEnv 源码的可编辑安装。不要重装环境。
 - 例外：变道练习的实际修改和运行入口是 HighwayEnv 仓库的 `learning/demos/01_lane_change.py`（2026-10-01 学习者选择）。vla_basic 里的同名文件是教材用的无车版本，两份不自动同步。
 
