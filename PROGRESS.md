@@ -4,15 +4,25 @@
 
 ## 现在在哪
 
-- **阶段 1 完成（2026-10-10）**。**阶段 2 = 作品项目 highway-sim-eval（2026-10-11 最终版）**：基于 CARLA 0.9.16 的智驾仿真评测与数据闭环平台。A 智驾基础打通 → B 评测与数据闭环平台（入行主力）→ C 多模态数据挖掘 + Agent → D 闭环学习（通往算法的桥）→ E 补短板（C++、ROS 2、Docker，穿插）。约 20–24 周，第 10 周左右开始边做边投。详见 [CURRENT_TASK](experiments/highway_driving/CURRENT_TASK.md)。
+- **阶段 1 完成（2026-10-10）**。**A1 完成（2026-10-11）**，下一课 A2（CARLA，在家里电脑）。**阶段 2 = 作品项目 highway-sim-eval（2026-10-11 最终版）**：基于 CARLA 0.9.16 的智驾仿真评测与数据闭环平台。A 智驾基础打通 → B 评测与数据闭环平台（入行主力）→ C 多模态数据挖掘 + Agent → D 闭环学习（通往算法的桥）→ E 补短板（C++、ROS 2、Docker，穿插）。约 20–24 周，第 10 周左右开始边做边投。详见 [CURRENT_TASK](experiments/highway_driving/CURRENT_TASK.md)。
 - 职业路径：社招 → 先进数据与仿真方向（仿真 / 评测平台、数据闭环）→ 以数据算法为跳板 → 1–2 年争取转算法工程师。
 - 阶段 1 能力判断：能凭记忆说出 `env.step` 主链、IDM 两项、MOBIL 两道检查、奖励只看快/靠右/不撞。依据：2026-10-10 收尾填空 6 题中 5 题正确，第 3 题漏了“生成 obs、算奖励”，已纠正。
 - 学习者要求（2026-10-11）：扎实、不虚浮；核心代码手写；先预测再看结果；解释和结论自己写。
 
 ## 下一步
 
-1. **A1 自行车模型**（代码已给）：在 highway-sim-eval 手敲 `ads/vehicle.py`、`tests/test_vehicle.py`、`examples/l1_circle.py`；`python -m pytest -q` 应为 5 passed；10 m/s、0.1 rad 绕圈直径 55.81 m；回答三个预测题和“为什么车速变了直径不变”。
-2. **A2 准备**：下载 CARLA 0.9.16 Windows 包（https://downloads.carlasim.com/Windows/CARLA_0.9.16.zip），解压到无中文无空格路径（如 `C:\CARLA_0.9.16`）；`py310` 里 `python -m pip install carla==0.9.16`。
+1. **A2 装 CARLA（在家里那台电脑上）**：下载 CARLA 0.9.16 Windows 包（https://downloads.carlasim.com/Windows/CARLA_0.9.16.zip），解压到无中文无空格路径（如 `C:\CARLA_0.9.16`）；装 conda 环境、`git clone` 两个仓库、`python -m pip install carla==0.9.16`；然后启动服务器、Python 连上、生成自车。助手一步步带。
+2. 这台笔记本只做纯 Python 部分；两台电脑用 git 同步（换电脑前先 `git pull`）。
+
+<details><summary>A1 自行车模型（2026-10-11 完成）</summary>
+
+- 手敲 `ads/vehicle.py`（运动学自行车模型，后轴参考点，y 向左）、`tests/test_vehicle.py`（6 个测试，第 6 个“第一步按旧车头直走”由助手给出代码）、`examples/l1_circle.py`。
+- 验证：10 m/s、0.1 rad 直径 55.81 m；0.2 rad 直径 27.63 m、一圈 8.68 s（本人预测“弯更急、半径更小”正确）；20 m/s 直径不变、一圈减半（本人观察正确）。
+- 理解：dt_s 是调用方传入的步长；先用旧车头算位置、再更新车头（第一步 y = 0）；`python -m` 从根目录找 import；本人亲手复现了 `No module named 'ads'`。
+- 待加强：“车速不影响运动学转弯半径”本人答出；“现实中高速会侧滑、模型只适用于低侧向加速度”由助手讲解，未独立说出。测试文件初稿有拼写、`=`/`==`、`,`/`.`、缩进错误，本人按指引改正。
+- 提交：highway-sim-eval f3d008c、0c9a3ec。
+
+</details>
 
 <details><summary>阶段 1 的 6 课（2026-10-10 完成）</summary>
 

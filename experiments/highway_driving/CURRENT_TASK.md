@@ -122,7 +122,7 @@ HighwayEnv 的价值主要在 IDM / MOBIL 和阶段 2 的评测项目。阶段 1
 
 ## 阶段 2：作品项目 highway-sim-eval（2026-10-11 最终版）
 
-仓库 **highway-sim-eval**（本机 `C:\company\own\highway-sim-eval`，GitHub `chasen2041maker/highway-sim-eval`）。仿真器 **CARLA 0.9.16**（Windows 包 + `pip install carla==0.9.16`，装进 `py310`）。硬件：NVIDIA 显存 ≥ 8 GB、硬盘 50 GB 以上；一次只能跑一个 CARLA，训练和仿真分开跑。
+仓库 **highway-sim-eval**（本机 `C:\company\own\highway-sim-eval`，GitHub `chasen2041maker/highway-sim-eval`）。仿真器 **CARLA 0.9.16**（Windows 包 + `pip install carla==0.9.16`，装进 `py310`）。硬件：NVIDIA 显存 ≥ 8 GB、硬盘 50 GB 以上；一次只能跑一个 CARLA，训练和仿真分开跑。**2026-10-11 补充**：日常这台笔记本配置低，只做不需要 CARLA 的纯 Python 部分（A1、各模块的单元测试等）；CARLA 和训练放在家里那台配置好的电脑上（远程操作），两台电脑用 git 同步。
 
 **作品一句话**：基于 CARLA 的智驾仿真评测与数据闭环平台——自己写的模块化驾驶系统，批量场景评测，录制回灌，多模态数据挖掘，并用它闭环训练、迭代了一个小的端到端模型。
 
