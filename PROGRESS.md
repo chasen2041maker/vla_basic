@@ -1,18 +1,34 @@
 # 学习进度
 
-更新：2026-10-10（America/Denver）
+更新：2026-10-12
 
 ## 现在在哪
 
-- **阶段 1 完成（2026-10-10）**。**A1 完成（2026-10-11）**，下一课 A2（CARLA，在家里电脑）。**阶段 2 = 作品项目 highway-sim-eval（2026-10-11 最终版）**：基于 CARLA 0.9.16 的智驾仿真评测与数据闭环平台。A 智驾基础打通 → B 评测与数据闭环平台（入行主力）→ C 多模态数据挖掘 + Agent → D 闭环学习（通往算法的桥）→ E 补短板（C++、ROS 2、Docker，穿插）。约 20–24 周，第 10 周左右开始边做边投。详见 [CURRENT_TASK](experiments/highway_driving/CURRENT_TASK.md)。
+- **阶段 1 完成（2026-10-10）**。**A1 完成（2026-10-11）**。**A2 进行中（2026-10-12，家里电脑）**：CARLA 已装好、Python 能连上；同步模式已掌握；自车能生成并直行。停在“打方向盘看 CARLA 坐标系”之前。**阶段 2 = 作品项目 highway-sim-eval（2026-10-11 最终版）**：基于 CARLA 0.9.16 的智驾仿真评测与数据闭环平台。A 智驾基础打通 → B 评测与数据闭环平台（入行主力）→ C 多模态数据挖掘 + Agent → D 闭环学习（通往算法的桥）→ E 补短板（C++、ROS 2、Docker，穿插）。约 20–24 周，第 10 周左右开始边做边投。详见 [CURRENT_TASK](experiments/highway_driving/CURRENT_TASK.md)。
 - 职业路径：社招 → 先进数据与仿真方向（仿真 / 评测平台、数据闭环）→ 以数据算法为跳板 → 1–2 年争取转算法工程师。
 - 阶段 1 能力判断：能凭记忆说出 `env.step` 主链、IDM 两项、MOBIL 两道检查、奖励只看快/靠右/不撞。依据：2026-10-10 收尾填空 6 题中 5 题正确，第 3 题漏了“生成 obs、算奖励”，已纠正。
 - 学习者要求（2026-10-11）：扎实、不虚浮；核心代码手写；先预测再看结果；解释和结论自己写。
 
 ## 下一步
 
-1. **A2 装 CARLA（在家里那台电脑上）**：下载 CARLA 0.9.16 Windows 包（https://downloads.carlasim.com/Windows/CARLA_0.9.16.zip），解压到无中文无空格路径（如 `C:\CARLA_0.9.16`）；装 conda 环境、`git clone` 两个仓库、`python -m pip install carla==0.9.16`；然后启动服务器、Python 连上、生成自车。助手一步步带。
-2. 这台笔记本只做纯 Python 部分；两台电脑用 git 同步（换电脑前先 `git pull`）。
+1. **A2 接着做（家里电脑）**。开工：PowerShell 里 `cd D:\zhijia\CARLA_0.9.16`，`.\CarlaUE4.exe -prefernvidia -quality-level=Low` 启动服务器；另开一个 PowerShell，`conda activate py310`，`cd C:\Users\Administrator\Desktop\职业生涯项目\highway-sim-eval`。
+   1. `examples\a2_spawn_ego.py` 第 29 行 `steer=0.0` 改成 `0.3`。**先预测**：窗口里车往左拐还是往右拐；y 变大还是变小；yaw 变大还是变小。再运行，和 A1 自行车模型对比（A1 转角为正：左转、y 变大、车头角度变大）。
+   2. 手写 `sim/transforms.py` + 测试：CARLA（x 前、y 右、角度用度）↔ 自己的坐标（x 前、y 左、弧度）。
+   3. `sim/carla_client.py`：同步模式主循环（每帧 0.05 秒）、生成自车，退出时删车并还原设置。
+   4. `sim/recorder.py`：录相机、激光雷达、GNSS、IMU，每条数据带帧号和仿真时间。
+2. 笔记本只做纯 Python 部分；两台电脑用 git 同步（换电脑前先 `git pull`）。
+
+<details><summary>A2 第一部分（2026-10-12）</summary>
+
+- 家里电脑：`py310` 在 `D:\miniconda\envs\py310`（Python 3.10.20，carla 0.9.16、pytest、matplotlib 已装，A1 测试 6 passed）；显卡 RTX 4080 笔记本版 12 GB；C 盘只剩约 5.6 GB，所以 CARLA 解压到 `D:\zhijia\CARLA_0.9.16`。
+- 启动加 `-prefernvidia`（这台还有 Intel 核显）：`nvidia-smi` 进程里有 `CarlaUE4-Win64-Shipping.exe`，2000 端口 LISTENING。异步模式空转时显卡 99%、87°C，以后加 `-quality-level=Low`。
+- 客户端与服务器都是 0.9.16，地图 `Town10HD_Opt`。
+- 异步：现实 1 秒帧号 +238，仿真 1.005 秒。本人先猜“在记录信息给智驾用”（实际没存任何东西，是没人看也在一直算帧、画画面）；本人说问题看不懂、要求直接讲，讲完理解了。
+- 同步（`examples/a2_sync_demo.py`）：等 1 秒帧号差 0；tick 20 次帧号差 20、仿真 1.0 秒；`fixed_delta_seconds` 改 0.1 后 2.0 秒。本人自己说出“一帧 0.1 秒，1 秒走 10 帧”。
+- 自车（`examples/a2_spawn_ego.py`）：model3，出生点 0，油门 0.5 开 3 秒：x −64.27 → −55.14，y ≈ 24.5，yaw ≈ 0.2°（单位是度），车速 2.25 → 6.04 m/s。仿真时间从约 1098 秒开始，是服务器启动后的累计值，所以录数据要同时记帧号。
+- 打方向盘的预测（左右手坐标系）还没做，本人累了停在这里。
+
+</details>
 
 <details><summary>A1 自行车模型（2026-10-11 完成）</summary>
 
