@@ -4,17 +4,15 @@
 
 ## 现在在哪
 
-- **阶段 1 完成（2026-10-10）**，进入**阶段 2 第 0–1 步**。阶段 2 的分步计划在 [CURRENT_TASK](experiments/highway_driving/CURRENT_TASK.md#阶段-2规则规划--批量评测--dqn-对比2026-10-10-细化)。
-- 阶段 1 能力判断：能凭记忆说出 `env.step` 主链（动作改目标 → 1 秒 5 个小步里控制器按“目标与当前差多少”算控制量、运动模型推进 → 碰撞检查）、IDM 两项、MOBIL 两道检查、奖励只看快/靠右/不撞。依据：2026-10-10 收尾填空 6 题中 5 题正确；第 3 题漏了“生成 obs、算奖励”，已当场纠正。运动学公式按约定只要求概念。
-- 学习方式：以 HighwayEnv 源码为主线，教材 [BOOK](learning/BOOK.zh-CN.md) 当复习。
+- **阶段 1 完成（2026-10-10）**。**阶段 2 = 作品项目 highway-sim-eval（2026-10-11 最终版）**：基于 CARLA 0.9.16 的智驾仿真评测与数据闭环平台。A 智驾基础打通 → B 评测与数据闭环平台（入行主力）→ C 多模态数据挖掘 + Agent → D 闭环学习（通往算法的桥）→ E 补短板（C++、ROS 2、Docker，穿插）。约 20–24 周，第 10 周左右开始边做边投。详见 [CURRENT_TASK](experiments/highway_driving/CURRENT_TASK.md)。
+- 职业路径：社招 → 先进数据与仿真方向（仿真 / 评测平台、数据闭环）→ 以数据算法为跳板 → 1–2 年争取转算法工程师。
+- 阶段 1 能力判断：能凭记忆说出 `env.step` 主链、IDM 两项、MOBIL 两道检查、奖励只看快/靠右/不撞。依据：2026-10-10 收尾填空 6 题中 5 题正确，第 3 题漏了“生成 obs、算奖励”，已纠正。
+- 学习者要求（2026-10-11）：扎实、不虚浮；核心代码手写；先预测再看结果；解释和结论自己写。
 
 ## 下一步
 
-阶段 2 作品仓库 **highway-sim-eval** 已建好（2026-10-10 首次提交：`sim_env.py` 环境入口、`check_env.py` 检查脚本、README 计划）。运行环境沿用 `py310`。
-
-1. **下次开始先做**：highway-sim-eval 已推送到 GitHub（eef4bde）。vla_basic 本次改动（AGENTS、PROGRESS、CURRENT_TASK、LEARNING_LOG）待提交推送。然后在 highway-sim-eval 运行 `python check_env.py`，确认 10 步正常。
-2. 阶段 2 第 0 步：读教材 2.8、4.1、4.4、4.6（约 15 分钟）。
-3. 阶段 2 第 1 步：在 highway-sim-eval 写 `evaluate.py`，比较“一直 IDLE”和 04 规则。
+1. **A1 自行车模型**（代码已给）：在 highway-sim-eval 手敲 `ads/vehicle.py`、`tests/test_vehicle.py`、`examples/l1_circle.py`；`python -m pytest -q` 应为 5 passed；10 m/s、0.1 rad 绕圈直径 55.81 m；回答三个预测题和“为什么车速变了直径不变”。
+2. **A2 准备**：下载 CARLA 0.9.16 Windows 包（https://downloads.carlasim.com/Windows/CARLA_0.9.16.zip），解压到无中文无空格路径（如 `C:\CARLA_0.9.16`）；`py310` 里 `python -m pip install carla==0.9.16`。
 
 <details><summary>阶段 1 的 6 课（2026-10-10 完成）</summary>
 
