@@ -4,7 +4,7 @@
 
 ## 现在在哪
 
-- **阶段 1 完成（2026-10-10）**。**A1 完成（2026-10-11）**。**A2 进行中（2026-10-12，家里电脑）**：CARLA 已装好、Python 能连上；同步模式已掌握；自车能生成并直行。停在“打方向盘看 CARLA 坐标系”之前。**阶段 2 = 作品项目 highway-sim-eval（2026-10-11 最终版）**：基于 CARLA 0.9.16 的智驾仿真评测与数据闭环平台。A 智驾基础打通 → B 评测与数据闭环平台（入行主力）→ C 多模态数据挖掘 + Agent → D 闭环学习（通往算法的桥）→ E 补短板（C++、ROS 2、Docker，穿插）。约 20–24 周，第 10 周左右开始边做边投。详见 [CURRENT_TASK](experiments/highway_driving/CURRENT_TASK.md)。
+- **阶段 1 完成（2026-10-10）**。**A1 完成（2026-10-11）**。**A2 进行中（2026-10-12，家里电脑）**：CARLA 已装好、Python 能连上；同步模式已掌握；自车能生成并直行。停在“打方向盘看 CARLA 坐标系”之前（回家做，顺便验证坐标转换）。**2026-10-12 笔记本**：坐标转换 `sim/transforms.py` + 5 个测试完成（highway-sim-eval `a74089d`，11 passed）；下一课在笔记本先做 A3 的 PID 速度控制。**阶段 2 = 作品项目 highway-sim-eval（2026-10-11 最终版）**：基于 CARLA 0.9.16 的智驾仿真评测与数据闭环平台。A 智驾基础打通 → B 评测与数据闭环平台（入行主力）→ C 多模态数据挖掘 + Agent → D 闭环学习（通往算法的桥）→ E 补短板（C++、ROS 2、Docker，穿插）。约 20–24 周，第 10 周左右开始边做边投。详见 [CURRENT_TASK](experiments/highway_driving/CURRENT_TASK.md)。
 - 职业路径：社招 → 先进数据与仿真方向（仿真 / 评测平台、数据闭环）→ 以数据算法为跳板 → 1–2 年争取转算法工程师。
 - 阶段 1 能力判断：能凭记忆说出 `env.step` 主链、IDM 两项、MOBIL 两道检查、奖励只看快/靠右/不撞。依据：2026-10-10 收尾填空 6 题中 5 题正确，第 3 题漏了“生成 obs、算奖励”，已纠正。
 - 学习者要求（2026-10-11）：扎实、不虚浮；核心代码手写；先预测再看结果；解释和结论自己写。
@@ -13,10 +13,21 @@
 
 1. **A2 接着做（家里电脑）**。开工：PowerShell 里 `cd D:\zhijia\CARLA_0.9.16`，`.\CarlaUE4.exe -prefernvidia -quality-level=Low` 启动服务器；另开一个 PowerShell，`conda activate py310`，`cd C:\Users\Administrator\Desktop\职业生涯项目\highway-sim-eval`。
    1. `examples\a2_spawn_ego.py` 第 29 行 `steer=0.0` 改成 `0.3`。**先预测**：窗口里车往左拐还是往右拐；y 变大还是变小；yaw 变大还是变小。再运行，和 A1 自行车模型对比（A1 转角为正：左转、y 变大、车头角度变大）。
-   2. 手写 `sim/transforms.py` + 测试：CARLA（x 前、y 右、角度用度）↔ 自己的坐标（x 前、y 左、弧度）。
+   2. ✅ 手写 `sim/transforms.py` + 测试：CARLA（x 前、y 右、角度用度）↔ 自己的坐标（x 前、y 左、弧度）。（2026-10-12 笔记本完成；回家打方向盘时用它核对）
    3. `sim/carla_client.py`：同步模式主循环（每帧 0.05 秒）、生成自车，退出时删车并还原设置。
    4. `sim/recorder.py`：录相机、激光雷达、GNSS、IMU，每条数据带帧号和仿真时间。
-2. 笔记本只做纯 Python 部分；两台电脑用 git 同步（换电脑前先 `git pull`）。
+2. **家里电脑不开时（笔记本）**：A3 先在 A1 自行车模型上写 PID 速度控制，再写 Pure Pursuit（`ads/control.py` + 测试），回家再放进 CARLA。
+3. 笔记本只做纯 Python 部分；两台电脑用 git 同步（换电脑前先 `git pull`）。
+
+<details><summary>A2 坐标转换（2026-10-12，笔记本）</summary>
+
+- 先讲 CARLA 是什么（开源仿真器，虚幻引擎 4，服务器 + Python 客户端）、行业三类仿真（引擎式、重建式 3DGS、生成式世界模型，如小鹏 X-World）。
+- 左右手系：智驾主流右手系（ROS、ISO 8855：x 前、y 左、z 上）；CARLA 左手系（y 右，角度往右转为正）。换算：x 不变，y 变号，角度变号并换单位。
+- 本人答出 CARLA y = 3 → 我们 y = −3；度换弧度不会，助手直接讲（弧度 = 度 × π ÷ 180），用 `math.radians(90)` = 1.571 确认。
+- 手敲 `sim/transforms.py`（`carla_to_ours`、`ours_to_carla`），`carla_to_ours(10, 3, 90)` 输出 `(10, -3, -1.571)`；测试 5 个（右侧点、yaw 90°、yaw −30° → +π/6、反向换算、往返），3 个空本人要求直接给答案；`11 passed`。
+- 改一处实验：第一次改成了测试输入（不是函数）；第二次去掉 `carla_to_ours` 里 y 的负号 → 2 failed（`test_point_on_right`、`test_round_trip`），本人总结“就是没有变换正确符号”。助手补充：一个测试只守护它检查的部分；往返测试能抓住任一方向的符号错误。
+
+</details>
 
 <details><summary>A2 第一部分（2026-10-12）</summary>
 
