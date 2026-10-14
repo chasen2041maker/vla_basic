@@ -1,26 +1,38 @@
 # 学习进度
 
-更新：2026-10-12
+更新：2026-10-14
 
 ## 现在在哪
 
-- **阶段 1 完成（2026-10-10）**。**A1 完成（2026-10-11）**。**A2 进行中（2026-10-12，家里电脑）**：CARLA 已装好、Python 能连上；同步模式已掌握；自车能生成并直行。停在“打方向盘看 CARLA 坐标系”之前（回家做，顺便验证坐标转换）。**2026-10-12 笔记本**：坐标转换 `sim/transforms.py` + 5 个测试完成（highway-sim-eval `a74089d`，11 passed）。**A3 进行中（2026-10-12 笔记本）**：PID 速度控制 `ads/control.py` + 上坡实验 `examples/a3_speed_pid.py` + 6 个测试完成（highway-sim-eval `8bc035b`，17 passed）。下一步：加速度上限与积分饱和，然后 Pure Pursuit。**阶段 2 = 作品项目 highway-sim-eval（2026-10-11 最终版）**：基于 CARLA 0.9.16 的智驾仿真评测与数据闭环平台。A 智驾基础打通 → B 评测与数据闭环平台（入行主力）→ C 多模态数据挖掘 + Agent → D 闭环学习（通往算法的桥）→ E 补短板（C++、ROS 2、Docker，穿插）。约 20–24 周，第 10 周左右开始边做边投。详见 [CURRENT_TASK](experiments/highway_driving/CURRENT_TASK.md)。
+- **阶段 1 完成（2026-10-10）**。**A1 完成（2026-10-11）**。**A2 进行中（家里电脑）**：CARLA 已装好、Python 能连上；同步模式已掌握；自车能生成并直行（2026-10-12）。**2026-10-14 家里电脑**：打方向盘验证坐标转换（CARLA 往右拐 y、yaw 变大，换成我们的坐标变小）；手写 `sim/carla_client.py`（`CarlaSim`：with 进门开同步、出门删车还原，`spawn_ego`、`tick`），回归检查与旧脚本数字完全一致（highway-sim-eval `9249656`）。剩传感器录制 `sim/recorder.py`。**2026-10-12 笔记本**：坐标转换 `sim/transforms.py` + 5 个测试完成（highway-sim-eval `a74089d`，11 passed）。**A3 进行中（2026-10-12 笔记本）**：PID 速度控制 `ads/control.py` + 上坡实验 `examples/a3_speed_pid.py` + 6 个测试完成（highway-sim-eval `8bc035b`，17 passed）。下一步：加速度上限与积分饱和，然后 Pure Pursuit。**阶段 2 = 作品项目 highway-sim-eval（2026-10-11 最终版）**：基于 CARLA 0.9.16 的智驾仿真评测与数据闭环平台。A 智驾基础打通 → B 评测与数据闭环平台（入行主力）→ C 多模态数据挖掘 + Agent → D 闭环学习（通往算法的桥）→ E 补短板（C++、ROS 2、Docker，穿插）。约 20–24 周，第 10 周左右开始边做边投。详见 [CURRENT_TASK](experiments/highway_driving/CURRENT_TASK.md)。
 - 职业路径：社招 → 先进数据与仿真方向（仿真 / 评测平台、数据闭环）→ 以数据算法为跳板 → 1–2 年争取转算法工程师。
 - 阶段 1 能力判断：能凭记忆说出 `env.step` 主链、IDM 两项、MOBIL 两道检查、奖励只看快/靠右/不撞。依据：2026-10-10 收尾填空 6 题中 5 题正确，第 3 题漏了“生成 obs、算奖励”，已纠正。
 - 学习者要求（2026-10-11）：扎实、不虚浮；核心代码手写；先预测再看结果；解释和结论自己写。
 
 ## 下一步
 
-1. **A2 接着做（家里电脑）**。开工：PowerShell 里 `cd D:\zhijia\CARLA_0.9.16`，`.\CarlaUE4.exe -prefernvidia -quality-level=Low` 启动服务器；另开一个 PowerShell，`conda activate py310`，`cd C:\Users\Administrator\Desktop\职业生涯项目\highway-sim-eval`。
-   1. `examples\a2_spawn_ego.py` 第 29 行 `steer=0.0` 改成 `0.3`。**先预测**：窗口里车往左拐还是往右拐；y 变大还是变小；yaw 变大还是变小。再运行，和 A1 自行车模型对比（A1 转角为正：左转、y 变大、车头角度变大）。
-   2. ✅ 手写 `sim/transforms.py` + 测试：CARLA（x 前、y 右、角度用度）↔ 自己的坐标（x 前、y 左、弧度）。（2026-10-12 笔记本完成；回家打方向盘时用它核对）
-   3. `sim/carla_client.py`：同步模式主循环（每帧 0.05 秒）、生成自车，退出时删车并还原设置。
-   4. `sim/recorder.py`：录相机、激光雷达、GNSS、IMU，每条数据带帧号和仿真时间。
+1. **家里电脑接着做**。开工：PowerShell 里 `cd D:\zhijia\CARLA_0.9.16`，`.\CarlaUE4.exe -prefernvidia -quality-level=Low -windowed -ResX=1280 -ResY=720` 启动服务器（只开一个）；另开一个 PowerShell，`conda activate py310`，`cd C:\Users\Administrator\Desktop\职业生涯项目\highway-sim-eval`，VS Code 用 `code .` 打开这个文件夹。
+   1. ✅ 打方向盘看 CARLA 坐标系，用 `carla_to_ours` 核对（2026-10-14）。
+   2. ✅ 手写 `sim/transforms.py` + 测试（2026-10-12 笔记本）。
+   3. ✅ `sim/carla_client.py`：`CarlaSim`（2026-10-14）。
+   4. **下一步：把 PID 放进 CARLA**：用 `CarlaSim` 放车，`ads/control.py` 的 PID 控车速到目标值。先想清楚 PID 输出的是加速度，CARLA 要的是油门 / 刹车（0–1），中间要换算；比较特斯拉和卡车用同一组参数的效果。
+   5. `sim/recorder.py`：录相机、激光雷达、GNSS、IMU，每条数据带帧号和仿真时间。
 2. **家里电脑不开时（笔记本）**：A3 在 A1 自行车模型上做，回家再放进 CARLA。
    1. ✅ PID 速度控制（`ads/control.py`、`examples/a3_speed_pid.py`、`tests/test_control.py`）。
    2. 加速度上限（例如 [−6, 3] m/s²）→ 看积分饱和（kp 1.0、ki 0.2、上限 3 时最高冲到 12.76）→ 防积分饱和。
    3. Pure Pursuit 方向盘控制。
 3. 笔记本只做纯 Python 部分；两台电脑用 git 同步（换电脑前先 `git pull`）。
+
+<details><summary>A2 打方向盘与 CarlaSim（2026-10-13 至 14，家里电脑）</summary>
+
+- 10-13 先排查 CARLA 画质：截图有阴影 → 不是 Low（官方文档：Low 关阴影和后期、只画 50 米）。原因是旧 CARLA 没关，新的带 Low 参数启动后因 2000 端口被占而退出。助手改了用户配置（8 项 `sg.*` 画质 → 0，原文件备份 `.bak`）；`FrameRateLimit=30` 与 `t.MaxFPS=30` 都没生效（空转仍 160–200 帧/秒、GPU 80–90%、约 85°C）。本人决定先不在 NVIDIA 驱动里限帧，约定不用就关 CARLA。本人问“限 30 帧影响学习吗”：同步模式结果只看帧数和步长，不影响；B / D 批量跑时再去掉上限。
+- 10-14 打方向盘：本人猜对往右拐，自己说出“我们以左为正，模拟器以右为正，所以变化方向相反”。实测 steer 0.1：CARLA y 24.49 → 26.49、yaw 0.98° → 19.77°；`carla_to_ours` 换算后 y −24.49 → −26.49、角度 −0.017 → −0.345 rad，与手算一致。本人第一次以为“我们的 y 变大”（把绝对值变大当成变大），提示 −26.49 和 −24.49 哪个大后自己改正。本人问“yaw 是什么”，用原地转身比喻讲清（= A1 的 heading，单位、正方向不同）。
+- 同一脚本两次运行数字完全相同 → 同步模式可复现。
+- 手写 `sim/carla_client.py`：`CarlaSim`（`__init__` 记参数；`__enter__` 连接、先备份设置再改同步 + 固定步长；`__exit__` 删 `_actors`、还原设置；`spawn_ego`、`tick` 返回帧号与仿真时间）。本人理解成“以后不用每次都配置”，补充“出门一定收尾”和“删车是为了不挡住下次放车”。本人问 `get_settings()` 怎么就变同步了：讲“抄一份 → 改 → 交回”，本人注释掉 `apply_settings` 自己验证（里面变成 False）。拼写错：`self.word`、注释多 0、车型名 `vehical`（看报错从下往上读）。
+- `a2_client_demo`：与旧 `a2_spawn_ego` 数字完全一致（回归检查）；去掉 sleep 跑得快、结果不变。本人自己换了几次车，“挺好玩”。卡车 vs 特斯拉（同油门 0.5、steer 0.1）：第 3 秒车速 1.44 vs 5.95；车头转 0.085 vs 0.345 rad，但每走 1 米都约转 0.04 rad。本人选对“卡车转得少是因为走得慢、路程短”，对上 A1 的“转弯半径与车速无关”。
+- 工具坑：VS Code 打开的是另一份 highway-sim-eval（有 `outputs`、没有今天的新文件），改用桌面那份；命令在 CARLA 终端里运行导致 `not a git repository`。
+
+</details>
 
 <details><summary>A3 PID 速度控制（2026-10-12，笔记本）</summary>
 

@@ -9,7 +9,7 @@
 - **vla_basic** 是学习者的智能驾驶学习主项目：教材、实验代码、进度都在这里。
 - **HighwayEnv**（学习者的 fork：`chasen2041maker/highwayenv-learning`）是当前阶段的模拟器和源码阅读对象，不在这里另建进度。
 - 本机路径：`C:\company\own\vla_basic`、`C:\company\own\highwayenv-learning`。阶段 2 作品仓库：`C:\company\own\highway-sim-eval`（GitHub `chasen2041maker/highway-sim-eval`，学习者授权助手全权管理，推送由学习者在本机执行）。旧记录里的 `C:\Users\Administrator\...` 和 `D:\miniconda\...` 是家里电脑的路径，在笔记本上不要用。
-- 家里电脑（Cowork 设备名 Dx-202401192128，跑 CARLA 和训练）：仓库在**桌面的 `职业生涯项目` 文件夹**下（`职业生涯项目\highway-sim-eval`、`职业生涯项目\vla_basic`），不在 `C:\company\own`。在家里电脑上，本文和其他文档里的 `C:\company\own\...` 都换成这个位置。conda 环境在 `D:\miniconda\envs\py310`。C 盘只剩约 5 GB，所以 CARLA 本体在 **`D:\zhijia\CARLA_0.9.16`**（无中文无空格）。启动命令：`cd D:\zhijia\CARLA_0.9.16`，然后 `.\CarlaUE4.exe -prefernvidia -quality-level=Low`（这台有 Intel 核显，`-prefernvidia` 让 CARLA 用独显）。录制数据、模型等大文件也放 D 盘。
+- 家里电脑（Cowork 设备名 Dx-202401192128，跑 CARLA 和训练）：仓库在**桌面的 `职业生涯项目` 文件夹**下（`职业生涯项目\highway-sim-eval`、`职业生涯项目\vla_basic`），不在 `C:\company\own`。在家里电脑上，本文和其他文档里的 `C:\company\own\...` 都换成这个位置。conda 环境在 `D:\miniconda\envs\py310`。C 盘只剩约 5 GB，所以 CARLA 本体在 **`D:\zhijia\CARLA_0.9.16`**（无中文无空格）。启动命令：`cd D:\zhijia\CARLA_0.9.16`，然后 `.\CarlaUE4.exe -prefernvidia -quality-level=Low -windowed -ResX=1280 -ResY=720`（这台有 Intel 核显，`-prefernvidia` 让 CARLA 用独显）。**只开一个 CARLA**：旧的没关时新的会因 2000 端口被占而退出。CARLA 用户配置在 `C:\Users\Administrator\AppData\Local\CarlaUE4\Saved\Config\WindowsNoEditor\`（2026-10-13 画质已降到 0，原文件备份为 `.bak`；配置文件限帧无效）。这台电脑上还有另一份 highway-sim-eval，VS Code 要从桌面仓库里用 `code .` 打开。录制数据、模型等大文件也放 D 盘。
 - 运行环境：PowerShell 里 `conda activate py310`，然后用 `python` 运行（不要用 `py`，它会启动没装依赖的系统 Python）。`py310` 里是 HighwayEnv 源码的可编辑安装。不要重装环境。
 - 例外：变道练习的实际修改和运行入口是 HighwayEnv 仓库的 `learning/demos/01_lane_change.py`（2026-10-01 学习者选择）。vla_basic 里的同名文件是教材用的无车版本，两份不自动同步。
 
