@@ -4,7 +4,7 @@
 
 ## 现在在哪
 
-- **阶段 1 完成（2026-10-10）**。**A1 完成（2026-10-11）**。**A2 进行中（家里电脑）**：CARLA 已装好、Python 能连上；同步模式已掌握；自车能生成并直行（2026-10-12）。**2026-10-14 家里电脑**：打方向盘验证坐标转换（CARLA 往右拐 y、yaw 变大，换成我们的坐标变小）；手写 `sim/carla_client.py`（`CarlaSim`：with 进门开同步、出门删车还原，`spawn_ego`、`tick`），回归检查与旧脚本数字完全一致（highway-sim-eval `9249656`）。剩传感器录制 `sim/recorder.py`。**2026-10-12 笔记本**：坐标转换 `sim/transforms.py` + 5 个测试完成（highway-sim-eval `a74089d`，11 passed）。**A3 进行中（2026-10-12 笔记本）**：PID 速度控制 `ads/control.py` + 上坡实验 `examples/a3_speed_pid.py` + 6 个测试完成（highway-sim-eval `8bc035b`，17 passed）。下一步：加速度上限与积分饱和，然后 Pure Pursuit。**阶段 2 = 作品项目 highway-sim-eval（2026-10-11 最终版）**：基于 CARLA 0.9.16 的智驾仿真评测与数据闭环平台。A 智驾基础打通 → B 评测与数据闭环平台（入行主力）→ C 多模态数据挖掘 + Agent → D 闭环学习（通往算法的桥）→ E 补短板（C++、ROS 2、Docker，穿插）。约 20–24 周，第 10 周左右开始边做边投。详见 [CURRENT_TASK](experiments/highway_driving/CURRENT_TASK.md)。
+- **阶段 1 完成（2026-10-10）**。**A1 完成（2026-10-11）**。**A2 进行中（家里电脑）**：CARLA 已装好、Python 能连上；同步模式已掌握；自车能生成并直行（2026-10-12）。**2026-10-14 家里电脑**：打方向盘验证坐标转换（CARLA 往右拐 y、yaw 变大，换成我们的坐标变小）；手写 `sim/carla_client.py`（`CarlaSim`：with 进门开同步、出门删车还原，`spawn_ego`、`tick`），回归检查与旧脚本数字完全一致（highway-sim-eval `9249656`）。剩传感器录制 `sim/recorder.py`。**A3 进 CARLA（2026-10-14 家里电脑）**：`to_pedals`（PID 输出 → 油门 / 刹车）；PID 第一次在 CARLA 里控车速（kp 1.0、ki 0.2、目标 8 m/s）最高冲到 9.46、8 秒后还在 8.27 → 积分饱和；写好防积分饱和（`PID(u_max=...)`，22 passed），**还没在 CARLA 里跑**。README 重写为作品集样式（highway-sim-eval `b7db0ab`）。**2026-10-12 笔记本**：坐标转换 `sim/transforms.py` + 5 个测试完成（highway-sim-eval `a74089d`，11 passed）。**A3 进行中（2026-10-12 笔记本）**：PID 速度控制 `ads/control.py` + 上坡实验 `examples/a3_speed_pid.py` + 6 个测试完成（highway-sim-eval `8bc035b`，17 passed）。下一步：加速度上限与积分饱和，然后 Pure Pursuit。**阶段 2 = 作品项目 highway-sim-eval（2026-10-11 最终版）**：基于 CARLA 0.9.16 的智驾仿真评测与数据闭环平台。A 智驾基础打通 → B 评测与数据闭环平台（入行主力）→ C 多模态数据挖掘 + Agent → D 闭环学习（通往算法的桥）→ E 补短板（C++、ROS 2、Docker，穿插）。约 20–24 周，第 10 周左右开始边做边投。详见 [CURRENT_TASK](experiments/highway_driving/CURRENT_TASK.md)。
 - 职业路径：社招 → 先进数据与仿真方向（仿真 / 评测平台、数据闭环）→ 以数据算法为跳板 → 1–2 年争取转算法工程师。
 - 阶段 1 能力判断：能凭记忆说出 `env.step` 主链、IDM 两项、MOBIL 两道检查、奖励只看快/靠右/不撞。依据：2026-10-10 收尾填空 6 题中 5 题正确，第 3 题漏了“生成 obs、算奖励”，已纠正。
 - 学习者要求（2026-10-11）：扎实、不虚浮；核心代码手写；先预测再看结果；解释和结论自己写。
@@ -15,13 +15,23 @@
    1. ✅ 打方向盘看 CARLA 坐标系，用 `carla_to_ours` 核对（2026-10-14）。
    2. ✅ 手写 `sim/transforms.py` + 测试（2026-10-12 笔记本）。
    3. ✅ `sim/carla_client.py`：`CarlaSim`（2026-10-14）。
-   4. **下一步：把 PID 放进 CARLA**：用 `CarlaSim` 放车，`ads/control.py` 的 PID 控车速到目标值。先想清楚 PID 输出的是加速度，CARLA 要的是油门 / 刹车（0–1），中间要换算；比较特斯拉和卡车用同一组参数的效果。
+   4. 🚧 PID 放进 CARLA（2026-10-14）：`to_pedals`、`examples/a3_carla_speed.py`、跟车镜头 `sim.follow(ego)`、防积分饱和 `u_max` 都写好了。**下一步**：`a3_carla_speed.py` 第 13 行改成 `PID(kp=1.0, ki=0.2, u_max=1.0)`，**先预测**最高车速比 9.46 高还是低，再跑；然后特斯拉和卡车用同一组参数对比。刹车一侧（u < −1）的饱和以后再补。
    5. `sim/recorder.py`：录相机、激光雷达、GNSS、IMU，每条数据带帧号和仿真时间。
 2. **家里电脑不开时（笔记本）**：A3 在 A1 自行车模型上做，回家再放进 CARLA。
    1. ✅ PID 速度控制（`ads/control.py`、`examples/a3_speed_pid.py`、`tests/test_control.py`）。
    2. 加速度上限（例如 [−6, 3] m/s²）→ 看积分饱和（kp 1.0、ki 0.2、上限 3 时最高冲到 12.76）→ 防积分饱和。
    3. Pure Pursuit 方向盘控制。
 3. 笔记本只做纯 Python 部分；两台电脑用 git 同步（换电脑前先 `git pull`）。
+
+<details><summary>A3 PID 进 CARLA 与防积分饱和（2026-10-14，家里电脑）</summary>
+
+- `to_pedals(u)`：u ≥ 0 踩油门、u < 0 踩刹车，都截到 1。本人要求直接给预测答案；问清 `(0.0, 0.4)` 是 (油门, 刹车)。写错：函数缩进进了 PID 类里还带 `self`（讲“要记东西才用类”）、测试文件没 import。20 passed。
+- 本人问“PID 只给加速度，油门刹车怎么换成力”：讲现在直接把 u 当踏板量、靠闭环纠正；踏板 → 扭矩 → 力 → 加速度随车速、挡位、车重变；量产车用“上层算加速度 + 下层查油门 / 刹车标定表”。
+- `a3_carla_speed.py`（目标 8 m/s，kp 1.0、ki 0.2）：第 1 秒 u = 4.06 但油门只能 1；最高 9.46（本人没预测）；第 2 秒后车速 > 8 油门仍约 0.39。本人按提示算出 P 项 −0.94 为负，选对“撑住油门的是 I 项”。从输出倒推 integral：1 秒 6.3、2 秒 6.35、8 秒 3.30。写错 `ego = sim.spawn_ego` 少括号（讲 `'function' object has no attribute`）。本人问出生点：`spawn_ego(spawn_index=N)`，提醒比较参数要用同一出生点。加 `CarlaSim.follow`（跟车镜头），本人要求逐行讲 `tf.transform`（相对车的位置 → 地图位置）和 `Transform`（位置 + 朝向）。
+- 讲积分饱和：第一次按三段 + 大表格讲，本人说“干巴、不直白”；再按公式 + 数字讲，本人说“还是看不轻松”；最后只用“饿久了吃撑”比方 + 4 步（踩不下去还在攒 → 到 8 时 P 为 0、攒的约 1.26 仍踩到底 → 冲到 9.46 → 只有超速时才慢慢消）讲，本人接受。
+- 防积分饱和：`u_max` 字段 + “先打草稿 `new_integral`，不是 windup 才抄进正本”。本人把它理解成“替代成上限”，已纠正：windup 时 integral 原样不动，限幅由 `to_pedals` 管。写错：旧的 `self.integral += ...` 没删（攒两遍，测试值正好翻倍）→ 删错成 `new_integral` 那行 → 改了没保存；本人要求“告诉我第几行改什么”。最终 22 passed。本人今天不想再看代码，停在 CARLA 验证之前。
+
+</details>
 
 <details><summary>A2 打方向盘与 CarlaSim（2026-10-13 至 14，家里电脑）</summary>
 
