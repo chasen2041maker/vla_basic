@@ -380,3 +380,5 @@
 - 2026-10-14｜手写 sim/carla_client.py（CarlaSim：with 进门同步、出门删车还原，spawn_ego、tick）；注释掉 apply_settings 验证“抄一份 → 改 → 交回”；修正 word/vehical 拼写。a2_client_demo 与旧脚本数字完全一致（回归检查）。换卡车：车速 1.44 vs 5.95，但每米转角都约 0.04 rad，本人选对“卡车走得慢、路程短”。highway-sim-eval 9249656。下一步 PID 放进 CARLA。
 - 2026-10-14｜A3 进 CARLA：写 to_pedals（u → 油门 / 刹车，截到 1）+ 3 个测试；问答“踏板怎么换成力”（闭环 + 标定表）。a3_carla_speed：kp 1.0、ki 0.2、目标 8 → 最高 9.46，8 秒后 8.27；本人选对“油门被 I 项撑住”。加 CarlaSim.follow 跟车镜头、spawn_index。
 - 2026-10-14｜积分饱和：大表格和公式版本人都说不直白，“饿久了吃撑 + 4 步”版接受。写防积分饱和（u_max，草稿 new_integral，不是 windup 才更新），纠正“替代成上限”的理解；连续改错（旧行没删 → 删错行 → 没保存），22 passed。README 重写（b7db0ab）。下一步：CARLA 里加 u_max=1.0 对比 9.46。
+- 2026-10-14｜公司电脑（笔记本）：git pull 三个仓库；讲 A–E 分工（造司机 / 建考场 / 看录像 / 带徒弟），E 现在依赖未完成的部分，改做 Pure Pursuit。pure_pursuit_steer：(10,10) → 15.64°，本人猜 (20,20) 更大，实测 7.97° 自己发现猜反。find_lookahead_point：踩“挑到身后 (0,0)”的坑，改成先找最近点 → (60,0)。
+- 2026-10-14｜a3_pure_pursuit：Ld 2 / 5 / 15 → 直道越过白线 1.23 / 0.27 / 0，拐弯离白线 0.08 / 0.16 / 1.13。“冲过头 / 横向误差”说法本人看不懂，改大白话 + 动画后懂了；本人自己说出“盯太远拐弯切得最多”。4 个测试 26 passed，highway-sim-eval f38d787。

@@ -4,7 +4,7 @@
 
 ## 现在在哪
 
-- **阶段 1 完成（2026-10-10）**。**A1 完成（2026-10-11）**。**A2 进行中（家里电脑）**：CARLA 已装好、Python 能连上；同步模式已掌握；自车能生成并直行（2026-10-12）。**2026-10-14 家里电脑**：打方向盘验证坐标转换（CARLA 往右拐 y、yaw 变大，换成我们的坐标变小）；手写 `sim/carla_client.py`（`CarlaSim`：with 进门开同步、出门删车还原，`spawn_ego`、`tick`），回归检查与旧脚本数字完全一致（highway-sim-eval `9249656`）。剩传感器录制 `sim/recorder.py`。**A3 进 CARLA（2026-10-14 家里电脑）**：`to_pedals`（PID 输出 → 油门 / 刹车）；PID 第一次在 CARLA 里控车速（kp 1.0、ki 0.2、目标 8 m/s）最高冲到 9.46、8 秒后还在 8.27 → 积分饱和；写好防积分饱和（`PID(u_max=...)`，22 passed），**还没在 CARLA 里跑**。README 重写为作品集样式（highway-sim-eval `b7db0ab`）。**2026-10-12 笔记本**：坐标转换 `sim/transforms.py` + 5 个测试完成（highway-sim-eval `a74089d`，11 passed）。**A3 进行中（2026-10-12 笔记本）**：PID 速度控制 `ads/control.py` + 上坡实验 `examples/a3_speed_pid.py` + 6 个测试完成（highway-sim-eval `8bc035b`，17 passed）。下一步：加速度上限与积分饱和，然后 Pure Pursuit。**阶段 2 = 作品项目 highway-sim-eval（2026-10-11 最终版）**：基于 CARLA 0.9.16 的智驾仿真评测与数据闭环平台。A 智驾基础打通 → B 评测与数据闭环平台（入行主力）→ C 多模态数据挖掘 + Agent → D 闭环学习（通往算法的桥）→ E 补短板（C++、ROS 2、Docker，穿插）。约 20–24 周，第 10 周左右开始边做边投。详见 [CURRENT_TASK](experiments/highway_driving/CURRENT_TASK.md)。
+- **阶段 1 完成（2026-10-10）**。**A1 完成（2026-10-11）**。**A2 进行中（家里电脑）**：CARLA 已装好、Python 能连上；同步模式已掌握；自车能生成并直行（2026-10-12）。**2026-10-14 家里电脑**：打方向盘验证坐标转换（CARLA 往右拐 y、yaw 变大，换成我们的坐标变小）；手写 `sim/carla_client.py`（`CarlaSim`：with 进门开同步、出门删车还原，`spawn_ego`、`tick`），回归检查与旧脚本数字完全一致（highway-sim-eval `9249656`）。剩传感器录制 `sim/recorder.py`。**A3 进 CARLA（2026-10-14 家里电脑）**：`to_pedals`（PID 输出 → 油门 / 刹车）；PID 第一次在 CARLA 里控车速（kp 1.0、ki 0.2、目标 8 m/s）最高冲到 9.46、8 秒后还在 8.27 → 积分饱和；写好防积分饱和（`PID(u_max=...)`，22 passed），**还没在 CARLA 里跑**。README 重写为作品集样式（highway-sim-eval `b7db0ab`）。**A3 Pure Pursuit（2026-10-14 笔记本 = 公司电脑）**：手敲 `pure_pursuit_steer`、`find_lookahead_point`；`examples/a3_pure_pursuit.py` 对比 Ld 2 / 5 / 15 米：直道越过白线最远 1.23 / 0.27 / 0 米，拐弯离白线最远 0.08 / 0.16 / 1.13 米（盯近画龙、盯远切弯）；动画讲解 `docs/a3_pure_pursuit_animation.html`；4 个测试（highway-sim-eval `f38d787`，26 passed）。**2026-10-12 笔记本**：坐标转换 `sim/transforms.py` + 5 个测试完成（highway-sim-eval `a74089d`，11 passed）。**A3 进行中（2026-10-12 笔记本）**：PID 速度控制 `ads/control.py` + 上坡实验 `examples/a3_speed_pid.py` + 6 个测试完成（highway-sim-eval `8bc035b`，17 passed）。下一步：加速度上限与积分饱和，然后 Pure Pursuit。**阶段 2 = 作品项目 highway-sim-eval（2026-10-11 最终版）**：基于 CARLA 0.9.16 的智驾仿真评测与数据闭环平台。A 智驾基础打通 → B 评测与数据闭环平台（入行主力）→ C 多模态数据挖掘 + Agent → D 闭环学习（通往算法的桥）→ E 补短板（C++、ROS 2、Docker，穿插）。约 20–24 周，第 10 周左右开始边做边投。详见 [CURRENT_TASK](experiments/highway_driving/CURRENT_TASK.md)。
 - 职业路径：社招 → 先进数据与仿真方向（仿真 / 评测平台、数据闭环）→ 以数据算法为跳板 → 1–2 年争取转算法工程师。
 - 阶段 1 能力判断：能凭记忆说出 `env.step` 主链、IDM 两项、MOBIL 两道检查、奖励只看快/靠右/不撞。依据：2026-10-10 收尾填空 6 题中 5 题正确，第 3 题漏了“生成 obs、算奖励”，已纠正。
 - 学习者要求（2026-10-11）：扎实、不虚浮；核心代码手写；先预测再看结果；解释和结论自己写。
@@ -20,8 +20,19 @@
 2. **家里电脑不开时（笔记本）**：A3 在 A1 自行车模型上做，回家再放进 CARLA。
    1. ✅ PID 速度控制（`ads/control.py`、`examples/a3_speed_pid.py`、`tests/test_control.py`）。
    2. 加速度上限（例如 [−6, 3] m/s²）→ 看积分饱和（kp 1.0、ki 0.2、上限 3 时最高冲到 12.76）→ 防积分饱和。
-   3. Pure Pursuit 方向盘控制。
+   3. ✅ Pure Pursuit 方向盘控制（2026-10-14）。回家放进 CARLA：车道中心线的点当 path，转角换成 CARLA 的 steer（−1 到 1），Ld 要重调（真车方向盘有延迟）。
 3. 笔记本只做纯 Python 部分；两台电脑用 git 同步（换电脑前先 `git pull`）。
+
+<details><summary>A3 Pure Pursuit（2026-10-14，笔记本 = 公司电脑）</summary>
+
+- 开课前：本地三个仓库 `git pull` 同步（highway-sim-eval `4a5e2ea`、vla_basic `591a318`）。本人问 A–E 各干嘛：用“A 造司机、B 建考场、C 看录像、D 带徒弟”讲；本人问今天能否做 E：E 依赖 A6 / CARLA / B，现在不划算，改做 A3 Pure Pursuit（公司电脑写算法 + 测试，回家进 CARLA）。
+- 第 1 步 `pure_pursuit_steer`：圆弧过前视点，R = Ld ÷ (2 sin α)，再用 A1 的 R = L ÷ tan δ 换成转角。(10, 10) → R 10 m → 15.64°。本人预测 (20, 20) 转角“更大”，跑出 7.97° 自己发现猜反；讲“目标越远弧越大、方向打得越少”。
+- 第 2 步 `find_lookahead_point`：先写“从第一个点数，第一个 ≥ Ld 的点”，车在 (50, 0) 时挑到身后的 (0, 0)（本人看不懂第二个结果，讲“只看够不够远、没看在不在前面”），改成先找最近点再往前数 → (60, 0)。
+- 第 3 步：助手建 `examples/a3_pure_pursuit.py`（路线、横向误差、画图），本人敲闭环循环（挑点 → 算转角 → 开一步）。本人问 path 是什么（提前画好的车道中心线，以后由规划给）、是否替代 CARLA（不是：先在假车上练，函数原样搬进 CARLA）、开头“变道”是什么（故意把车放在白线右边 3 米出题）、为什么有弯道（只有直道会误以为盯越远越好）。
+- 本人说“冲过头 / 弯道最大误差”中文看不懂、文件整体也不懂：换成“贴胶带、放遥控车、每 0.1 秒看一眼”按时间顺序讲 + “越过白线最远 / 离白线最远”大白话；再做了动画（artifact「前视距离试驾场」，本地 `docs/a3_pure_pursuit_animation.html`），本人看动画后懂了，并问“为什么先左拐再右拐”（Ld 2：车头扭到 57°，压线时还斜 38° → 冲过 1.23 米）。本人自己总结“盯太远，拐弯时切得最多，所以离白线最多”。
+- 第 4 步：4 个测试（正前方 0、手算 15.64 / 7.97、跳过身后的点、快到终点用最后一点），26 passed，提交 `f38d787`。
+
+</details>
 
 <details><summary>A3 PID 进 CARLA 与防积分饱和（2026-10-14，家里电脑）</summary>
 
