@@ -4,7 +4,7 @@
 
 ## 现在在哪
 
-- **阶段 1 完成（2026-10-10）**。**A1 完成（2026-10-11）**。**A2 进行中（家里电脑）**：CARLA 已装好、Python 能连上；同步模式已掌握；自车能生成并直行（2026-10-12）。**2026-10-14 家里电脑**：打方向盘验证坐标转换（CARLA 往右拐 y、yaw 变大，换成我们的坐标变小）；手写 `sim/carla_client.py`（`CarlaSim`：with 进门开同步、出门删车还原，`spawn_ego`、`tick`），回归检查与旧脚本数字完全一致（highway-sim-eval `9249656`）。剩传感器录制 `sim/recorder.py`。**A3 进 CARLA（2026-10-14 家里电脑）**：`to_pedals`（PID 输出 → 油门 / 刹车）；PID 第一次在 CARLA 里控车速（kp 1.0、ki 0.2、目标 8 m/s）最高冲到 9.46、8 秒后还在 8.27 → 积分饱和；写好防积分饱和（`PID(u_max=...)`，22 passed），**还没在 CARLA 里跑**。README 重写为作品集样式（highway-sim-eval `b7db0ab`）。**A3 Pure Pursuit（2026-10-14 笔记本 = 公司电脑）**：手敲 `pure_pursuit_steer`、`find_lookahead_point`；`examples/a3_pure_pursuit.py` 对比 Ld 2 / 5 / 15 米：直道越过白线最远 1.23 / 0.27 / 0 米，拐弯离白线最远 0.08 / 0.16 / 1.13 米（盯近画龙、盯远切弯）；动画讲解 `docs/a3_pure_pursuit_animation.html`；4 个测试（highway-sim-eval `f38d787`，26 passed）。**A4 跟车开始（2026-10-15 笔记本）**：手写 `ads/planning.py` 的 `idm_accel`（想加的 − 怕撞的）；`examples/a4_follow.py` 前车急刹场景已建好，**循环还没敲**（highway-sim-eval `f7ae4e6`）。**2026-10-12 笔记本**：坐标转换 `sim/transforms.py` + 5 个测试完成（highway-sim-eval `a74089d`，11 passed）。**A3 进行中（2026-10-12 笔记本）**：PID 速度控制 `ads/control.py` + 上坡实验 `examples/a3_speed_pid.py` + 6 个测试完成（highway-sim-eval `8bc035b`，17 passed）。下一步：加速度上限与积分饱和，然后 Pure Pursuit。**阶段 2 = 作品项目 highway-sim-eval（2026-10-11 最终版）**：基于 CARLA 0.9.16 的智驾仿真评测与数据闭环平台。A 智驾基础打通 → B 评测与数据闭环平台（入行主力）→ C 多模态数据挖掘 + Agent → D 闭环学习（通往算法的桥）→ E 补短板（C++、ROS 2、Docker，穿插）。约 20–24 周，第 10 周左右开始边做边投。详见 [CURRENT_TASK](experiments/highway_driving/CURRENT_TASK.md)。
+- **阶段 1 完成（2026-10-10）**。**A1 完成（2026-10-11）**。**A2 进行中（家里电脑）**：CARLA 已装好、Python 能连上；同步模式已掌握；自车能生成并直行（2026-10-12）。**2026-10-14 家里电脑**：打方向盘验证坐标转换（CARLA 往右拐 y、yaw 变大，换成我们的坐标变小）；手写 `sim/carla_client.py`（`CarlaSim`：with 进门开同步、出门删车还原，`spawn_ego`、`tick`），回归检查与旧脚本数字完全一致（highway-sim-eval `9249656`）。剩传感器录制 `sim/recorder.py`。**A3 进 CARLA（2026-10-14 家里电脑）**：`to_pedals`（PID 输出 → 油门 / 刹车）；PID 第一次在 CARLA 里控车速（kp 1.0、ki 0.2、目标 8 m/s）最高冲到 9.46、8 秒后还在 8.27 → 积分饱和；写好防积分饱和（`PID(u_max=...)`，22 passed），**还没在 CARLA 里跑**。README 重写为作品集样式（highway-sim-eval `b7db0ab`）。**A3 Pure Pursuit（2026-10-14 笔记本 = 公司电脑）**：手敲 `pure_pursuit_steer`、`find_lookahead_point`；`examples/a3_pure_pursuit.py` 对比 Ld 2 / 5 / 15 米：直道越过白线最远 1.23 / 0.27 / 0 米，拐弯离白线最远 0.08 / 0.16 / 1.13 米（盯近画龙、盯远切弯）；动画讲解 `docs/a3_pure_pursuit_animation.html`；4 个测试（highway-sim-eval `f38d787`，26 passed）。**A4 跟车开始（2026-10-15 笔记本）**：手写 `ads/planning.py` 的 `idm_accel`（想加的 − 怕撞的）；`examples/a4_follow.py` 前车急刹场景：本人敲好循环，只看车距时最猛刹 −5.96、最小车距 4.46 米；给 IDM 加“看刹车灯”（接近速度项）后最猛 −3.69、最小车距 4.95 米，都没撞（highway-sim-eval `1679ded`）。**测试还没写**（本人说先不写）。**2026-10-12 笔记本**：坐标转换 `sim/transforms.py` + 5 个测试完成（highway-sim-eval `a74089d`，11 passed）。**A3 进行中（2026-10-12 笔记本）**：PID 速度控制 `ads/control.py` + 上坡实验 `examples/a3_speed_pid.py` + 6 个测试完成（highway-sim-eval `8bc035b`，17 passed）。下一步：加速度上限与积分饱和，然后 Pure Pursuit。**阶段 2 = 作品项目 highway-sim-eval（2026-10-11 最终版）**：基于 CARLA 0.9.16 的智驾仿真评测与数据闭环平台。A 智驾基础打通 → B 评测与数据闭环平台（入行主力）→ C 多模态数据挖掘 + Agent → D 闭环学习（通往算法的桥）→ E 补短板（C++、ROS 2、Docker，穿插）。约 20–24 周，第 10 周左右开始边做边投。详见 [CURRENT_TASK](experiments/highway_driving/CURRENT_TASK.md)。
 - 职业路径：社招 → 先进数据与仿真方向（仿真 / 评测平台、数据闭环）→ 以数据算法为跳板 → 1–2 年争取转算法工程师。
 - 阶段 1 能力判断：能凭记忆说出 `env.step` 主链、IDM 两项、MOBIL 两道检查、奖励只看快/靠右/不撞。依据：2026-10-10 收尾填空 6 题中 5 题正确，第 3 题漏了“生成 obs、算奖励”，已纠正。
 - 学习者要求（2026-10-11）：扎实、不虚浮；核心代码手写；先预测再看结果；解释和结论自己写。
@@ -21,8 +21,18 @@
    1. ✅ PID 速度控制（`ads/control.py`、`examples/a3_speed_pid.py`、`tests/test_control.py`）。
    2. 加速度上限（例如 [−6, 3] m/s²）→ 看积分饱和（kp 1.0、ki 0.2、上限 3 时最高冲到 12.76）→ 防积分饱和。
    3. ✅ Pure Pursuit 方向盘控制（2026-10-14）。回家放进 CARLA：车道中心线的点当 path，转角换成 CARLA 的 steer（−1 到 1），Ld 要重调（真车方向盘有延迟）。
-   4. 🚧 A4 跟车（2026-10-15 开始）：✅ 第 1 步 `idm_accel`。**下一步**：`examples/a4_follow.py` 第 31 行敲循环（量车距 → IDM 算加速度、最猛 −8 → 我走一步 → 前车第 5 秒起以 −5 刹车），**先预测**我最猛的刹车比前车的 −5 轻还是猛，再跑（参考答案：最小车距 4.46 米、最猛 −5.96、没撞：前车刹了 1 秒多我才真正刹）。第 3 步给 IDM 加“追得快就多留距离”（接近速度项，要加前车车速参数），对比刹得更早更轻；第 4 步写 `tests/test_planning.py`（2.0625、−0.1875）后提交。
+   4. 🚧 A4 跟车（2026-10-15）：✅ 第 1 步 `idm_accel`；✅ 第 2 步前车急刹场景；✅ 第 3 步接近速度项（`idm_accel(speed, lead_speed, gap, target, ..., comfort_brake_mps2=5)`）。**下一步**：① 写 `tests/test_planning.py`（助手 10-15 给过三条：(10,10,40,20) → 2.0625；(10,10,20,20) → −0.1875；同一时刻车速 10.08、距离 19.78、目标 15，前车 10.08 → −0.72、前车 5 → −3.09；预期 29 passed）；② 可选撞车实验：第 22 行 `LEAD_BRAKE_MPS2 = -8.0` + 第 35 行加 `, time_gap_s=0.5`，比较有无接近速度项；③ 回家：IDM 进 CARLA（前车距离用真值，IDM 出加速度 → PID / `to_pedals` 出踏板）。
 3. 笔记本只做纯 Python 部分；两台电脑用 git 同步（换电脑前先 `git pull`）。
+
+<details><summary>A4 跟车第 2–3 步：前车急刹、看刹车灯（2026-10-15，笔记本 = 公司电脑）</summary>
+
+- 本人先问文件目的（测前车急刹时的减速过程）、IDM 开的是谁（这里是自车，前车写死剧本）。敲循环时写错 `ego.e_m`（应为 `x_m`，AttributeError），占位注释没删；助手读文件、在本机跑后指出行号，本人自己改。本人提前把前车刹车改成 −8 想做撞车实验，助手让先改回 −5 跑基准。
+- 只看车距：前车第 5 秒在 22.8 米外开始刹，自车到 6.7 秒、15 米才真正刹（超过 −2），最猛 −5.96（比前车还猛，预测题答案 B，本人没预测），最小 4.46 米。本人问“提前多少米开始减速”，助手按时刻列表；本人自己总结“后车一直想加速到 15，距离变小后 fear 变大开始刹车”。助手补充：想加的反而越来越响（2.31 → 3.00），怕撞的要压过它。
+- 本人问 `desired_gap_m`、`fear` 两行：讲“想保持的距离 = 5 米 + 1.5 秒的路”和“(想要 ÷ 实际)² × 3，距离少一半害怕变 4 倍”，用第 7.7 秒的 8.92 核对。
+- 第 3 步“看刹车灯”：想保持的距离多加“车速 × 我比前车快多少 ÷ 7.75（= 2√(3×5)）”，`max(0, ...)` 防前车更快时减成负数。从下往上改行号不乱；检查 (10,10,40,20) 仍 = 2.0625。结果：6.1 秒、20 米开始刹，最猛 −3.69，最小 4.95 米。
+- 本人追问并自己说对：“平时保持一定距离，一旦前车刹车就把这个因素加进去，提前给反向加速度”；“多远开始刹”和“刹多猛”是两件事（助手：前者决定后者，需要的刹车 = 车速² ÷ (2 × 能用的距离)）；问“反向加速度是不是 PID”（不是：IDM 直接算加速度；进 CARLA 才需要 PID / `to_pedals` 把加速度变成踏板，规划 / 控制 / 车三层）；问加速度是什么、IDM 怎么算（每秒车速变多少；4 个输入 → 想加的、怕撞的 → 相减）。测试先不写，进度上交。
+
+</details>
 
 <details><summary>A4 跟车第 1 步：手写 IDM（2026-10-15，笔记本 = 公司电脑）</summary>
 
